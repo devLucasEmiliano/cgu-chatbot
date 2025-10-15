@@ -860,17 +860,22 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         request: { idTipoManifestacao: 5, idTipoFormulario: 1 },
       }
 
-      const chosen = tipoMap[formData.manifestationType || "request"] || tipoMap["request"]
-      const isAnonymous = formData.identificationType === "anonymous"
+  const chosen = tipoMap[formData.manifestationType || "request"] || tipoMap["request"]
+  const isAnonymous = formData.identificationType === "anonymous"
+  const isReport = (formData.manifestationType === "report")
+  // Regra: usar 1 para denúncia anônima; 4 para os demais casos
+  const idTipoIdentificacao = (isReport && isAnonymous) ? 1 : 4
 
       // Montar DTO mínimo para o backend com base no tipo escolhido
       const body = {
+  tipoChave: (typeof formData.manifestationType === "string" ? formData.manifestationType : undefined),
         idTipoFormulario: chosen.idTipoFormulario,
         idTipoManifestacao: chosen.idTipoManifestacao,
-        idTipoIdentificacaoManifestante: isAnonymous ? 3 : 1,
+  idTipoIdentificacaoManifestante: idTipoIdentificacao,
         textoUsuario: formData.description || "",
         linguagem: language,
         paisNaturalidade: formData.countryName || undefined,
+        numeroUnfccc: formData.unfcccNumber || null,
         manifestante: isAnonymous
           ? undefined
           : {
@@ -1176,7 +1181,12 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                 <Textarea
                   ref={textareaRef}
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  // Impede ultrapassar o limite permitido (ajustado pelo cabeçalho)
+                  maxLength={allowedBody}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    setInputValue(v.length > allowedBody ? v.slice(0, allowedBody) : v)
+                  }}
                   placeholder={translations.placeholder[language]}
                   className="min-h-[120px] resize-none focus:ring-2 focus:ring-primary/20 transition-smooth"
                   onKeyDown={(e) => {

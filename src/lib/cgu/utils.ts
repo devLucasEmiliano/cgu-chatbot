@@ -109,7 +109,35 @@ export function anexosToPayload(anexos: AnexoInput[] = []): AnexoPayload[] {
 }
 
 export function toCGUPayload(dto: ManifestacaoRequestDTO) {
-  const { idTipoFormulario, idTipoManifestacao } = dto;
+  // Mapeamento robusto com base em tipoChave (se fornecido) e variáveis de ambiente para override
+  const mapFromKey: Record<string, { tipo: number; form: number }> = {
+    report: { tipo: 1, form: 4 },
+    complaint: { tipo: 2, form: 1 },
+    compliment: { tipo: 3, form: 1 },
+    suggestion: { tipo: 4, form: 1 },
+    request: { tipo: 5, form: 1 },
+  };
+
+  const fromEnv = (name: string): number | undefined => {
+    const v = process.env[name];
+    if (!v) return undefined;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : undefined;
+  };
+
+  let idTipoManifestacao = dto.idTipoManifestacao;
+  let idTipoFormulario = dto.idTipoFormulario;
+
+  if (dto.tipoChave && mapFromKey[dto.tipoChave]) {
+    // Se o front mandou a chave, prioriza mapeamento estável e não sobrescreve por env
+    idTipoManifestacao = mapFromKey[dto.tipoChave].tipo;
+    idTipoFormulario = mapFromKey[dto.tipoChave].form;
+  } else {
+    // Sem chave explícita, permite override por ambiente
+    idTipoManifestacao = fromEnv("CGU_ID_TIPO_MANIFESTACAO") ?? idTipoManifestacao;
+    idTipoFormulario = fromEnv("CGU_ID_TIPO_FORMULARIO") ?? idTipoFormulario;
+  }
+
   const valid = validarParTipoFormulario(idTipoManifestacao, idTipoFormulario);
   if (!valid.valido) {
     throw new Error(valid.motivo || "Combinação de tipo/formulário inválida");
@@ -143,8 +171,8 @@ export function toCGUPayload(dto: ManifestacaoRequestDTO) {
   }
 
   const payload: ManifestacaoPayloadMinimo = {
-    IdTipoFormulario: dto.idTipoFormulario,
-    IdTipoManifestacao: dto.idTipoManifestacao,
+    IdTipoFormulario: idTipoFormulario,
+    IdTipoManifestacao: idTipoManifestacao,
     IdOuvidoriaDestino: efetivoIdOuvidoriaDestino,
     TextoManifestacao,
     Anexos: anexosToPayload(dto.anexos),

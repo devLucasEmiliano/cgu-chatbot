@@ -32,6 +32,11 @@ export interface ManifestacaoPayloadMinimo {
 
 // DTO de entrada no nosso endpoint interno (mais amigável ao front)
 export interface ManifestacaoRequestDTO {
+  /**
+   * Chave textual do tipo (ex.: 'report' | 'complaint' | 'compliment' | 'suggestion' | 'request').
+   * Usada para mapear com robustez no backend quando idTipoManifestacao/idTipoFormulario vierem inconsistentes do front.
+   */
+  tipoChave?: string;
   idTipoFormulario: number;
   idTipoManifestacao: number;
   /**

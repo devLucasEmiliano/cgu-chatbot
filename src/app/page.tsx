@@ -61,8 +61,9 @@ export default function Home() {
   }
 
   const handleRestart = () => {
-  setCurrentStep("language")
-  setSubmitResult(null)
+    // Volta direto para o chat, mantendo idioma já escolhido e termos aceitos
+    setSubmitResult(null)
+    setCurrentStep("chat")
   }
 
   // Mostrar loading enquanto carrega preferências
