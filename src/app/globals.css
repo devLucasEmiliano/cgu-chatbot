@@ -120,29 +120,30 @@
   }
 }
 
-/* Added custom animations for chatbot interface */
+/* Enhanced animations for chatbot interface */
 @layer utilities {
+  /* Message animations with smooth fade and slide */
   @keyframes message-slide-in {
     from {
       opacity: 0;
-      transform: translateY(12px);
+      transform: translateY(16px) scale(0.95);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
   }
 
-  @keyframes pulse-glow {
-    0%,
-    100% {
-      box-shadow: 0 0 0 0 oklch(0.55 0.15 170 / 0.4);
+  @keyframes message-fade-in {
+    from {
+      opacity: 0;
     }
-    50% {
-      box-shadow: 0 0 0 8px oklch(0.55 0.15 170 / 0);
+    to {
+      opacity: 1;
     }
   }
 
+  /* Typing indicator animation */
   @keyframes typing-dot {
     0%,
     60%,
@@ -151,21 +152,141 @@
       opacity: 0.7;
     }
     30% {
-      transform: translateY(-8px);
+      transform: translateY(-10px);
       opacity: 1;
     }
   }
 
-  .animate-message-in {
-    animation: message-slide-in 0.4s ease-out;
+  /* Button hover micro-interaction */
+  @keyframes button-press {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(0.96);
+    }
+    100% {
+      transform: scale(1);
+    }
   }
 
-  .animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
+  /* Pulse glow for important elements */
+  @keyframes pulse-glow {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 oklch(0.55 0.15 170 / 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 12px oklch(0.55 0.15 170 / 0);
+    }
+  }
+
+  /* Shimmer effect for loading states */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  /* Smooth entrance for cards and modals */
+  @keyframes modal-entrance {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Backdrop blur animation */
+  @keyframes backdrop-blur-in {
+    from {
+      backdrop-filter: blur(0px);
+      background-color: oklch(0 0 0 / 0);
+    }
+    to {
+      backdrop-filter: blur(8px);
+      background-color: oklch(0 0 0 / 0.5);
+    }
+  }
+
+  /* Float animation for decorative elements */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  /* Gentle shake for errors */
+  @keyframes gentle-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-8px);
+    }
+    75% {
+      transform: translateX(8px);
+    }
+  }
+
+  /* Apply animations */
+  .animate-message-in {
+    animation: message-slide-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .animate-message-fade {
+    animation: message-fade-in 0.4s ease-out;
   }
 
   .animate-typing-dot {
     animation: typing-dot 1.4s ease-in-out infinite;
+  }
+
+  .animate-button-press {
+    animation: button-press 0.2s ease-out;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2.5s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+    background: linear-gradient(
+      to right,
+      oklch(0.96 0.01 160) 0%,
+      oklch(0.98 0.01 160) 20%,
+      oklch(0.96 0.01 160) 40%,
+      oklch(0.96 0.01 160) 100%
+    );
+    background-size: 1000px 100%;
+  }
+
+  .animate-modal-entrance {
+    animation: modal-entrance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .animate-backdrop-blur {
+    animation: backdrop-blur-in 0.3s ease-out;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-gentle-shake {
+    animation: gentle-shake 0.4s ease-in-out;
   }
 
   /* Smooth scroll behavior for chat */
@@ -175,7 +296,7 @@
 
   /* Custom scrollbar for chat area */
   .chat-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
 
   .chat-scrollbar::-webkit-scrollbar-track {
@@ -183,11 +304,31 @@
   }
 
   .chat-scrollbar::-webkit-scrollbar-thumb {
-    background: oklch(0.5 0.02 160 / 0.3);
-    border-radius: 3px;
+    background: oklch(0.5 0.02 160 / 0.2);
+    border-radius: 4px;
+    transition: background 0.2s ease;
   }
 
   .chat-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.5 0.02 160 / 0.5);
+    background: oklch(0.5 0.02 160 / 0.4);
+  }
+
+  /* Transition utilities for smooth interactions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-bounce {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Hover effects for interactive elements */
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px oklch(0 0 0 / 0.1);
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px oklch(0.55 0.15 170 / 0.3);
   }
 }

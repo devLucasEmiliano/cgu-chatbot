@@ -123,23 +123,41 @@ export function TermsModal({ language, isOpen, onAccept, onClose }: TermsModalPr
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-card border shadow-2xl rounded-lg w-full max-w-3xl max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-300">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-2xl font-bold">{translations.title[language]}</h2>
-          <Button variant="ghost" size="icon" onClick={onClose} className="hover:bg-muted">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-4 animate-backdrop-blur">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-background/90 backdrop-blur-md"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Modal container - responsive sizing */}
+      <div className="relative bg-card border shadow-2xl rounded-2xl w-full max-w-[95vw] md:max-w-3xl lg:max-w-4xl h-[90vh] md:h-[85vh] flex flex-col animate-modal-entrance">
+        {/* Header - sticky */}
+        <div className="flex items-center justify-between p-4 md:p-6 border-b bg-card/95 backdrop-blur-sm rounded-t-2xl shrink-0">
+          <h2 className="text-xl md:text-2xl font-bold text-balance">{translations.title[language]}</h2>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose} 
+            className="hover:bg-muted transition-smooth hover:scale-110 shrink-0"
+            aria-label={translations.close[language]}
+          >
             <X className="w-5 h-5" />
           </Button>
         </div>
 
-        {/* Content with scroll */}
-        <ScrollArea className="flex-1 p-6">
+        {/* Content with scroll - flexible height */}
+        <ScrollArea className="flex-1 p-4 md:p-6 overflow-y-auto chat-scrollbar">
           <div className="prose prose-sm max-w-none text-foreground">
             {translations.content[language].split("\n\n").map((paragraph, i) => {
               const parts = parseLinks(paragraph)
               return (
-                <p key={i} className="mb-4 leading-relaxed">
+                <p 
+                  key={i} 
+                  className="mb-4 leading-relaxed text-sm md:text-base animate-in fade-in slide-in-from-bottom-2 duration-500"
+                  style={{ animationDelay: `${i * 50}ms` }}
+                >
                   {parts.map((part, j) =>
                     typeof part === "string" ? (
                       <span key={j}>{part}</span>
@@ -149,7 +167,7 @@ export function TermsModal({ language, isOpen, onAccept, onClose }: TermsModalPr
                         href={part.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary hover:text-primary/80 underline decoration-primary/30 hover:decoration-primary transition-all duration-200"
+                        className="text-primary hover:text-primary/80 underline decoration-primary/30 hover:decoration-primary transition-smooth font-medium"
                       >
                         {part.text}
                       </a>
@@ -161,25 +179,38 @@ export function TermsModal({ language, isOpen, onAccept, onClose }: TermsModalPr
           </div>
         </ScrollArea>
 
-        {/* Footer */}
-        <div className="p-6 border-t space-y-4">
-          <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+        {/* Footer - sticky, always visible */}
+        <div className="p-4 md:p-6 border-t bg-card/95 backdrop-blur-sm space-y-3 md:space-y-4 rounded-b-2xl shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <div className="flex items-start gap-3 p-3 md:p-4 rounded-xl bg-muted/50 border border-border/50 transition-smooth hover:bg-muted/70">
             <Checkbox
               id="terms-modal"
               checked={accepted}
               onCheckedChange={(checked) => setAccepted(checked as boolean)}
-              className="mt-1"
+              className="mt-0.5 md:mt-1 transition-smooth"
             />
-            <label htmlFor="terms-modal" className="text-sm font-medium leading-relaxed cursor-pointer">
+            <label 
+              htmlFor="terms-modal" 
+              className="text-xs md:text-sm font-medium leading-relaxed cursor-pointer select-none"
+            >
               {translations.checkboxLabel[language]}
             </label>
           </div>
 
-          <div className="flex gap-2">
-            <Button onClick={onClose} variant="outline" className="flex-1">
+          <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
+            <Button 
+              onClick={onClose} 
+              variant="outline" 
+              className="flex-1 transition-smooth hover:scale-[1.02] active:scale-[0.98]"
+              size="lg"
+            >
               {translations.close[language]}
             </Button>
-            <Button onClick={onAccept} disabled={!accepted} className="flex-1">
+            <Button 
+              onClick={onAccept} 
+              disabled={!accepted} 
+              className="flex-1 transition-smooth hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              size="lg"
+            >
               {translations.accept[language]}
             </Button>
           </div>

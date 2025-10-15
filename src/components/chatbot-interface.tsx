@@ -91,8 +91,12 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
   const [isLangOpen, setIsLangOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   // Evita executar mensagens iniciais duas vezes em modo Strict (Next.js/React dev)
   const hasInitializedRef = useRef(false)
+  // Track asked questions to prevent duplicates
+  const askedQuestionsRef = useRef<Set<string>>(new Set())
 
   // const currentLang = languages.find((lang) => lang.code === language)
 
@@ -102,6 +106,16 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
 
   useEffect(() => {
     scrollToBottom()
+  }, [messages])
+
+  // Auto-focus input when it appears
+  useEffect(() => {
+    const currentMessage = messages[messages.length - 1]
+    if (currentMessage?.inputType === "textarea" && textareaRef.current) {
+      textareaRef.current.focus()
+    } else if (currentMessage?.inputType && inputRef.current) {
+      inputRef.current.focus()
+    }
   }, [messages])
 
   useEffect(() => {
@@ -161,6 +175,13 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
     inputType?: "text" | "textarea" | "email" | "file",
     variant: "default" | "info" = "default",
   ) => {
+    // Prevent duplicate messages
+    const messageKey = `${content}-${currentStep}`
+    if (askedQuestionsRef.current.has(messageKey)) {
+      return
+    }
+    askedQuestionsRef.current.add(messageKey)
+
     setIsTyping(true)
 
     setTimeout(() => {
@@ -732,61 +753,63 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Elementos decorativos de palmeiras */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
+      <div className="absolute inset-0 opacity-[0.08] pointer-events-none">
         <Image
           src="/plant-1.svg"
           alt=""
           width={200}
           height={280}
-          className="absolute bottom-0 left-0"
+          className="absolute bottom-0 left-0 animate-float"
+          style={{ animationDelay: "0s" }}
         />
         <Image
           src="/plant-1.svg"
           alt=""
           width={180}
           height={250}
-          className="absolute bottom-0 right-0 scale-x-[-1]"
+          className="absolute bottom-0 right-0 scale-x-[-1] animate-float"
+          style={{ animationDelay: "1.5s" }}
         />
       </div>
 
-      <header className="bg-gradient-to-r from-emerald-900 via-teal-800 to-emerald-900 text-white shadow-md animate-in fade-in slide-in-from-top-4 duration-700 relative z-10">
-        <div className="container max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between gap-6">
-            <div className="flex items-center gap-5 min-w-0">
+      <header className="bg-gradient-to-r from-emerald-900 via-teal-800 to-emerald-900 text-white shadow-lg animate-in fade-in slide-in-from-top-4 duration-700 relative z-10 border-b-4 border-emerald-700/50">
+        <div className="container max-w-6xl mx-auto px-4 py-5 md:py-6">
+          <div className="flex items-center justify-between gap-4 md:gap-6">
+            <div className="flex items-center gap-3 md:gap-5 min-w-0">
               {/* Logo COP30 */}
-              <div className="w-28 h-16 flex items-center justify-center shrink-0">
+              <div className="w-24 md:w-28 h-14 md:h-16 flex items-center justify-center shrink-0 animate-in zoom-in duration-500" style={{ animationDelay: "300ms" }}>
                 <Image
                   src="/cop30logo.svg"
                   alt="COP30 Logo"
                   width={120}
                   height={64}
-                  className="object-contain"
+                  className="object-contain hover:scale-105 transition-smooth"
                 />
               </div>
-              <div className="min-w-0">
-                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight whitespace-pre-wrap">{translations.header[language]}</h1>
-                <p className="text-sm md:text-base opacity-90">
+              <div className="min-w-0 animate-in fade-in slide-in-from-left-4 duration-700" style={{ animationDelay: "500ms" }}>
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight whitespace-pre-wrap">{translations.header[language]}</h1>
+                <p className="text-xs md:text-sm lg:text-base opacity-90 mt-0.5">
                   {translations.subtitle[language]}
                 </p>
               </div>
             </div>
 
-            {/* Language selector styled like screenshot */}
+            {/* Language selector */}
             <DropdownMenu open={isLangOpen} onOpenChange={setIsLangOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full border-white/30 bg-white/10 text-white hover:bg-white/20 hover:scale-[1.02] transition-all duration-200 px-4"
+                  className="rounded-full border-white/40 bg-white/15 text-white hover:bg-white/25 hover:scale-105 transition-smooth px-3 md:px-4 shadow-lg backdrop-blur-sm shrink-0 animate-in fade-in zoom-in duration-500"
+                  style={{ animationDelay: "700ms" }}
                 >
-                  <Globe className="w-4 h-4 mr-2" />
-                  {/* Country and language abbreviation per current language */}
-                  <span className="font-medium tracking-wide">
+                  <Globe className="w-4 h-4 mr-1.5 md:mr-2" />
+                  <span className="font-medium tracking-wide text-xs md:text-sm">
                     {language === "pt-BR" ? "pt-BR" : language === "en" ? "en-US" : "es-ES"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuContent align="end" className="w-52 animate-in fade-in slide-in-from-top-2 duration-200">
                 {languages.map((lang) => (
                   <DropdownMenuItem
                     key={lang.code}
@@ -794,7 +817,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                       onLanguageChange(lang.code)
                       setIsLangOpen(false)
                     }}
-                    className={`${language === lang.code ? "bg-teal-50 text-teal-900" : ""} gap-3 cursor-pointer`}
+                    className={`${language === lang.code ? "bg-teal-50 text-teal-900 font-medium" : "hover:bg-muted"} gap-3 cursor-pointer transition-smooth`}
                   >
                     <span className="text-lg">{lang.flag}</span>
                     <span>{lang.name}</span>
@@ -806,35 +829,38 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         </div>
       </header>
 
-      <div className="container max-w-4xl mx-auto px-4 py-6 relative z-10">
+      <div className="container max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-6 relative z-10">
         <Card
-          className="shadow-2xl mb-4 animate-in fade-in zoom-in-95 duration-700"
+          className="shadow-2xl mb-4 animate-in fade-in zoom-in-95 duration-700 border-2 hover:shadow-3xl transition-smooth rounded-2xl overflow-hidden"
           style={{ animationDelay: "200ms" }}
         >
-          <ScrollArea className="h-[60vh] md:h-[65vh] p-4 md:p-6">
+          <ScrollArea className="h-[60vh] md:h-[65vh] p-4 md:p-6 chat-scrollbar">
             <div className="space-y-4">
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex gap-3 animate-in fade-in slide-in-from-bottom-4 duration-500 ${
+                className={`flex gap-3 animate-message-in ${
                   message.type === "user" ? "flex-row-reverse" : "flex-row"
                 }`}
-                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <Avatar className={`${message.type === "bot" ? "bg-primary" : "bg-muted"} transition-all duration-300`}>
-                  <AvatarFallback className={message.type === "bot" ? "text-primary-foreground" : ""}>
+                <Avatar className={`${
+                  message.type === "bot" 
+                    ? "bg-gradient-to-br from-primary to-primary/80 shadow-md" 
+                    : "bg-gradient-to-br from-muted to-muted/80"
+                } transition-smooth shrink-0`}>
+                  <AvatarFallback className={message.type === "bot" ? "text-primary-foreground text-lg" : "text-lg"}>
                     {message.type === "bot" ? "🤖" : "👤"}
                   </AvatarFallback>
                 </Avatar>
 
                 <div className={`flex-1 max-w-[78%] md:max-w-[70%] ${message.type === "user" ? "items-end" : "items-start"}`}>
                   <div
-                    className={`rounded-2xl px-4 py-3 transition-all duration-300 hover:shadow-md ${
+                    className={`rounded-2xl px-4 py-3 transition-smooth hover:shadow-lg ${
                       message.type === "user"
-                        ? "bg-primary text-primary-foreground"
+                        ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-md"
                         : message.variant === "info"
-                          ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
-                          : "bg-muted text-foreground"
+                          ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 text-emerald-900 border-2 border-emerald-200/50 shadow-sm"
+                          : "bg-gradient-to-br from-muted to-muted/80 text-foreground border border-border/50"
                     }`}
                   >
                     <p className="text-sm leading-relaxed whitespace-pre-line">{message.content}</p>
@@ -842,13 +868,14 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
 
                   {message.buttons && (
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {message.buttons.map((button) => (
+                      {message.buttons.map((button, btnIndex) => (
                         <Button
                           key={button.value}
                           onClick={() => handleButtonClick(button.value, button.label)}
                           variant={button.variant || "outline"}
                           size="sm"
-                          className="rounded-full transition-all duration-300 hover:scale-105"
+                          className="rounded-full transition-smooth hover:scale-105 active:scale-95 shadow-sm hover:shadow-md animate-in fade-in slide-in-from-bottom-2 duration-300"
+                          style={{ animationDelay: `${btnIndex * 100}ms` }}
                         >
                           {button.label}
                         </Button>
@@ -856,7 +883,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                     </div>
                   )}
 
-                  <p className="text-xs text-muted-foreground mt-1 px-2">
+                  <p className="text-xs text-muted-foreground mt-1.5 px-2 opacity-70">
                     {message.timestamp.toLocaleTimeString(language, {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -868,22 +895,22 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
 
             {isTyping && (
               <div className="flex gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <Avatar className="bg-primary">
-                  <AvatarFallback className="text-primary-foreground">🤖</AvatarFallback>
+                <Avatar className="bg-gradient-to-br from-primary to-primary/80 shadow-md">
+                  <AvatarFallback className="text-primary-foreground text-lg">🤖</AvatarFallback>
                 </Avatar>
-                <div className="bg-muted rounded-2xl px-4 py-3">
-                  <div className="flex gap-1">
+                <div className="bg-muted rounded-2xl px-5 py-4 shadow-sm border border-border/50">
+                  <div className="flex gap-1.5">
                     <div
-                      className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
+                      className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
                       style={{ animationDelay: "0ms" }}
                     />
                     <div
-                      className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                      style={{ animationDelay: "150ms" }}
+                      className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
+                      style={{ animationDelay: "200ms" }}
                     />
                     <div
-                      className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                      style={{ animationDelay: "300ms" }}
+                      className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
+                      style={{ animationDelay: "400ms" }}
                     />
                   </div>
                 </div>
@@ -896,33 +923,44 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         </Card>
 
         {showInput && (
-          <Card className="p-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <Card className="p-4 shadow-xl border-2 animate-in fade-in slide-in-from-bottom-4 duration-300 hover:shadow-2xl transition-smooth">
             {currentMessage.inputType === "textarea" ? (
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 space-y-3">
                 <Textarea
+                  ref={textareaRef}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={translations.placeholder[language]}
-                  className="min-h-[100px] resize-none"
+                  className="min-h-[120px] resize-none focus:ring-2 focus:ring-primary/20 transition-smooth"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && e.ctrlKey) {
                       handleInputSubmit()
                     }
                   }}
                 />
-                <Button onClick={handleInputSubmit} className="w-full gap-2" disabled={!inputValue.trim()}>
-                  <Send className="w-4 h-4" />
-                  {translations.send[language]}
-                </Button>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    {language === "pt-BR" ? "Pressione Ctrl+Enter para enviar" : language === "en" ? "Press Ctrl+Enter to send" : "Presione Ctrl+Enter para enviar"}
+                  </p>
+                  <Button 
+                    onClick={handleInputSubmit} 
+                    className="gap-2 shadow-md hover:shadow-lg transition-smooth hover:scale-105 active:scale-95" 
+                    disabled={!inputValue.trim()}
+                  >
+                    <Send className="w-4 h-4" />
+                    {translations.send[language]}
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="flex gap-2">
                 <Input
+                  ref={inputRef}
                   type={currentMessage.inputType === "email" ? "email" : "text"}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={translations.placeholder[language]}
-                  className="flex-1"
+                  className="flex-1 focus:ring-2 focus:ring-primary/20 transition-smooth"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       handleInputSubmit()
@@ -933,7 +971,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                   onClick={handleInputSubmit}
                   size="icon"
                   disabled={!inputValue.trim()}
-                  className="transition-all duration-300 hover:scale-105"
+                  className="transition-smooth hover:scale-110 active:scale-95 shadow-md hover:shadow-lg shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </Button>

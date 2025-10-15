@@ -4,6 +4,7 @@ import { Button } from "@/src/components/ui/button"
 import { Card } from "@/src/components/ui/card"
 import { CheckCircle2, Download, Home } from "lucide-react"
 import type { Language } from "@/src/app/page"
+import Image from "next/image"
 
 interface ConfirmationScreenProps {
   language: Language
@@ -86,56 +87,102 @@ Status: Registered
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-primary/5 to-background">
-      <Card className="w-full max-w-2xl p-8 md:p-12 shadow-2xl">
-        <div className="flex flex-col items-center text-center space-y-6">
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-            <CheckCircle2 className="w-12 h-12 text-primary" />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-primary/10 to-background relative overflow-hidden">
+      {/* Animated palm tree decorations */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <Image
+          src="/plant-1.svg"
+          alt=""
+          width={250}
+          height={350}
+          className="absolute bottom-0 left-0 animate-float"
+          style={{ animationDelay: "0s" }}
+        />
+        <Image
+          src="/plant-1.svg"
+          alt=""
+          width={230}
+          height={330}
+          className="absolute bottom-0 right-0 scale-x-[-1] animate-float"
+          style={{ animationDelay: "1.5s" }}
+        />
+      </div>
+
+      <Card className="w-full max-w-2xl p-6 md:p-10 lg:p-12 shadow-2xl animate-modal-entrance relative z-10 border-2 rounded-2xl">
+        <div className="flex flex-col items-center text-center space-y-5 md:space-y-6">
+          {/* Success icon with pulse */}
+          <div 
+            className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center animate-pulse-glow animate-in zoom-in duration-500"
+            style={{ animationDelay: "200ms" }}
+          >
+            <CheckCircle2 className="w-12 h-12 md:w-14 md:h-14 text-primary" />
           </div>
 
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-balance">{translations.title[language]}</h1>
-            <p className="text-muted-foreground text-balance">{translations.subtitle[language]}</p>
+          {/* Title and subtitle */}
+          <div className="space-y-2 animate-in fade-in slide-in-from-top-4 duration-500" style={{ animationDelay: "300ms" }}>
+            <h1 className="text-2xl md:text-3xl font-bold text-balance">{translations.title[language]}</h1>
+            <p className="text-sm md:text-base text-muted-foreground text-balance px-2">{translations.subtitle[language]}</p>
           </div>
 
-          <Card className="w-full p-6 bg-primary/5 border-primary/20">
+          {/* Protocol card with gradient */}
+          <Card 
+            className="w-full p-5 md:p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/30 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 hover:shadow-xl transition-smooth"
+            style={{ animationDelay: "400ms" }}
+          >
             <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">{translations.protocolLabel[language]}</p>
-              <p className="text-3xl font-bold font-mono tracking-wider text-primary">{protocol}</p>
+              <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wide">{translations.protocolLabel[language]}</p>
+              <p className="text-2xl md:text-3xl font-bold font-mono tracking-wider text-primary">{protocol}</p>
               <p className="text-xs text-muted-foreground">{translations.protocolInfo[language]}</p>
             </div>
           </Card>
 
-          <div className="w-full text-left space-y-4 pt-4">
-            <h2 className="font-semibold text-lg">{translations.nextSteps[language]}</h2>
+          {/* Next steps */}
+          <div 
+            className="w-full text-left space-y-4 pt-2 md:pt-4 animate-in fade-in slide-in-from-bottom-4 duration-500"
+            style={{ animationDelay: "500ms" }}
+          >
+            <h2 className="font-semibold text-base md:text-lg">{translations.nextSteps[language]}</h2>
             <div className="space-y-3">
-              <div className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="flex gap-3 animate-in fade-in slide-in-from-left-2 duration-500" style={{ animationDelay: "600ms" }}>
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
                   <span className="text-xs font-bold text-primary">1</span>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{translations.step1[language]}</p>
+                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{translations.step1[language]}</p>
               </div>
-              <div className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="flex gap-3 animate-in fade-in slide-in-from-left-2 duration-500" style={{ animationDelay: "700ms" }}>
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
                   <span className="text-xs font-bold text-primary">2</span>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{translations.step2[language]}</p>
+                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{translations.step2[language]}</p>
               </div>
-              <div className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="flex gap-3 animate-in fade-in slide-in-from-left-2 duration-500" style={{ animationDelay: "800ms" }}>
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
                   <span className="text-xs font-bold text-primary">3</span>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{translations.step3[language]}</p>
+                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{translations.step3[language]}</p>
               </div>
             </div>
           </div>
 
-          <div className="w-full flex flex-col sm:flex-row gap-3 pt-4">
-            <Button onClick={handleDownload} variant="outline" className="flex-1 gap-2 bg-transparent" size="lg">
+          {/* Action buttons */}
+          <div 
+            className="w-full flex flex-col sm:flex-row gap-3 pt-2 md:pt-4 animate-in fade-in slide-in-from-bottom-4 duration-500"
+            style={{ animationDelay: "900ms" }}
+          >
+            <Button 
+              onClick={handleDownload} 
+              variant="outline" 
+              className="flex-1 gap-2 bg-transparent transition-smooth hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg border-2" 
+              size="lg"
+            >
               <Download className="w-4 h-4" />
               {translations.download[language]}
             </Button>
-            <Button onClick={onRestart} className="flex-1 gap-2" size="lg">
+            <Button 
+              onClick={onRestart} 
+              className="flex-1 gap-2 transition-smooth hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl" 
+              size="lg"
+            >
               <Home className="w-4 h-4" />
               {translations.newRequest[language]}
             </Button>

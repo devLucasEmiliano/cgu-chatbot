@@ -138,23 +138,39 @@ export function TermsAcceptance({ language, onAccept, onBack, onLanguageChange }
   const currentLang = languages.find((lang) => lang.code === language)
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm z-50">
-      <div className="absolute inset-0 opacity-15 pointer-events-none">
+    <div className="fixed inset-0 flex items-center justify-center p-3 md:p-4 bg-gradient-to-br from-background via-primary/5 to-background overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
         <Image
-          src="plant-1.svg"
+          src="/plant-1.svg"
           alt=""
           width={250}
           height={350}
-          className="absolute bottom-0 left-0 animate-in fade-in slide-in-from-bottom-8 duration-1000"
+          className="absolute bottom-0 left-0 animate-float"
+          style={{ animationDelay: "0s" }}
+        />
+        <Image
+          src="/plant-1.svg"
+          alt=""
+          width={200}
+          height={300}
+          className="absolute bottom-0 right-0 scale-x-[-1] animate-float"
+          style={{ animationDelay: "1s" }}
         />
       </div>
 
-      <Card className="w-full max-w-4xl max-h-[90vh] shadow-2xl animate-in fade-in zoom-in-95 duration-700 relative z-10 flex flex-col overflow-hidden">
-        <div className="p-6 md:p-8 flex flex-col max-h-[90vh]">
-          <div className="flex items-center justify-between mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
-            <Button variant="ghost" size="sm" onClick={onBack} className="gap-2 hover:scale-105 transition-all">
+      <Card className="w-full max-w-[95vw] md:max-w-3xl lg:max-w-4xl max-h-[92vh] shadow-2xl animate-modal-entrance relative z-10 flex flex-col overflow-hidden rounded-2xl">
+        <div className="p-4 md:p-6 lg:p-8 flex flex-col max-h-[92vh]">
+          {/* Header with back button and language selector */}
+          <div className="flex items-center justify-between mb-4 md:mb-6 animate-in fade-in slide-in-from-top-4 duration-500 shrink-0">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onBack} 
+              className="gap-2 transition-smooth hover:scale-105 hover-lift"
+            >
               <ArrowLeft className="w-4 h-4" />
-              {translations.back[language]}
+              <span className="hidden sm:inline">{translations.back[language]}</span>
             </Button>
 
             {onLanguageChange && (
@@ -163,10 +179,10 @@ export function TermsAcceptance({ language, onAccept, onBack, onLanguageChange }
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2 hover:scale-105 transition-all duration-300 border-2 bg-transparent"
+                    className="gap-2 transition-smooth hover:scale-105 border-2 bg-transparent hover-glow"
                   >
                     <Globe className="w-4 h-4 text-primary" />
-                    <span className="font-medium">{currentLang?.code.split("-")[0].toUpperCase()}</span>
+                    <span className="font-medium text-xs md:text-sm">{currentLang?.code.split("-")[0].toUpperCase()}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -177,12 +193,12 @@ export function TermsAcceptance({ language, onAccept, onBack, onLanguageChange }
                         onLanguageChange(lang.code)
                         setIsLangOpen(false)
                       }}
-                      className={`gap-3 cursor-pointer transition-all duration-200 ${
-                        language === lang.code ? "bg-primary/10 font-medium" : ""
+                      className={`gap-3 cursor-pointer transition-smooth ${
+                        language === lang.code ? "bg-primary/10 font-medium" : "hover:bg-muted"
                       }`}
                     >
                       <span className="text-lg">{lang.flag}</span>
-                      <span>{lang.name}</span>
+                      <span className="text-sm">{lang.name}</span>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -190,27 +206,29 @@ export function TermsAcceptance({ language, onAccept, onBack, onLanguageChange }
             )}
           </div>
 
+          {/* Title and subtitle */}
           <div
-            className="text-center mb-6 animate-in fade-in slide-in-from-top-4 duration-500"
+            className="text-center mb-4 md:mb-6 animate-in fade-in slide-in-from-top-4 duration-500 shrink-0"
             style={{ animationDelay: "200ms" }}
           >
-            <h1 className="text-3xl font-bold mb-3 text-balance">{translations.title[language]}</h1>
-            <p className="text-muted-foreground text-balance">{translations.subtitle[language]}</p>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2 md:mb-3 text-balance">{translations.title[language]}</h1>
+            <p className="text-xs md:text-sm text-muted-foreground text-balance px-2">{translations.subtitle[language]}</p>
           </div>
 
-          <div className="flex-1 overflow-hidden mb-6">
+          {/* Scrollable content area */}
+          <div className="flex-1 overflow-hidden mb-4 md:mb-6 min-h-0">
             <ScrollArea
-              className="h-full rounded-lg border bg-muted/30 p-6 animate-in fade-in slide-in-from-bottom-4 duration-500"
+              className="h-full rounded-xl border-2 bg-muted/30 p-4 md:p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 chat-scrollbar"
               style={{ animationDelay: "400ms" }}
             >
-              <div className="prose prose-sm max-w-none text-foreground pr-4">
+              <div className="prose prose-sm max-w-none text-foreground pr-2">
                 {translations.content[language].split("\n\n").map((paragraph, i) => {
                   const parts = parseLinks(paragraph)
                   return (
                     <p
                       key={i}
-                      className="mb-4 leading-relaxed animate-in fade-in slide-in-from-left-2 duration-500"
-                      style={{ animationDelay: `${600 + i * 100}ms` }}
+                      className="mb-3 md:mb-4 leading-relaxed text-xs md:text-sm animate-in fade-in slide-in-from-left-2 duration-500"
+                      style={{ animationDelay: `${600 + i * 50}ms` }}
                     >
                       {parts.map((part, j) =>
                         typeof part === "string" ? (
@@ -221,7 +239,7 @@ export function TermsAcceptance({ language, onAccept, onBack, onLanguageChange }
                             href={part.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary hover:text-primary/80 underline decoration-primary/30 hover:decoration-primary transition-all duration-200"
+                            className="text-primary hover:text-primary/80 underline decoration-primary/30 hover:decoration-primary transition-smooth font-medium"
                           >
                             {part.text}
                           </a>
@@ -234,25 +252,27 @@ export function TermsAcceptance({ language, onAccept, onBack, onLanguageChange }
             </ScrollArea>
           </div>
 
+          {/* Checkbox section */}
           <div
-            className="flex items-start gap-3 mb-6 p-4 rounded-lg bg-muted/50 animate-in fade-in slide-in-from-bottom-4 duration-500"
+            className="flex items-start gap-3 mb-4 md:mb-6 p-3 md:p-4 rounded-xl bg-muted/50 border-2 border-border/50 animate-in fade-in slide-in-from-bottom-4 duration-500 transition-smooth hover:bg-muted/70 hover:border-primary/20 shrink-0"
             style={{ animationDelay: "500ms" }}
           >
             <Checkbox
               id="terms"
               checked={accepted}
               onCheckedChange={(checked) => setAccepted(checked as boolean)}
-              className="mt-1"
+              className="mt-0.5 md:mt-1 transition-smooth"
             />
-            <label htmlFor="terms" className="text-sm font-medium leading-relaxed cursor-pointer">
+            <label htmlFor="terms" className="text-xs md:text-sm font-medium leading-relaxed cursor-pointer select-none">
               {translations.checkboxLabel[language]}
             </label>
           </div>
 
+          {/* Action button */}
           <Button
             onClick={onAccept}
             disabled={!accepted}
-            className="w-full h-12 text-base font-medium animate-in fade-in slide-in-from-bottom-4 duration-500 hover:scale-105 transition-all"
+            className="w-full h-11 md:h-12 text-sm md:text-base font-medium animate-in fade-in slide-in-from-bottom-4 duration-500 transition-smooth hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl shrink-0"
             style={{ animationDelay: "600ms" }}
             size="lg"
           >
