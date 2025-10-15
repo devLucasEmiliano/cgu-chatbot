@@ -41,9 +41,9 @@ interface Message {
 
 const translations = {
   header: {
-    "pt-BR": "Registro de Solicitação",
-    en: "Request Registration",
-    es: "Registro de Solicitud",
+    "pt-BR": "Registro de Manifestação",
+    en: "Manifestation Registration",
+    es: "Registro de Manifestación",
   },
   subtitle: {
     "pt-BR": "Controladoria-Geral da União • Governo Federal do Brasil",
@@ -144,7 +144,7 @@ export function ChatbotInterface({
   };
 
   // Limite de caracteres: replicar cabeçalho do backend para calcular espaço restante
-  const MAX_CHARS = 8000;
+  const MAX_CHARS = 7500;
   const computeHeaderLen = () => {
     const linha1 = "Manifestação recebida no âmbito da COP30.";
     const pais = formData.countryName || "Não Informado";
@@ -1145,7 +1145,7 @@ export function ChatbotInterface({
         />
       </div>
 
-      <header className="bg-gradient-to-r from-emerald-900 via-teal-800 to-emerald-900 text-white shadow-lg relative z-10 border-b-4 border-emerald-700/50">
+      <header className="bg-gradient-to-r from-teal-700 via-emerald-600 to-teal-600 text-white shadow-lg relative z-10 border-b-4 border-emerald-700/50">
         <div className="container max-w-6xl mx-auto px-4 py-5 md:py-6">
           <div className="flex items-center justify-between gap-4 md:gap-6">
             <div className="flex items-center gap-3 md:gap-5 min-w-0">
@@ -1175,7 +1175,7 @@ export function ChatbotInterface({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full border-white/40 bg-white/15 text-white hover:bg-white/25 transition-all duration-200 px-3 md:px-4 shadow-lg backdrop-blur-sm shrink-0"
+                  className="rounded-full border-white/50 bg-white/20 text-white hover:bg-white/30 hover:text-white transition-all duration-200 px-3 md:px-4 shadow-lg backdrop-blur-sm shrink-0 font-semibold"
                 >
                   <Globe className="w-4 h-4 mr-1.5 md:mr-2" />
                   <span className="font-medium tracking-wide text-xs md:text-sm">
@@ -1244,12 +1244,12 @@ export function ChatbotInterface({
                   </Avatar>
 
                   <div
-                    className={`flex-1 max-w-[78%] md:max-w-[70%] ${
+                    className={`flex-1 max-w-[85%] md:max-w-[75%] ${
                       message.type === "user" ? "items-end" : "items-start"
                     }`}
                   >
                     <div
-                      className={`rounded-2xl px-4 py-3 transition-all duration-200 ${
+                      className={`rounded-2xl px-4 py-3 transition-all duration-200 break-words overflow-wrap-anywhere ${
                         message.type === "user"
                           ? "bg-teal-500 text-white shadow-md"
                           : message.variant === "info"
@@ -1257,7 +1257,7 @@ export function ChatbotInterface({
                           : "bg-gray-100 text-gray-900 shadow-sm"
                       }`}
                     >
-                      <p className="text-sm leading-relaxed whitespace-pre-line">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                         {message.content}
                       </p>
                     </div>
@@ -1272,12 +1272,12 @@ export function ChatbotInterface({
                             }
                             variant={button.variant || "outline"}
                             size="sm"
-                            className={`rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md animate-in fade-in border-2 ${
+                            className={`rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg animate-in fade-in border-2 font-semibold ${
                               button.variant === "default"
-                                ? "bg-teal-500 hover:bg-teal-600 text-white border-teal-500"
+                                ? "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-emerald-200 hover:text-white"
                                 : button.variant === "secondary"
-                                ? "bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-200"
-                                : "bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-200"
+                                ? "bg-amber-600 hover:bg-amber-700 text-white border-amber-600 shadow-amber-200 hover:text-white"
+                                : "bg-white hover:bg-teal-600 text-teal-700 border-teal-500 hover:border-teal-600 shadow-teal-100 hover:text-white"
                             }`}
                             style={{
                               animationDelay: `${btnIndex * 80}ms`,
@@ -1357,7 +1357,7 @@ export function ChatbotInterface({
                   variant="outline"
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
-                  className="transition-all duration-200"
+                  className="transition-all duration-200 border-teal-500 text-teal-700 hover:bg-teal-600 hover:text-white hover:border-teal-600"
                 >
                   {language === "pt-BR"
                     ? "Adicionar mais"
@@ -1368,7 +1368,7 @@ export function ChatbotInterface({
                 <Button
                   size="sm"
                   onClick={() => completeForm()}
-                  className="transition-all duration-200"
+                  className="transition-all duration-200 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   {language === "pt-BR"
                     ? "Finalizar cadastro"
@@ -1396,7 +1396,7 @@ export function ChatbotInterface({
                     variant="outline"
                     size="sm"
                     onClick={() => handleRemoveAttachment(i)}
-                    className="transition-all duration-200"
+                    className="transition-all duration-200 border-red-400 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600"
                   >
                     {language === "pt-BR"
                       ? "Remover"
@@ -1426,7 +1426,7 @@ export function ChatbotInterface({
                     );
                   }}
                   placeholder={translations.placeholder[language]}
-                  className="min-h-[120px] resize-none focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                  className="min-h-[120px] max-h-[300px] resize-y focus:ring-2 focus:ring-primary/20 transition-all duration-200 overflow-y-auto"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && e.ctrlKey) {
                       handleInputSubmit();
@@ -1475,7 +1475,7 @@ export function ChatbotInterface({
                   </p>
                   <Button
                     onClick={handleInputSubmit}
-                    className="gap-2 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                    className="gap-2 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95 min-w-[120px] px-6 bg-emerald-600 hover:bg-emerald-700 text-white"
                     disabled={
                       !inputValue.trim() || inputValue.length > allowedBody
                     }
@@ -1541,11 +1541,13 @@ export function ChatbotInterface({
                       setSelectedCountry(null);
                     }
                   }}
-                  size="icon"
                   disabled={!selectedCountry}
-                  className="transition-all duration-200 hover:scale-110 active:scale-95 shadow-md hover:shadow-lg shrink-0"
+                  className="transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg shrink-0 gap-2 min-w-[100px] bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   <Send className="w-4 h-4" />
+                  <span className="hidden sm:inline">
+                    {translations.send[language]}
+                  </span>
                 </Button>
               </div>
             ) : (
@@ -1565,11 +1567,13 @@ export function ChatbotInterface({
                 />
                 <Button
                   onClick={handleInputSubmit}
-                  size="icon"
                   disabled={!inputValue.trim()}
-                  className="transition-all duration-200 hover:scale-110 active:scale-95 shadow-md hover:shadow-lg shrink-0"
+                  className="transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg shrink-0 gap-2 min-w-[100px] bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   <Send className="w-4 h-4" />
+                  <span className="hidden sm:inline">
+                    {translations.send[language]}
+                  </span>
                 </Button>
               </div>
             )}

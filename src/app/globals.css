@@ -331,4 +331,11 @@
   .hover-glow:hover {
     box-shadow: 0 0 20px oklch(0.55 0.15 170 / 0.3);
   }
+
+  /* Word breaking for long text */
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+  }
 }
