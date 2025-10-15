@@ -89,8 +89,10 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
   const [isLangOpen, setIsLangOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  // Evita executar mensagens iniciais duas vezes em modo Strict (Next.js/React dev)
+  const hasInitializedRef = useRef(false)
 
-  const currentLang = languages.find((lang) => lang.code === language)
+  // const currentLang = languages.find((lang) => lang.code === language)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -101,6 +103,9 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
   }, [messages])
 
   useEffect(() => {
+    if (hasInitializedRef.current) return
+    hasInitializedRef.current = true
+
     // Mensagem inicial
     addBotMessage(
       language === "pt-BR"
@@ -726,38 +731,44 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         />
       </div>
 
-      <header className="bg-accent text-accent-foreground shadow-lg animate-in fade-in slide-in-from-top-4 duration-700 relative z-10">
-        <div className="container max-w-4xl mx-auto px-4 py-8">
-          <div className="flex items-center gap-4 justify-between">
-            <div className="flex items-center gap-4">
+      <header className="bg-gradient-to-r from-emerald-900 via-teal-800 to-emerald-900 text-white shadow-md animate-in fade-in slide-in-from-top-4 duration-700 relative z-10">
+        <div className="container max-w-6xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between gap-6">
+            <div className="flex items-center gap-5 min-w-0">
               {/* Logo COP30 */}
-              <div className="w-20 h-20 flex items-center justify-center">
+              <div className="w-28 h-16 flex items-center justify-center shrink-0">
                 <Image
                   src="/cop30logo.svg"
                   alt="COP30 Logo"
-                  width={80}
-                  height={80}
+                  width={120}
+                  height={64}
                   className="object-contain"
                 />
               </div>
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold mb-1">{translations.header[language]}</h1>
-                <p className="text-xs opacity-90 font-light tracking-wide">{translations.subtitle[language]}</p>
+              <div className="min-w-0">
+                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight whitespace-pre-wrap">{translations.header[language]}</h1>
+                <p className="text-sm md:text-base opacity-90">
+                  {translations.subtitle[language]}
+                </p>
               </div>
             </div>
 
+            {/* Language selector styled like screenshot */}
             <DropdownMenu open={isLangOpen} onOpenChange={setIsLangOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2 hover:scale-105 transition-all duration-300 border-2 bg-background/50"
+                  className="rounded-full border-white/30 bg-white/10 text-white hover:bg-white/20 hover:scale-[1.02] transition-all duration-200 px-4"
                 >
-                  <Globe className="w-4 h-4 text-primary" />
-                  <span className="font-medium">{currentLang?.flag}</span>
+                  <Globe className="w-4 h-4 mr-2" />
+                  {/* Country and language abbreviation per current language */}
+                  <span className="font-medium tracking-wide">
+                    {language === "pt-BR" ? "BR PT" : language === "en" ? "US EN" : "ES ES"}
+                  </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 animate-in fade-in slide-in-from-top-2 duration-200">
+              <DropdownMenuContent align="end" className="w-52">
                 {languages.map((lang) => (
                   <DropdownMenuItem
                     key={lang.code}
@@ -765,9 +776,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                       onLanguageChange(lang.code)
                       setIsLangOpen(false)
                     }}
-                    className={`gap-3 cursor-pointer transition-all duration-200 ${
-                      language === lang.code ? "bg-primary/10 font-medium" : ""
-                    }`}
+                    className={`${language === lang.code ? "bg-teal-50 text-teal-900" : ""} gap-3 cursor-pointer`}
                   >
                     <span className="text-lg">{lang.flag}</span>
                     <span>{lang.name}</span>
