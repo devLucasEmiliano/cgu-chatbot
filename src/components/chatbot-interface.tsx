@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import { Send, Globe } from "lucide-react"
 import type { Language } from "@/src/app/page"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
+import Image from "next/image"
 
 interface ChatbotInterfaceProps {
   language: Language
@@ -23,7 +24,7 @@ interface Message {
   content: string
   timestamp: Date
   buttons?: { label: string; value: string; variant?: "default" | "outline" | "secondary" }[]
-  inputType?: "text" | "textarea" | "email" | "file" | "country"
+  inputType?: "text" | "textarea" | "email" | "file"
 }
 
 const translations = {
@@ -65,18 +66,6 @@ const languages = [
   { code: "es" as Language, flag: "🇪🇸", name: "Español" },
 ]
 
-const countries = [
-  { code: "BR", name: { "pt-BR": "Brasil", en: "Brazil", es: "Brasil" } },
-  { code: "US", name: { "pt-BR": "Estados Unidos", en: "United States", es: "Estados Unidos" } },
-  { code: "ES", name: { "pt-BR": "Espanha", en: "Spain", es: "España" } },
-  { code: "AR", name: { "pt-BR": "Argentina", en: "Argentina", es: "Argentina" } },
-  { code: "MX", name: { "pt-BR": "México", en: "Mexico", es: "México" } },
-  { code: "CO", name: { "pt-BR": "Colômbia", en: "Colombia", es: "Colombia" } },
-  { code: "CL", name: { "pt-BR": "Chile", en: "Chile", es: "Chile" } },
-  { code: "PE", name: { "pt-BR": "Peru", en: "Peru", es: "Perú" } },
-  { code: "OTHER", name: { "pt-BR": "Outro", en: "Other", es: "Otro" } },
-]
-
 type FlowStep = 
   | "initial"
   | "manifestationType"
@@ -87,7 +76,6 @@ type FlowStep =
   | "unfcccQuestion"
   | "unfcccNumber"
   | "description"
-  | "nationality"
   | "attachmentQuestion"
   | "moreAttachments"
   | "complete"
@@ -126,11 +114,22 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
+          ? "Você já leu e aceitou os Termos de Uso."
+          : language === "en"
+            ? "You have read and accepted the Terms of Use."
+            : "Usted ha leído y aceptado los Términos de Uso.",
+        800,
+      )
+    }, 800)
+
+    setTimeout(() => {
+      addBotMessage(
+        language === "pt-BR"
           ? "Você gostaria de Consultar ou Cadastrar uma manifestação?"
           : language === "en"
             ? "Would you like to Consult or Register a manifestation?"
             : "¿Le gustaría Consultar o Registrar una manifestación?",
-        800,
+        1600,
         [
           {
             label: language === "pt-BR" ? "Consultar" : language === "en" ? "Consult" : "Consultar",
@@ -144,14 +143,15 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           },
         ],
       )
-    }, 800)
-  }, [language])
+    }, 1600)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const addBotMessage = (
     content: string,
     delay: number = 500,
     buttons?: { label: string; value: string; variant?: "default" | "outline" | "secondary" }[],
-    inputType?: "text" | "textarea" | "email" | "file" | "country",
+    inputType?: "text" | "textarea" | "email" | "file",
   ) => {
     setIsTyping(true)
 
@@ -202,7 +202,52 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           ],
         )
       }, 300)
-    } else {
+      return
+    }
+
+    if (choice === "register") {
+      // Mostrar aviso do Fala.BR para brasileiros
+      setTimeout(() => {
+        addBotMessage(
+          language === "pt-BR"
+            ? "Se você for brasileiro, utilize o serviço oficial Fala.BR:"
+            : language === "en"
+              ? "If you are Brazilian, please use the official Fala.BR service:"
+              : "Si usted es brasileño, utilice el servicio oficial Fala.BR:",
+          300,
+          [
+            {
+              label: language === "pt-BR" ? "Ir para o Fala.BR" : language === "en" ? "Go to Fala.BR" : "Ir a Fala.BR",
+              value: "falabr",
+              variant: "default" as const,
+            },
+            {
+              label: language === "pt-BR" ? "Eu não sou Brasileiro" : language === "en" ? "I am not Brazilian" : "No soy Brasileño",
+              value: "continue",
+              variant: "outline" as const,
+            },
+          ],
+        )
+      }, 300)
+      return
+    }
+
+    if (choice === "falabr") {
+      window.open("https://falabr.cgu.gov.br", "_blank")
+      setTimeout(() => {
+        addBotMessage(
+          language === "pt-BR"
+            ? "Você será redirecionado para o portal Fala.BR. Obrigado por usar nosso serviço!"
+            : language === "en"
+              ? "You will be redirected to the Fala.BR portal. Thank you for using our service!"
+              : "Será redirigido al portal Fala.BR. ¡Gracias por usar nuestro servicio!",
+          300,
+        )
+      }, 300)
+      return
+    }
+
+    if (choice === "continue") {
       setCurrentStep("manifestationType")
       setTimeout(() => {
         addBotMessage(
@@ -441,17 +486,28 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
 
       case "description":
         setFormData((prev) => ({ ...prev, description: value }))
-        setCurrentStep("nationality")
+        // Pula a pergunta de nacionalidade já que foi verificado no início
+        setCurrentStep("attachmentQuestion")
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Qual é sua nacionalidade?"
+              ? "Você gostaria de anexar um arquivo à sua solicitação?"
               : language === "en"
-                ? "What is your nationality?"
-                : "¿Cuál es su nacionalidad?",
+                ? "Would you like to attach a file to your request?"
+                : "¿Le gustaría adjuntar un archivo a su solicitud?",
             300,
-            undefined,
-            "country",
+            [
+              {
+                label: language === "pt-BR" ? "Sim" : language === "en" ? "Yes" : "Sí",
+                value: "yes",
+                variant: "outline" as const,
+              },
+              {
+                label: language === "pt-BR" ? "Não" : language === "en" ? "No" : "No",
+                value: "no",
+                variant: "secondary" as const,
+              },
+            ],
           )
         }, 300)
         break
@@ -512,53 +568,6 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         300,
         undefined,
         "textarea",
-      )
-    }, 300)
-  }
-
-  const handleCountrySelect = (country: string, label: string) => {
-    addUserMessage(label)
-    setFormData((prev) => ({ ...prev, nationality: country }))
-
-    if (country === "BR") {
-      setTimeout(() => {
-        addBotMessage(
-          language === "pt-BR"
-            ? "Como você é brasileiro(a), recomendamos usar o canal oficial Fala.BR. Você será redirecionado."
-            : language === "en"
-              ? "As you are Brazilian, we recommend using the official Fala.BR channel. You will be redirected."
-              : "Como usted es brasileño(a), recomendamos usar el canal oficial Fala.BR. Será redirigido.",
-          300,
-        )
-      }, 300)
-
-      setTimeout(() => {
-        window.open("https://falabr.cgu.gov.br", "_blank")
-      }, 3000)
-      return
-    }
-
-    setCurrentStep("attachmentQuestion")
-    setTimeout(() => {
-      addBotMessage(
-        language === "pt-BR"
-          ? "Você gostaria de anexar um arquivo à sua solicitação?"
-          : language === "en"
-            ? "Would you like to attach a file to your request?"
-            : "¿Le gustaría adjuntar un archivo a su solicitud?",
-        300,
-        [
-          {
-            label: language === "pt-BR" ? "Sim" : language === "en" ? "Yes" : "Sí",
-            value: "yes",
-            variant: "outline" as const,
-          },
-          {
-            label: language === "pt-BR" ? "Não" : language === "en" ? "No" : "No",
-            value: "no",
-            variant: "secondary" as const,
-          },
-        ],
       )
     }, 300)
   }
@@ -675,9 +684,6 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           handleSkipUnfccc(label)
         }
         break
-      case "nationality":
-        handleCountrySelect(value, label)
-        break
       case "attachmentQuestion":
         handleAttachmentQuestion(value, label)
         break
@@ -698,17 +704,41 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
   const showInput =
     currentMessage?.inputType &&
     !isTyping &&
-    currentMessage.inputType !== "file" &&
-    currentMessage.inputType !== "country"
+    currentMessage.inputType !== "file"
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-accent text-accent-foreground shadow-lg animate-in fade-in slide-in-from-top-4 duration-700">
-        <div className="container max-w-4xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Elementos decorativos de palmeiras */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <Image
+          src="/plant-1.svg"
+          alt=""
+          width={200}
+          height={280}
+          className="absolute bottom-0 left-0"
+        />
+        <Image
+          src="/plant-1.svg"
+          alt=""
+          width={180}
+          height={250}
+          className="absolute bottom-0 right-0 scale-x-[-1]"
+        />
+      </div>
+
+      <header className="bg-accent text-accent-foreground shadow-lg animate-in fade-in slide-in-from-top-4 duration-700 relative z-10">
+        <div className="container max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center gap-4 justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                <span className="text-2xl">🌱</span>
+              {/* Logo COP30 */}
+              <div className="w-20 h-20 flex items-center justify-center">
+                <Image
+                  src="/cop30logo.svg"
+                  alt="COP30 Logo"
+                  width={80}
+                  height={80}
+                  className="object-contain"
+                />
               </div>
               <div className="flex-1">
                 <h1 className="text-2xl font-bold mb-1">{translations.header[language]}</h1>
@@ -749,7 +779,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         </div>
       </header>
 
-      <div className="container max-w-4xl mx-auto px-4 py-6">
+      <div className="container max-w-4xl mx-auto px-4 py-6 relative z-10">
         <Card
           className="shadow-2xl mb-4 animate-in fade-in zoom-in-95 duration-700"
           style={{ animationDelay: "200ms" }}
@@ -789,22 +819,6 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                           className="rounded-full transition-all duration-300 hover:scale-105"
                         >
                           {button.label}
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-
-                  {message.inputType === "country" && !isTyping && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {countries.map((country) => (
-                        <Button
-                          key={country.code}
-                          onClick={() => handleButtonClick(country.code, country.name[language])}
-                          variant="outline"
-                          size="sm"
-                          className="rounded-full transition-all duration-300 hover:scale-105"
-                        >
-                          {country.name[language]}
                         </Button>
                       ))}
                     </div>
