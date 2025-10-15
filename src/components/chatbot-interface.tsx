@@ -11,6 +11,7 @@ import { Send, Globe } from "lucide-react"
 import type { Language } from "@/src/app/page"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 import Image from "next/image"
+import { ScrollArea } from "@/src/components/ui/scroll-area"
 
 interface ChatbotInterfaceProps {
   language: Language
@@ -25,6 +26,7 @@ interface Message {
   timestamp: Date
   buttons?: { label: string; value: string; variant?: "default" | "outline" | "secondary" }[]
   inputType?: "text" | "textarea" | "email" | "file"
+  variant?: "default" | "info"
 }
 
 const translations = {
@@ -157,6 +159,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
     delay: number = 500,
     buttons?: { label: string; value: string; variant?: "default" | "outline" | "secondary" }[],
     inputType?: "text" | "textarea" | "email" | "file",
+    variant: "default" | "info" = "default",
   ) => {
     setIsTyping(true)
 
@@ -168,6 +171,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         timestamp: new Date(),
         buttons,
         inputType,
+        variant,
       }
 
       setMessages((prev) => [...prev, newMessage])
@@ -301,6 +305,20 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
     if (type === "report") {
       setCurrentStep("identificationType")
       setTimeout(() => {
+        // Aviso informativo para denuncias (identificada vs anônima)
+        addBotMessage(
+          language === "pt-BR"
+            ? "Identificada: você poderá receber informações sobre as providências adotadas. Denúncia anônima: não será possível acompanhar ou receber respostas."
+            : language === "en"
+              ? "Identified: you will be able to receive information about the measures taken. Anonymous report: it will not be possible to track or receive responses."
+              : "Identificada: podrá recibir información sobre las medidas adoptadas. Denuncia anónima: no será posible hacer seguimiento ni recibir respuestas.",
+          150,
+          undefined,
+          undefined,
+          "info",
+        )
+      }, 150)
+      setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Você deseja se identificar ou permanecer anônimo(a)?"
@@ -321,7 +339,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
             },
           ],
         )
-      }, 300)
+      }, 350)
     } else {
       // Para outros tipos, vai direto para identificação
       setCurrentStep("fullName")
@@ -764,7 +782,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                   <Globe className="w-4 h-4 mr-2" />
                   {/* Country and language abbreviation per current language */}
                   <span className="font-medium tracking-wide">
-                    {language === "pt-BR" ? "BR PT" : language === "en" ? "US EN" : "ES ES"}
+                    {language === "pt-BR" ? "pt-BR" : language === "en" ? "en-US" : "es-ES"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
@@ -793,7 +811,8 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           className="shadow-2xl mb-4 animate-in fade-in zoom-in-95 duration-700"
           style={{ animationDelay: "200ms" }}
         >
-          <div className="h-[500px] md:h-[600px] overflow-y-auto p-4 md:p-6 space-y-4">
+          <ScrollArea className="h-[60vh] md:h-[65vh] p-4 md:p-6">
+            <div className="space-y-4">
             {messages.map((message, index) => (
               <div
                 key={message.id}
@@ -808,10 +827,14 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                   </AvatarFallback>
                 </Avatar>
 
-                <div className={`flex-1 max-w-[80%] ${message.type === "user" ? "items-end" : "items-start"}`}>
+                <div className={`flex-1 max-w-[78%] md:max-w-[70%] ${message.type === "user" ? "items-end" : "items-start"}`}>
                   <div
                     className={`rounded-2xl px-4 py-3 transition-all duration-300 hover:shadow-md ${
-                      message.type === "bot" ? "bg-muted text-foreground" : "bg-primary text-primary-foreground"
+                      message.type === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : message.variant === "info"
+                          ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
+                          : "bg-muted text-foreground"
                     }`}
                   >
                     <p className="text-sm leading-relaxed whitespace-pre-line">{message.content}</p>
@@ -868,7 +891,8 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
             )}
 
             <div ref={messagesEndRef} />
-          </div>
+            </div>
+          </ScrollArea>
         </Card>
 
         {showInput && (
