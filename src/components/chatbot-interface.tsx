@@ -703,21 +703,36 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
       )
     }, 300)
     try {
-      // Montar DTO mínimo para o backend (exemplo simples baseado nos dados coletados)
+      // Mapeia tipo de manifestação e formulário aceito pela API CGU
+      // 1: Denúncia -> Formulário 4
+      // 2: Reclamação -> Formulário 1
+      // 3: Elogio -> Formulário 1
+      // 4: Sugestão -> Formulário 1
+      // 5: Solicitação -> Formulário 1
+      const tipoMap: Record<string, { idTipoManifestacao: number; idTipoFormulario: number }> = {
+        report: { idTipoManifestacao: 1, idTipoFormulario: 4 },
+        complaint: { idTipoManifestacao: 2, idTipoFormulario: 1 },
+        compliment: { idTipoManifestacao: 3, idTipoFormulario: 1 },
+        suggestion: { idTipoManifestacao: 4, idTipoFormulario: 1 },
+        request: { idTipoManifestacao: 5, idTipoFormulario: 1 },
+      }
+
+      const chosen = tipoMap[formData.manifestationType || "request"] || tipoMap["request"]
+      const isAnonymous = formData.identificationType === "anonymous"
+
+      // Montar DTO mínimo para o backend com base no tipo escolhido
       const body = {
-        idTipoFormulario: 1,
-        idTipoManifestacao: 5,
-        idTipoIdentificacaoManifestante: formData.identificationType === "anonymous" ? 3 : 1,
+        idTipoFormulario: chosen.idTipoFormulario,
+        idTipoManifestacao: chosen.idTipoManifestacao,
+        idTipoIdentificacaoManifestante: isAnonymous ? 3 : 1,
         textoUsuario: formData.description || "",
         linguagem: language,
-        manifestante:
-          formData.identificationType === "anonymous"
-            ? undefined
-            : {
-                idPais: 33,
-                nome: formData.fullName || "",
-                email: formData.email || "",
-              },
+        manifestante: isAnonymous
+          ? undefined
+          : {
+              nome: formData.fullName || "",
+              email: formData.email || "",
+            },
       }
 
       const res = await fetch("/api/manifestacoes", {
