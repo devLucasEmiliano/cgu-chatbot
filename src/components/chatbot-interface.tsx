@@ -8,14 +8,14 @@ import { Input } from "@/src/components/ui/input"
 import { Textarea } from "@/src/components/ui/textarea"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import { Send, Globe } from "lucide-react"
-import type { Language } from "@/src/app/page"
+import type { Language, SubmitResult } from "@/src/app/page"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 import Image from "next/image"
 import { ScrollArea } from "@/src/components/ui/scroll-area"
 
 interface ChatbotInterfaceProps {
   language: Language
-  onComplete: (protocol: string) => void
+  onComplete: (result: SubmitResult) => void
   onLanguageChange: (language: Language) => void
 }
 
@@ -690,7 +690,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
     }
   }
 
-  const completeForm = () => {
+  const completeForm = async () => {
     setCurrentStep("complete")
     setTimeout(() => {
       addBotMessage(
@@ -702,11 +702,52 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         300,
       )
     }, 300)
+    try {
+      // Montar DTO mínimo para o backend (exemplo simples baseado nos dados coletados)
+      const body = {
+        idTipoFormulario: 1,
+        idTipoManifestacao: 5,
+        idTipoIdentificacaoManifestante: formData.identificationType === "anonymous" ? 3 : 1,
+        textoUsuario: formData.description || "",
+        linguagem: language,
+        manifestante:
+          formData.identificationType === "anonymous"
+            ? undefined
+            : {
+                idPais: 33,
+                nome: formData.fullName || "",
+                email: formData.email || "",
+              },
+      }
 
-    setTimeout(() => {
-      const protocol = `COP30-${Date.now().toString().slice(-8)}`
-      onComplete(protocol)
-    }, 2000)
+      const res = await fetch("/api/manifestacoes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+
+      const json: unknown = await res.json()
+      const obj = (json && typeof json === "object" ? (json as Record<string, unknown>) : {})
+      if (res.ok && obj && obj.data && typeof obj.data === "object") {
+        const d = obj.data as Record<string, unknown>
+        const result: SubmitResult = {
+          success: true,
+          data: {
+            NumeroProtocolo: (d["NumeroProtocolo"] as string) || (d["NumProtocolo"] as string) || (d["protocolo"] as string) || undefined,
+            CodigoAcesso: (d["CodigoAcesso"] as string) || undefined,
+            DataCadastro: (d["DataCadastro"] as string) || undefined,
+            PrazoResposta: (d["PrazoResposta"] as string) || undefined,
+          },
+        }
+        onComplete(result)
+      } else {
+        const errMsg = (obj && ((obj["error"] as string) || (obj["message"] as string))) || `HTTP ${res.status}`
+        onComplete({ success: false, error: String(errMsg) })
+      }
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Erro inesperado ao enviar"
+      onComplete({ success: false, error: message })
+    }
   }
 
   const handleButtonClick = (value: string, label: string) => {

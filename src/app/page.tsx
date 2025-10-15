@@ -11,11 +11,15 @@ export type Language = "pt-BR" | "en" | "es"
 
 export type Step = "language" | "terms" | "chat" | "confirmation"
 
+type SuccessResult = { success: true; data: { NumeroProtocolo?: string; CodigoAcesso?: string; DataCadastro?: string; PrazoResposta?: string } }
+type ErrorResult = { success: false; error: string }
+export type SubmitResult = SuccessResult | ErrorResult
+
 export default function Home() {
   const { preferences, isLoaded, setLanguage, acceptTerms } = useUserPreferences()
   const [currentStep, setCurrentStep] = useState<Step>("language")
   const [selectedLanguage, setSelectedLanguage] = useState<Language>("pt-BR")
-  const [protocol, setProtocol] = useState<string>("")
+  const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null)
 
   // Carregar preferências salvas quando o componente montar
   useEffect(() => {
@@ -51,14 +55,14 @@ export default function Home() {
     setCurrentStep("chat")
   }
 
-  const handleChatComplete = (generatedProtocol: string) => {
-    setProtocol(generatedProtocol)
+  const handleChatComplete = (result: SubmitResult) => {
+    setSubmitResult(result)
     setCurrentStep("confirmation")
   }
 
   const handleRestart = () => {
-    setCurrentStep("language")
-    setProtocol("")
+  setCurrentStep("language")
+  setSubmitResult(null)
   }
 
   // Mostrar loading enquanto carrega preferências
@@ -88,8 +92,8 @@ export default function Home() {
           onLanguageChange={handleLanguageChange}
         />
       )}
-      {currentStep === "confirmation" && (
-        <ConfirmationScreen language={selectedLanguage} protocol={protocol} onRestart={handleRestart} />
+      {currentStep === "confirmation" && submitResult && (
+        <ConfirmationScreen language={selectedLanguage} result={submitResult} onRestart={handleRestart} />
       )}
     </main>
   )

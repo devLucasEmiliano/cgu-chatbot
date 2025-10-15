@@ -103,13 +103,31 @@ export function toCGUPayload(dto: ManifestacaoRequestDTO) {
     textoUsuario: dto.textoUsuario,
   });
 
+  // Resolver IDs configuráveis: prioriza valor vindo do DTO; se ausente, usa env no servidor
+  const parseEnvInt = (name: string): number | undefined => {
+    const raw = process.env[name];
+    if (!raw) return undefined;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : undefined;
+  };
+
+  const efetivoIdOuvidoriaDestino = dto.idOuvidoriaDestino ?? parseEnvInt("CGU_ID_OUVIDORIA_DESTINO");
+  const efetivoIdModoResposta = dto.idModoResposta ?? parseEnvInt("CGU_ID_MODO_RESPOSTA");
+
+  if (efetivoIdOuvidoriaDestino == null) {
+    throw new Error("IdOuvidoriaDestino não informado e variável de ambiente CGU_ID_OUVIDORIA_DESTINO não definida.");
+  }
+  if (efetivoIdModoResposta == null) {
+    throw new Error("IdModoResposta não informado e variável de ambiente CGU_ID_MODO_RESPOSTA não definida.");
+  }
+
   const payload: ManifestacaoPayloadMinimo = {
     IdTipoFormulario: dto.idTipoFormulario,
     IdTipoManifestacao: dto.idTipoManifestacao,
-    IdOuvidoriaDestino: dto.idOuvidoriaDestino,
+    IdOuvidoriaDestino: efetivoIdOuvidoriaDestino,
     TextoManifestacao,
     Anexos: anexosToPayload(dto.anexos),
-    IdModoResposta: dto.idModoResposta,
+    IdModoResposta: efetivoIdModoResposta,
     IdTipoIdentificacaoManifestante: dto.idTipoIdentificacaoManifestante,
   };
 

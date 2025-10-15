@@ -34,8 +34,14 @@ export interface ManifestacaoPayloadMinimo {
 export interface ManifestacaoRequestDTO {
   idTipoFormulario: number;
   idTipoManifestacao: number;
-  idOuvidoriaDestino: number;
-  idModoResposta: number;
+  /**
+   * Opcional: se omitido, será lido de process.env.CGU_ID_OUVIDORIA_DESTINO (server-side)
+   */
+  idOuvidoriaDestino?: number;
+  /**
+   * Opcional: se omitido, será lido de process.env.CGU_ID_MODO_RESPOSTA (server-side)
+   */
+  idModoResposta?: number;
   idTipoIdentificacaoManifestante: number;
   manifestante?: {
     idPais: number;

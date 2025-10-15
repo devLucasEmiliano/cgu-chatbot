@@ -54,6 +54,18 @@ Regras implementadas:
 Configuração por ambiente:
 - `CGU_API_BASE_URL` (default: `https://treinafalabr.cgu.gov.br`)
 - `CGU_API_TOKEN` (opcional)
+- `CGU_ID_OUVIDORIA_DESTINO` (server-only): usado quando o front não enviar `idOuvidoriaDestino`
+- `CGU_ID_MODO_RESPOSTA` (server-only): usado quando o front não enviar `idModoResposta`
+
+Exemplo:
+Crie um arquivo `.env.local` baseado em `.env.local.example`:
+
+```
+CGU_ID_OUVIDORIA_DESTINO=123
+CGU_ID_MODO_RESPOSTA=1
+# CGU_API_BASE_URL=https://treinafalabr.cgu.gov.br
+# CGU_API_TOKEN=seu_token
+```
 
 Encaminhamento para CGU:
 - POST `https://treinafalabr.cgu.gov.br/api/manifestacoes`
