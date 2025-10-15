@@ -7,7 +7,7 @@ import { Card } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
 import { Textarea } from "@/src/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
-import { Send, Globe } from "lucide-react";
+import { Send, Globe, ChevronDown } from "lucide-react";
 import type { Language, SubmitResult } from "@/src/app/page";
 import {
   DropdownMenu,
@@ -107,6 +107,11 @@ export function ChatbotInterface({
     { NomeArquivo: string; ConteudoBase64: string; TamanhoArquivo: number }[]
   >([]);
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<{
+    codigo: number;
+    descricao: string;
+  } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -184,6 +189,7 @@ export function ChatbotInterface({
       0
     );
 
+    // Segunda mensagem após a primeira (800ms de digitação + delay)
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
@@ -191,10 +197,11 @@ export function ChatbotInterface({
           : language === "en"
           ? "You have read and accepted the Terms of Use."
           : "Usted ha leído y aceptado los Términos de Uso.",
-        800
+        0
       );
-    }, 800);
+    }, 1000);
 
+    // Terceira mensagem após a segunda (mais 800ms + delay)
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
@@ -202,7 +209,7 @@ export function ChatbotInterface({
           : language === "en"
           ? "Would you like to Consult or Register a manifestation?"
           : "¿Le gustaría Consultar o Registrar una manifestación?",
-        1600,
+        0,
         [
           {
             label:
@@ -226,7 +233,7 @@ export function ChatbotInterface({
           },
         ]
       );
-    }, 1600);
+    }, 2000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -248,8 +255,12 @@ export function ChatbotInterface({
     }
     askedQuestionsRef.current.add(messageKey);
 
-    setIsTyping(true);
+    // Aguarda um pouco antes de mostrar a animação de digitação
+    setTimeout(() => {
+      setIsTyping(true);
+    }, delay);
 
+    // Mostra a mensagem após a animação de digitação (mínimo 800ms)
     setTimeout(() => {
       const newMessage: Message = {
         id: Date.now().toString() + Math.random(),
@@ -263,7 +274,7 @@ export function ChatbotInterface({
 
       setMessages((prev) => [...prev, newMessage]);
       setIsTyping(false);
-    }, delay);
+    }, delay + 800);
   };
 
   const addUserMessage = (content: string) => {
@@ -291,7 +302,7 @@ export function ChatbotInterface({
             : language === "en"
             ? "You will be redirected to the consultation portal. Can I help you with something else?"
             : "Será redirigido al portal de consultas. ¿Puedo ayudarle con algo más?",
-          300,
+          0,
           [
             {
               label:
@@ -305,7 +316,7 @@ export function ChatbotInterface({
             },
           ]
         );
-      }, 300);
+      }, 100);
       return;
     }
 
@@ -318,7 +329,7 @@ export function ChatbotInterface({
             : language === "en"
             ? "If you are Brazilian, please use the official Fala.BR service:"
             : "Si usted es brasileño, utilice el servicio oficial Fala.BR:",
-          300,
+          0,
           [
             {
               label:
@@ -342,7 +353,7 @@ export function ChatbotInterface({
             },
           ]
         );
-      }, 300);
+      }, 100);
       return;
     }
 
@@ -355,9 +366,9 @@ export function ChatbotInterface({
             : language === "en"
             ? "You will be redirected to the Fala.BR portal. Thank you for using our service!"
             : "Será redirigido al portal Fala.BR. ¡Gracias por usar nuestro servicio!",
-          300
+          0
         );
-      }, 300);
+      }, 100);
       return;
     }
 
@@ -370,7 +381,7 @@ export function ChatbotInterface({
             : language === "en"
             ? "What type of manifestation would you like to make?"
             : "¿Qué tipo de manifestación le gustaría hacer?",
-          300,
+          0,
           [
             {
               label:
@@ -424,7 +435,7 @@ export function ChatbotInterface({
             },
           ]
         );
-      }, 300);
+      }, 100);
     }
   };
 
@@ -442,12 +453,12 @@ export function ChatbotInterface({
             : language === "en"
             ? "Identified: you will be able to receive information about the measures taken. Anonymous report: it will not be possible to track or receive responses."
             : "Identificada: podrá recibir información sobre las medidas adoptadas. Denuncia anónima: no será posible hacer seguimiento ni recibir respuestas.",
-          150,
+          0,
           undefined,
           undefined,
           "info"
         );
-      }, 150);
+      }, 100);
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
@@ -455,7 +466,7 @@ export function ChatbotInterface({
             : language === "en"
             ? "Do you wish to identify yourself or remain anonymous?"
             : "¿Desea identificarse o permanecer anónimo(a)?",
-          300,
+          0,
           [
             {
               label:
@@ -479,7 +490,7 @@ export function ChatbotInterface({
             },
           ]
         );
-      }, 350);
+      }, 1000);
     } else {
       // Para outros tipos, vai direto para identificação
       setCurrentStep("fullName");
@@ -490,11 +501,11 @@ export function ChatbotInterface({
             : language === "en"
             ? "What is your full name?"
             : "¿Cuál es su nombre completo?",
-          300,
+          0,
           undefined,
           "text"
         );
-      }, 300);
+      }, 100);
     }
   };
 
@@ -1207,26 +1218,25 @@ export function ChatbotInterface({
         <Card className="shadow-2xl mb-4 animate-in fade-in duration-500 border-2 rounded-2xl overflow-hidden">
           <ScrollArea className="h-[60vh] md:h-[65vh] p-4 md:p-6 chat-scrollbar">
             <div className="space-y-4">
-              {messages.map((message, index) => (
+              {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex gap-3 animate-in fade-in duration-300 ${
                     message.type === "user" ? "flex-row-reverse" : "flex-row"
                   }`}
-                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <Avatar
                     className={`${
                       message.type === "bot"
-                        ? "bg-gradient-to-br from-primary to-primary/80 shadow-md"
-                        : "bg-gradient-to-br from-muted to-muted/80"
-                    } transition-all duration-200 shrink-0`}
+                        ? "bg-teal-100 border-2 border-teal-200"
+                        : "bg-teal-500"
+                    } transition-all duration-200 shrink-0 w-10 h-10`}
                   >
                     <AvatarFallback
                       className={
                         message.type === "bot"
-                          ? "text-primary-foreground text-lg"
-                          : "text-lg"
+                          ? "text-teal-700 text-lg"
+                          : "text-white text-lg"
                       }
                     >
                       {message.type === "bot" ? "🤖" : "👤"}
@@ -1241,10 +1251,10 @@ export function ChatbotInterface({
                     <div
                       className={`rounded-2xl px-4 py-3 transition-all duration-200 ${
                         message.type === "user"
-                          ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-md"
+                          ? "bg-teal-500 text-white shadow-md"
                           : message.variant === "info"
-                          ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 text-emerald-900 border-2 border-emerald-200/50 shadow-sm"
-                          : "bg-gradient-to-br from-muted to-muted/80 text-foreground border border-border/50"
+                          ? "bg-blue-50 text-blue-900 border border-blue-200 shadow-sm"
+                          : "bg-gray-100 text-gray-900 shadow-sm"
                       }`}
                     >
                       <p className="text-sm leading-relaxed whitespace-pre-line">
@@ -1262,7 +1272,13 @@ export function ChatbotInterface({
                             }
                             variant={button.variant || "outline"}
                             size="sm"
-                            className="rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md animate-in fade-in"
+                            className={`rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md animate-in fade-in border-2 ${
+                              button.variant === "default"
+                                ? "bg-teal-500 hover:bg-teal-600 text-white border-teal-500"
+                                : button.variant === "secondary"
+                                ? "bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-200"
+                                : "bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-200"
+                            }`}
                             style={{
                               animationDelay: `${btnIndex * 80}ms`,
                               animationDuration: "300ms",
@@ -1274,7 +1290,11 @@ export function ChatbotInterface({
                       </div>
                     )}
 
-                    <p className="text-xs text-muted-foreground mt-1.5 px-2 opacity-70">
+                    <p
+                      className={`text-[11px] text-muted-foreground mt-1 px-1 opacity-60 ${
+                        message.type === "user" ? "text-right" : "text-left"
+                      }`}
+                    >
                       {message.timestamp.toLocaleTimeString(language, {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -1286,23 +1306,23 @@ export function ChatbotInterface({
 
               {isTyping && (
                 <div className="flex gap-3 animate-in fade-in duration-300">
-                  <Avatar className="bg-gradient-to-br from-primary to-primary/80 shadow-md">
-                    <AvatarFallback className="text-primary-foreground text-lg">
+                  <Avatar className="bg-teal-100 border-2 border-teal-200 w-10 h-10">
+                    <AvatarFallback className="text-teal-700 text-lg">
                       🤖
                     </AvatarFallback>
                   </Avatar>
-                  <div className="bg-muted rounded-2xl px-5 py-4 shadow-sm border border-border/50">
+                  <div className="bg-gray-100 rounded-2xl px-5 py-4 shadow-sm">
                     <div className="flex gap-1.5">
                       <div
-                        className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
+                        className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-typing-dot"
                         style={{ animationDelay: "0ms" }}
                       />
                       <div
-                        className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
+                        className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-typing-dot"
                         style={{ animationDelay: "200ms" }}
                       />
                       <div
-                        className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
+                        className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-typing-dot"
                         style={{ animationDelay: "400ms" }}
                       />
                     </div>
@@ -1465,6 +1485,69 @@ export function ChatbotInterface({
                   </Button>
                 </div>
               </div>
+            ) : currentStep === "country" ? (
+              <div className="flex gap-2">
+                <DropdownMenu
+                  open={isCountryOpen}
+                  onOpenChange={setIsCountryOpen}
+                >
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="flex-1 justify-between h-10 px-3 font-normal"
+                    >
+                      <span
+                        className={
+                          selectedCountry
+                            ? "text-foreground"
+                            : "text-muted-foreground"
+                        }
+                      >
+                        {selectedCountry
+                          ? selectedCountry.descricao
+                          : language === "pt-BR"
+                          ? "Selecione seu país/naturalidade..."
+                          : language === "en"
+                          ? "Select your country/nationality..."
+                          : "Seleccione su país/nacionalidad..."}
+                      </span>
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[300px]"
+                  >
+                    <ScrollArea className="h-[280px]">
+                      {COUNTRIES.map((country) => (
+                        <DropdownMenuItem
+                          key={country.codigo}
+                          onClick={() => {
+                            setSelectedCountry(country);
+                            setIsCountryOpen(false);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          {country.descricao}
+                        </DropdownMenuItem>
+                      ))}
+                    </ScrollArea>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button
+                  onClick={() => {
+                    if (selectedCountry) {
+                      handleTextInput(selectedCountry.descricao);
+                      setSelectedCountry(null);
+                    }
+                  }}
+                  size="icon"
+                  disabled={!selectedCountry}
+                  className="transition-all duration-200 hover:scale-110 active:scale-95 shadow-md hover:shadow-lg shrink-0"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
             ) : (
               <div className="flex gap-2">
                 <Input
@@ -1472,16 +1555,7 @@ export function ChatbotInterface({
                   type={currentMessage.inputType === "email" ? "email" : "text"}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={
-                    currentStep === "country"
-                      ? language === "pt-BR"
-                        ? "Digite seu país/naturalidade..."
-                        : language === "en"
-                        ? "Type your country/nationality..."
-                        : "Escriba su país/nacionalidad..."
-                      : translations.placeholder[language]
-                  }
-                  list={currentStep === "country" ? "country-list" : undefined}
+                  placeholder={translations.placeholder[language]}
                   className="flex-1 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -1489,13 +1563,6 @@ export function ChatbotInterface({
                     }
                   }}
                 />
-                {currentStep === "country" && (
-                  <datalist id="country-list">
-                    {COUNTRIES.map((c) => (
-                      <option key={c.codigo} value={c.descricao} />
-                    ))}
-                  </datalist>
-                )}
                 <Button
                   onClick={handleInputSubmit}
                   size="icon"
