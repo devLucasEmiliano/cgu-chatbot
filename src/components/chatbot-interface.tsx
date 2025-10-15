@@ -1,33 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
-import { Button } from "@/src/components/ui/button"
-import { Card } from "@/src/components/ui/card"
-import { Input } from "@/src/components/ui/input"
-import { Textarea } from "@/src/components/ui/textarea"
-import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
-import { Send, Globe } from "lucide-react"
-import type { Language, SubmitResult } from "@/src/app/page"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
-import Image from "next/image"
-import { ScrollArea } from "@/src/components/ui/scroll-area"
-import { COUNTRIES, findCountryCodeByName } from "@/src/lib/cgu/countries"
+import type React from "react";
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@/src/components/ui/button";
+import { Card } from "@/src/components/ui/card";
+import { Input } from "@/src/components/ui/input";
+import { Textarea } from "@/src/components/ui/textarea";
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
+import { Send, Globe } from "lucide-react";
+import type { Language, SubmitResult } from "@/src/app/page";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/src/components/ui/dropdown-menu";
+import Image from "next/image";
+import { ScrollArea } from "@/src/components/ui/scroll-area";
+import { COUNTRIES, findCountryCodeByName } from "@/src/lib/cgu/countries";
 
 interface ChatbotInterfaceProps {
-  language: Language
-  onComplete: (result: SubmitResult) => void
-  onLanguageChange: (language: Language) => void
+  language: Language;
+  onComplete: (result: SubmitResult) => void;
+  onLanguageChange: (language: Language) => void;
 }
 
 interface Message {
-  id: string
-  type: "bot" | "user"
-  content: string
-  timestamp: Date
-  buttons?: { label: string; value: string; variant?: "default" | "outline" | "secondary" }[]
-  inputType?: "text" | "textarea" | "email" | "file"
-  variant?: "default" | "info"
+  id: string;
+  type: "bot" | "user";
+  content: string;
+  timestamp: Date;
+  buttons?: {
+    label: string;
+    value: string;
+    variant?: "default" | "outline" | "secondary";
+  }[];
+  inputType?: "text" | "textarea" | "email" | "file";
+  variant?: "default" | "info";
 }
 
 const translations = {
@@ -61,15 +70,15 @@ const translations = {
     en: "Skip attachments",
     es: "Omitir archivos adjuntos",
   },
-}
+};
 
 const languages = [
   { code: "pt-BR" as Language, flag: "🇧🇷", name: "Português" },
   { code: "en" as Language, flag: "🇺🇸", name: "English" },
   { code: "es" as Language, flag: "🇪🇸", name: "Español" },
-]
+];
 
-type FlowStep = 
+type FlowStep =
   | "initial"
   | "manifestationType"
   | "identificationType"
@@ -82,139 +91,164 @@ type FlowStep =
   | "description"
   | "attachmentQuestion"
   | "moreAttachments"
-  | "complete"
+  | "complete";
 
-export function ChatbotInterface({ language, onComplete, onLanguageChange }: ChatbotInterfaceProps) {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [currentStep, setCurrentStep] = useState<FlowStep>("initial")
-  const [inputValue, setInputValue] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  const [formData, setFormData] = useState<Record<string, string>>({})
-  const [attachments, setAttachments] = useState<{ NomeArquivo: string; ConteudoBase64: string; TamanhoArquivo: number }[]>([])
-  const [isLangOpen, setIsLangOpen] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+export function ChatbotInterface({
+  language,
+  onComplete,
+  onLanguageChange,
+}: ChatbotInterfaceProps) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [currentStep, setCurrentStep] = useState<FlowStep>("initial");
+  const [inputValue, setInputValue] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [attachments, setAttachments] = useState<
+    { NomeArquivo: string; ConteudoBase64: string; TamanhoArquivo: number }[]
+  >([]);
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Evita executar mensagens iniciais duas vezes em modo Strict (Next.js/React dev)
-  const hasInitializedRef = useRef(false)
+  const hasInitializedRef = useRef(false);
   // Track asked questions to prevent duplicates
-  const askedQuestionsRef = useRef<Set<string>>(new Set())
+  const askedQuestionsRef = useRef<Set<string>>(new Set());
 
   // const currentLang = languages.find((lang) => lang.code === language)
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Helpers para anexos
   const formatBytes = (bytes: number) => {
-    const mb = bytes / (1024 * 1024)
-    if (mb >= 0.1) return `${mb.toFixed(2)} MB`
-    const kb = bytes / 1024
-    if (kb >= 0.1) return `${kb.toFixed(2)} KB`
-    return `${bytes} B`
-  }
-  const totalBytes = attachments.reduce((acc, a) => acc + (a.TamanhoArquivo || 0), 0)
+    const mb = bytes / (1024 * 1024);
+    if (mb >= 0.1) return `${mb.toFixed(2)} MB`;
+    const kb = bytes / 1024;
+    if (kb >= 0.1) return `${kb.toFixed(2)} KB`;
+    return `${bytes} B`;
+  };
+  const totalBytes = attachments.reduce(
+    (acc, a) => acc + (a.TamanhoArquivo || 0),
+    0
+  );
   const handleRemoveAttachment = (index: number) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index))
-  }
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // Limite de caracteres: replicar cabeçalho do backend para calcular espaço restante
-  const MAX_CHARS = 8000
+  const MAX_CHARS = 8000;
   const computeHeaderLen = () => {
-    const linha1 = "Manifestação recebida no âmbito da COP30."
-    const pais = formData.countryName || "Não Informado"
-    const linha2 = `País/Naturalidade selecionado: ${pais}`
-    const linha3 = `Linguagem selecionada: ${language || "Não Informado"}`
-    const unf = (formData.unfcccNumber && formData.unfcccNumber.trim()) ? formData.unfcccNumber.trim() : "Não Informado"
-    const linha4 = `Número de inscrição UNFCCC: ${unf}`
-    const header = [linha1, linha2, linha3, linha4].join("\n") + "\n"
-    return header.length
-  }
-  const headerLen = computeHeaderLen()
-  const allowedBody = Math.max(0, MAX_CHARS - headerLen)
+    const linha1 = "Manifestação recebida no âmbito da COP30.";
+    const pais = formData.countryName || "Não Informado";
+    const linha2 = `País/Naturalidade selecionado: ${pais}`;
+    const linha3 = `Linguagem selecionada: ${language || "Não Informado"}`;
+    const unf =
+      formData.unfcccNumber && formData.unfcccNumber.trim()
+        ? formData.unfcccNumber.trim()
+        : "Não Informado";
+    const linha4 = `Número de inscrição UNFCCC: ${unf}`;
+    const header = [linha1, linha2, linha3, linha4].join("\n") + "\n";
+    return header.length;
+  };
+  const headerLen = computeHeaderLen();
+  const allowedBody = Math.max(0, MAX_CHARS - headerLen);
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    scrollToBottom();
+  }, [messages]);
 
   // Auto-focus input when it appears
   useEffect(() => {
-    const currentMessage = messages[messages.length - 1]
+    const currentMessage = messages[messages.length - 1];
     if (currentMessage?.inputType === "textarea" && textareaRef.current) {
-      textareaRef.current.focus()
+      textareaRef.current.focus();
     } else if (currentMessage?.inputType && inputRef.current) {
-      inputRef.current.focus()
+      inputRef.current.focus();
     }
-  }, [messages])
-
+  }, [messages]);
 
   useEffect(() => {
-    if (hasInitializedRef.current) return
-    hasInitializedRef.current = true
+    if (hasInitializedRef.current) return;
+    hasInitializedRef.current = true;
 
     // Mensagem inicial
     addBotMessage(
       language === "pt-BR"
         ? "Olá! Bem-vindo ao sistema de atendimento da COP30."
         : language === "en"
-          ? "Hello! Welcome to the COP30 service system."
-          : "¡Hola! Bienvenido al sistema de atención de la COP30.",
-      0,
-    )
+        ? "Hello! Welcome to the COP30 service system."
+        : "¡Hola! Bienvenido al sistema de atención de la COP30.",
+      0
+    );
 
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
           ? "Você já leu e aceitou os Termos de Uso."
           : language === "en"
-            ? "You have read and accepted the Terms of Use."
-            : "Usted ha leído y aceptado los Términos de Uso.",
-        800,
-      )
-    }, 800)
+          ? "You have read and accepted the Terms of Use."
+          : "Usted ha leído y aceptado los Términos de Uso.",
+        800
+      );
+    }, 800);
 
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
           ? "Você gostaria de Consultar ou Cadastrar uma manifestação?"
           : language === "en"
-            ? "Would you like to Consult or Register a manifestation?"
-            : "¿Le gustaría Consultar o Registrar una manifestación?",
+          ? "Would you like to Consult or Register a manifestation?"
+          : "¿Le gustaría Consultar o Registrar una manifestación?",
         1600,
         [
           {
-            label: language === "pt-BR" ? "Consultar" : language === "en" ? "Consult" : "Consultar",
+            label:
+              language === "pt-BR"
+                ? "Consultar"
+                : language === "en"
+                ? "Consult"
+                : "Consultar",
             value: "consult",
             variant: "outline" as const,
           },
           {
-            label: language === "pt-BR" ? "Cadastrar" : language === "en" ? "Register" : "Registrar",
+            label:
+              language === "pt-BR"
+                ? "Cadastrar"
+                : language === "en"
+                ? "Register"
+                : "Registrar",
             value: "register",
             variant: "default" as const,
           },
-        ],
-      )
-    }, 1600)
+        ]
+      );
+    }, 1600);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const addBotMessage = (
     content: string,
     delay: number = 500,
-    buttons?: { label: string; value: string; variant?: "default" | "outline" | "secondary" }[],
+    buttons?: {
+      label: string;
+      value: string;
+      variant?: "default" | "outline" | "secondary";
+    }[],
     inputType?: "text" | "textarea" | "email" | "file",
-    variant: "default" | "info" = "default",
+    variant: "default" | "info" = "default"
   ) => {
     // Prevent duplicate messages
-    const messageKey = `${content}-${currentStep}`
+    const messageKey = `${content}-${currentStep}`;
     if (askedQuestionsRef.current.has(messageKey)) {
-      return
+      return;
     }
-    askedQuestionsRef.current.add(messageKey)
+    askedQuestionsRef.current.add(messageKey);
 
-    setIsTyping(true)
+    setIsTyping(true);
 
     setTimeout(() => {
       const newMessage: Message = {
@@ -225,12 +259,12 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         buttons,
         inputType,
         variant,
-      }
+      };
 
-      setMessages((prev) => [...prev, newMessage])
-      setIsTyping(false)
-    }, delay)
-  }
+      setMessages((prev) => [...prev, newMessage]);
+      setIsTyping(false);
+    }, delay);
+  };
 
   const addUserMessage = (content: string) => {
     const userMessage: Message = {
@@ -238,33 +272,41 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
       type: "user",
       content,
       timestamp: new Date(),
-    }
-    setMessages((prev) => [...prev, userMessage])
-  }
+    };
+    setMessages((prev) => [...prev, userMessage]);
+  };
 
   const handleInitialChoice = (choice: string, label: string) => {
-    addUserMessage(label)
+    addUserMessage(label);
 
     if (choice === "consult") {
-      window.open("https://falabr.cgu.gov.br/web/manifestacao/consultar", "_blank")
+      window.open(
+        "https://falabr.cgu.gov.br/web/manifestacao/consultar",
+        "_blank"
+      );
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Você será redirecionado para o portal de consultas. Posso ajudá-lo com algo mais?"
             : language === "en"
-              ? "You will be redirected to the consultation portal. Can I help you with something else?"
-              : "Será redirigido al portal de consultas. ¿Puedo ayudarle con algo más?",
+            ? "You will be redirected to the consultation portal. Can I help you with something else?"
+            : "Será redirigido al portal de consultas. ¿Puedo ayudarle con algo más?",
           300,
           [
             {
-              label: language === "pt-BR" ? "Fazer novo cadastro" : language === "en" ? "Make new registration" : "Hacer nuevo registro",
+              label:
+                language === "pt-BR"
+                  ? "Fazer novo cadastro"
+                  : language === "en"
+                  ? "Make new registration"
+                  : "Hacer nuevo registro",
               value: "register",
               variant: "default" as const,
             },
-          ],
-        )
-      }, 300)
-      return
+          ]
+        );
+      }, 300);
+      return;
     }
 
     if (choice === "register") {
@@ -274,232 +316,277 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           language === "pt-BR"
             ? "Se você for brasileiro, utilize o serviço oficial Fala.BR:"
             : language === "en"
-              ? "If you are Brazilian, please use the official Fala.BR service:"
-              : "Si usted es brasileño, utilice el servicio oficial Fala.BR:",
+            ? "If you are Brazilian, please use the official Fala.BR service:"
+            : "Si usted es brasileño, utilice el servicio oficial Fala.BR:",
           300,
           [
             {
-              label: language === "pt-BR" ? "Ir para o Fala.BR" : language === "en" ? "Go to Fala.BR" : "Ir a Fala.BR",
+              label:
+                language === "pt-BR"
+                  ? "Ir para o Fala.BR"
+                  : language === "en"
+                  ? "Go to Fala.BR"
+                  : "Ir a Fala.BR",
               value: "falabr",
               variant: "default" as const,
             },
             {
-              label: language === "pt-BR" ? "Eu não sou Brasileiro" : language === "en" ? "I am not Brazilian" : "No soy Brasileño",
+              label:
+                language === "pt-BR"
+                  ? "Eu não sou Brasileiro"
+                  : language === "en"
+                  ? "I am not Brazilian"
+                  : "No soy Brasileño",
               value: "continue",
               variant: "outline" as const,
             },
-          ],
-        )
-      }, 300)
-      return
+          ]
+        );
+      }, 300);
+      return;
     }
 
     if (choice === "falabr") {
-      window.open("https://falabr.cgu.gov.br", "_blank")
+      window.open("https://falabr.cgu.gov.br", "_blank");
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Você será redirecionado para o portal Fala.BR. Obrigado por usar nosso serviço!"
             : language === "en"
-              ? "You will be redirected to the Fala.BR portal. Thank you for using our service!"
-              : "Será redirigido al portal Fala.BR. ¡Gracias por usar nuestro servicio!",
-          300,
-        )
-      }, 300)
-      return
+            ? "You will be redirected to the Fala.BR portal. Thank you for using our service!"
+            : "Será redirigido al portal Fala.BR. ¡Gracias por usar nuestro servicio!",
+          300
+        );
+      }, 300);
+      return;
     }
 
     if (choice === "continue") {
-      setCurrentStep("manifestationType")
+      setCurrentStep("manifestationType");
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Que tipo de manifestação você gostaria de fazer?"
             : language === "en"
-              ? "What type of manifestation would you like to make?"
-              : "¿Qué tipo de manifestación le gustaría hacer?",
+            ? "What type of manifestation would you like to make?"
+            : "¿Qué tipo de manifestación le gustaría hacer?",
           300,
           [
             {
-              label: language === "pt-BR" ? "Denúncia" : language === "en" ? "Report" : "Denuncia",
+              label:
+                language === "pt-BR"
+                  ? "Denúncia"
+                  : language === "en"
+                  ? "Report"
+                  : "Denuncia",
               value: "report",
               variant: "outline" as const,
             },
             {
-              label: language === "pt-BR" ? "Elogio" : language === "en" ? "Compliment" : "Elogio",
+              label:
+                language === "pt-BR"
+                  ? "Elogio"
+                  : language === "en"
+                  ? "Compliment"
+                  : "Elogio",
               value: "compliment",
               variant: "outline" as const,
             },
             {
-              label: language === "pt-BR" ? "Reclamação" : language === "en" ? "Complaint" : "Queja",
+              label:
+                language === "pt-BR"
+                  ? "Reclamação"
+                  : language === "en"
+                  ? "Complaint"
+                  : "Queja",
               value: "complaint",
               variant: "outline" as const,
             },
             {
-              label: language === "pt-BR" ? "Solicitação" : language === "en" ? "Request" : "Solicitud",
+              label:
+                language === "pt-BR"
+                  ? "Solicitação"
+                  : language === "en"
+                  ? "Request"
+                  : "Solicitud",
               value: "request",
               variant: "outline" as const,
             },
             {
-              label: language === "pt-BR" ? "Sugestão" : language === "en" ? "Suggestion" : "Sugerencia",
+              label:
+                language === "pt-BR"
+                  ? "Sugestão"
+                  : language === "en"
+                  ? "Suggestion"
+                  : "Sugerencia",
               value: "suggestion",
               variant: "outline" as const,
             },
-          ],
-        )
-      }, 300)
+          ]
+        );
+      }, 300);
     }
-  }
+  };
 
   const handleManifestationType = (type: string, label: string) => {
-    addUserMessage(label)
-    setFormData((prev) => ({ ...prev, manifestationType: type }))
+    addUserMessage(label);
+    setFormData((prev) => ({ ...prev, manifestationType: type }));
 
     if (type === "report") {
-      setCurrentStep("identificationType")
+      setCurrentStep("identificationType");
       setTimeout(() => {
         // Aviso informativo para denuncias (identificada vs anônima)
         addBotMessage(
           language === "pt-BR"
             ? "Identificada: você poderá receber informações sobre as providências adotadas. Denúncia anônima: não será possível acompanhar ou receber respostas."
             : language === "en"
-              ? "Identified: you will be able to receive information about the measures taken. Anonymous report: it will not be possible to track or receive responses."
-              : "Identificada: podrá recibir información sobre las medidas adoptadas. Denuncia anónima: no será posible hacer seguimiento ni recibir respuestas.",
+            ? "Identified: you will be able to receive information about the measures taken. Anonymous report: it will not be possible to track or receive responses."
+            : "Identificada: podrá recibir información sobre las medidas adoptadas. Denuncia anónima: no será posible hacer seguimiento ni recibir respuestas.",
           150,
           undefined,
           undefined,
-          "info",
-        )
-      }, 150)
+          "info"
+        );
+      }, 150);
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Você deseja se identificar ou permanecer anônimo(a)?"
             : language === "en"
-              ? "Do you wish to identify yourself or remain anonymous?"
-              : "¿Desea identificarse o permanecer anónimo(a)?",
+            ? "Do you wish to identify yourself or remain anonymous?"
+            : "¿Desea identificarse o permanecer anónimo(a)?",
           300,
           [
             {
-              label: language === "pt-BR" ? "Identificada" : language === "en" ? "Identified" : "Identificada",
+              label:
+                language === "pt-BR"
+                  ? "Identificada"
+                  : language === "en"
+                  ? "Identified"
+                  : "Identificada",
               value: "identified",
               variant: "outline" as const,
             },
             {
-              label: language === "pt-BR" ? "Anônima" : language === "en" ? "Anonymous" : "Anónima",
+              label:
+                language === "pt-BR"
+                  ? "Anônima"
+                  : language === "en"
+                  ? "Anonymous"
+                  : "Anónima",
               value: "anonymous",
               variant: "secondary" as const,
             },
-          ],
-        )
-      }, 350)
+          ]
+        );
+      }, 350);
     } else {
       // Para outros tipos, vai direto para identificação
-      setCurrentStep("fullName")
+      setCurrentStep("fullName");
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Qual é seu nome completo?"
             : language === "en"
-              ? "What is your full name?"
-              : "¿Cuál es su nombre completo?",
+            ? "What is your full name?"
+            : "¿Cuál es su nombre completo?",
           300,
           undefined,
-          "text",
-        )
-      }, 300)
+          "text"
+        );
+      }, 300);
     }
-  }
+  };
 
   const handleIdentificationType = (type: string, label: string) => {
-    addUserMessage(label)
-    setFormData((prev) => ({ ...prev, identificationType: type }))
+    addUserMessage(label);
+    setFormData((prev) => ({ ...prev, identificationType: type }));
 
     if (type === "identified") {
-      setCurrentStep("fullName")
+      setCurrentStep("fullName");
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Qual é seu nome completo?"
             : language === "en"
-              ? "What is your full name?"
-              : "¿Cuál es su nombre completo?",
+            ? "What is your full name?"
+            : "¿Cuál es su nombre completo?",
           300,
           undefined,
-          "text",
-        )
-      }, 300)
+          "text"
+        );
+      }, 300);
     } else {
       // Anônimo vai direto para descrição
-      setCurrentStep("description")
+      setCurrentStep("description");
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Descreva sua solicitação em detalhes:"
             : language === "en"
-              ? "Describe your request in detail:"
-              : "Describa su solicitud en detalle:",
+            ? "Describe your request in detail:"
+            : "Describa su solicitud en detalle:",
           300,
           undefined,
-          "textarea",
-        )
-      }, 300)
+          "textarea"
+        );
+      }, 300);
     }
-  }
+  };
 
   const handleTextInput = (value: string) => {
-    addUserMessage(value)
+    addUserMessage(value);
 
     switch (currentStep) {
       case "fullName":
-        setFormData((prev) => ({ ...prev, fullName: value }))
-        setCurrentStep("email")
+        setFormData((prev) => ({ ...prev, fullName: value }));
+        setCurrentStep("email");
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
               ? "Qual é seu e-mail?"
               : language === "en"
-                ? "What is your email?"
-                : "¿Cuál es su correo electrónico?",
+              ? "What is your email?"
+              : "¿Cuál es su correo electrónico?",
             300,
             undefined,
-            "email",
-          )
-        }, 300)
-        break
+            "email"
+          );
+        }, 300);
+        break;
 
       case "email":
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) {
           setTimeout(() => {
             addBotMessage(
               language === "pt-BR"
                 ? "Por favor, insira um e-mail válido."
                 : language === "en"
-                  ? "Please enter a valid email."
-                  : "Por favor, ingrese un correo electrónico válido.",
+                ? "Please enter a valid email."
+                : "Por favor, ingrese un correo electrónico válido.",
               300,
               undefined,
-              "email",
-            )
-          }, 300)
-          return
+              "email"
+            );
+          }, 300);
+          return;
         }
-        setFormData((prev) => ({ ...prev, email: value }))
-        setCurrentStep("confirmEmail")
+        setFormData((prev) => ({ ...prev, email: value }));
+        setCurrentStep("confirmEmail");
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
               ? "Confirme seu e-mail:"
               : language === "en"
-                ? "Confirm your email:"
-                : "Confirme su correo electrónico:",
+              ? "Confirm your email:"
+              : "Confirme su correo electrónico:",
             300,
             undefined,
-            "email",
-          )
-        }, 300)
-        break
+            "email"
+          );
+        }, 300);
+        break;
 
       case "confirmEmail":
         if (value !== formData.email) {
@@ -508,268 +595,310 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
               language === "pt-BR"
                 ? "Os e-mails não coincidem. Por favor, tente novamente."
                 : language === "en"
-                  ? "Emails do not match. Please try again."
-                  : "Los correos electrónicos no coinciden. Por favor, inténtelo de nuevo.",
+                ? "Emails do not match. Please try again."
+                : "Los correos electrónicos no coinciden. Por favor, inténtelo de nuevo.",
               300,
               undefined,
-              "email",
-            )
-          }, 300)
-          return
+              "email"
+            );
+          }, 300);
+          return;
         }
-        setFormData((prev) => ({ ...prev, emailConfirmed: value }))
-        setCurrentStep("unfcccQuestion")
+        setFormData((prev) => ({ ...prev, emailConfirmed: value }));
+        setCurrentStep("unfcccQuestion");
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
               ? "Você possui afiliação UNFCCC?"
               : language === "en"
-                ? "Do you have UNFCCC affiliation?"
-                : "¿Tiene afiliación UNFCCC?",
+              ? "Do you have UNFCCC affiliation?"
+              : "¿Tiene afiliación UNFCCC?",
             300,
             [
               {
-                label: language === "pt-BR" ? "Sim" : language === "en" ? "Yes" : "Sí",
+                label:
+                  language === "pt-BR"
+                    ? "Sim"
+                    : language === "en"
+                    ? "Yes"
+                    : "Sí",
                 value: "yes",
                 variant: "outline" as const,
               },
               {
-                label: language === "pt-BR" ? "Não" : language === "en" ? "No" : "No",
+                label:
+                  language === "pt-BR"
+                    ? "Não"
+                    : language === "en"
+                    ? "No"
+                    : "No",
                 value: "no",
                 variant: "outline" as const,
               },
-            ],
-          )
-        }, 300)
-        break
+            ]
+          );
+        }, 300);
+        break;
 
       case "unfcccNumber":
-        setFormData((prev) => ({ ...prev, unfcccNumber: value }))
-        setCurrentStep("country")
+        setFormData((prev) => ({ ...prev, unfcccNumber: value }));
+        setCurrentStep("country");
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
               ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
               : language === "en"
-                ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
-                : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
+              ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
+              : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
             300,
             undefined,
-            "text",
-          )
-        }, 300)
-        break
+            "text"
+          );
+        }, 300);
+        break;
 
       case "country": {
-        const code = findCountryCodeByName(value)
+        const code = findCountryCodeByName(value);
         if (!code) {
           setTimeout(() => {
             addBotMessage(
               language === "pt-BR"
                 ? "Não consegui reconhecer o país. Tente novamente usando o nome completo (ex.: Argentina, Espanha, Estados Unidos)."
                 : language === "en"
-                  ? "Could not recognize the country. Please try again with the full name (e.g., Argentina, Spain, United States)."
-                  : "No pude reconocer el país. Intente nuevamente con el nombre completo (ej.: Argentina, España, United States).",
+                ? "Could not recognize the country. Please try again with the full name (e.g., Argentina, Spain, United States)."
+                : "No pude reconocer el país. Intente nuevamente con el nombre completo (ej.: Argentina, España, United States).",
               300,
               undefined,
-              "text",
-            )
-          }, 300)
-          return
+              "text"
+            );
+          }, 300);
+          return;
         }
-        setFormData((prev) => ({ ...prev, countryName: value, countryCode: String(code) }))
-        setCurrentStep("description")
+        setFormData((prev) => ({
+          ...prev,
+          countryName: value,
+          countryCode: String(code),
+        }));
+        setCurrentStep("description");
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
               ? "Descreva sua solicitação em detalhes:"
               : language === "en"
-                ? "Describe your request in detail:"
-                : "Describa su solicitud en detalle:",
+              ? "Describe your request in detail:"
+              : "Describa su solicitud en detalle:",
             300,
             undefined,
-            "textarea",
-          )
-        }, 300)
-        break
+            "textarea"
+          );
+        }, 300);
+        break;
       }
 
       case "description":
-        setFormData((prev) => ({ ...prev, description: value }))
+        setFormData((prev) => ({ ...prev, description: value }));
         // Pula a pergunta de nacionalidade já que foi verificado no início
-        setCurrentStep("attachmentQuestion")
+        setCurrentStep("attachmentQuestion");
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
               ? "Você gostaria de anexar um arquivo à sua solicitação?"
               : language === "en"
-                ? "Would you like to attach a file to your request?"
-                : "¿Le gustaría adjuntar un archivo a su solicitud?",
+              ? "Would you like to attach a file to your request?"
+              : "¿Le gustaría adjuntar un archivo a su solicitud?",
             300,
             [
               {
-                label: language === "pt-BR" ? "Sim" : language === "en" ? "Yes" : "Sí",
+                label:
+                  language === "pt-BR"
+                    ? "Sim"
+                    : language === "en"
+                    ? "Yes"
+                    : "Sí",
                 value: "yes",
                 variant: "outline" as const,
               },
               {
-                label: language === "pt-BR" ? "Não" : language === "en" ? "No" : "No",
+                label:
+                  language === "pt-BR"
+                    ? "Não"
+                    : language === "en"
+                    ? "No"
+                    : "No",
                 value: "no",
                 variant: "secondary" as const,
               },
-            ],
-          )
-        }, 300)
-        break
+            ]
+          );
+        }, 300);
+        break;
     }
-  }
+  };
 
   const handleUnfcccQuestion = (answer: string, label: string) => {
-    addUserMessage(label)
-    setFormData((prev) => ({ ...prev, unfccc: answer }))
+    addUserMessage(label);
+    setFormData((prev) => ({ ...prev, unfccc: answer }));
 
     if (answer === "yes") {
-      setCurrentStep("unfcccNumber")
+      setCurrentStep("unfcccNumber");
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Qual é seu número de inscrição UNFCCC? (opcional)"
             : language === "en"
-              ? "What is your UNFCCC registration number? (optional)"
-              : "¿Cuál es su número de inscripción UNFCCC? (opcional)",
+            ? "What is your UNFCCC registration number? (optional)"
+            : "¿Cuál es su número de inscripción UNFCCC? (opcional)",
           300,
           [
             {
-              label: language === "pt-BR" ? "Pular" : language === "en" ? "Skip" : "Omitir",
+              label:
+                language === "pt-BR"
+                  ? "Pular"
+                  : language === "en"
+                  ? "Skip"
+                  : "Omitir",
               value: "skip",
               variant: "secondary" as const,
             },
           ],
-          "text",
-        )
-      }, 300)
+          "text"
+        );
+      }, 300);
     } else {
-      setCurrentStep("country")
+      setCurrentStep("country");
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
             : language === "en"
-              ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
-              : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
+            ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
+            : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
           300,
           undefined,
-          "text",
-        )
-      }, 300)
+          "text"
+        );
+      }, 300);
     }
-  }
+  };
 
   const handleSkipUnfccc = (label: string) => {
-    addUserMessage(label)
-    setCurrentStep("country")
+    addUserMessage(label);
+    setCurrentStep("country");
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
           ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
           : language === "en"
-            ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
-            : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
+          ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
+          : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
         300,
-      undefined,
-      "text",
-      )
-    }, 300)
-  }
+        undefined,
+        "text"
+      );
+    }, 300);
+  };
 
   const handleAttachmentQuestion = (answer: string, label: string) => {
-    addUserMessage(label)
+    addUserMessage(label);
 
     if (answer === "yes") {
-      fileInputRef.current?.click()
+      fileInputRef.current?.click();
     } else {
-      completeForm()
+      completeForm();
     }
-  }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
+    const files = Array.from(e.target.files || []);
     // Limpeza do input para permitir re-seleção do mesmo arquivo posteriormente
-    e.target.value = ""
+    e.target.value = "";
 
-    if (files.length === 0) return
+    if (files.length === 0) return;
 
     const allowedExt = [
-      ".pdf", ".doc", ".docx", ".txt",
-      ".xls", ".xlsx",
-      ".png", ".jpg", ".jpeg",
+      ".pdf",
+      ".doc",
+      ".docx",
+      ".txt",
+      ".xls",
+      ".xlsx",
+      ".png",
+      ".jpg",
+      ".jpeg",
       ".mp3",
-      ".mp4", ".avi",
-    ]
+      ".mp4",
+      ".avi",
+    ];
 
-    const maxFiles = 10
-    const maxTotalBytes = 30 * 1024 * 1024 // 30MB no total
+    const maxFiles = 10;
+    const maxTotalBytes = 30 * 1024 * 1024; // 30MB no total
 
     const getExt = (name: string) => {
-      const i = name.lastIndexOf('.')
-      return i >= 0 ? name.slice(i).toLowerCase() : ''
-    }
+      const i = name.lastIndexOf(".");
+      return i >= 0 ? name.slice(i).toLowerCase() : "";
+    };
 
-    const currentTotal = attachments.reduce((acc, a) => acc + a.TamanhoArquivo, 0)
-    const currentCount = attachments.length
+    const currentTotal = attachments.reduce(
+      (acc, a) => acc + a.TamanhoArquivo,
+      0
+    );
+    const currentCount = attachments.length;
 
-  const accepted: File[] = []
-    const rejectedMessages: string[] = []
+    const accepted: File[] = [];
+    const rejectedMessages: string[] = [];
 
     // Filtra por extensão e respeita limites de quantidade e tamanho total
     for (const file of files) {
-      const ext = getExt(file.name)
+      const ext = getExt(file.name);
       if (!allowedExt.includes(ext)) {
         rejectedMessages.push(
-          language === 'pt-BR'
+          language === "pt-BR"
             ? `Tipo não permitido: ${file.name}`
-            : language === 'en'
-              ? `Not allowed type: ${file.name}`
-              : `Tipo no permitido: ${file.name}`
-        )
-        continue
+            : language === "en"
+            ? `Not allowed type: ${file.name}`
+            : `Tipo no permitido: ${file.name}`
+        );
+        continue;
       }
       if (currentCount + accepted.length + 1 > maxFiles) {
         rejectedMessages.push(
-          language === 'pt-BR'
+          language === "pt-BR"
             ? `Limite de ${maxFiles} arquivos atingido.`
-            : language === 'en'
-              ? `Limit of ${maxFiles} files reached.`
-              : `Límite de ${maxFiles} archivos alcanzado.`
-        )
-        break
+            : language === "en"
+            ? `Limit of ${maxFiles} files reached.`
+            : `Límite de ${maxFiles} archivos alcanzado.`
+        );
+        break;
       }
-      const projectedTotal = currentTotal + accepted.reduce((acc, f) => acc + f.size, 0) + file.size
+      const projectedTotal =
+        currentTotal + accepted.reduce((acc, f) => acc + f.size, 0) + file.size;
       if (projectedTotal > maxTotalBytes) {
         rejectedMessages.push(
-          language === 'pt-BR'
+          language === "pt-BR"
             ? `Tamanho total excede 30MB ao adicionar ${file.name}.`
-            : language === 'en'
-              ? `Total size exceeds 30MB when adding ${file.name}.`
-              : `El tamaño total supera 30MB al agregar ${file.name}.`
-        )
-        continue
+            : language === "en"
+            ? `Total size exceeds 30MB when adding ${file.name}.`
+            : `El tamaño total supera 30MB al agregar ${file.name}.`
+        );
+        continue;
       }
-      accepted.push(file)
+      accepted.push(file);
     }
 
     if (accepted.length === 0) {
-      if (rejectedMessages.length > 0) alert(rejectedMessages.join('\n'))
-      return
+      if (rejectedMessages.length > 0) alert(rejectedMessages.join("\n"));
+      return;
     }
 
     // Converte arquivos aceitos para Base64
-    const readAsBase64 = (file: File) => new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve((reader.result as string).split(',')[1] || '')
-      reader.onerror = () => reject(reader.error)
-      reader.readAsDataURL(file)
-    })
+    const readAsBase64 = (file: File) =>
+      new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () =>
+          resolve((reader.result as string).split(",")[1] || "");
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
 
     try {
       const converted = await Promise.all(
@@ -778,73 +907,83 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           ConteudoBase64: await readAsBase64(file),
           TamanhoArquivo: file.size,
         }))
-      )
-      setAttachments((prev) => [...prev, ...converted])
+      );
+      setAttachments((prev) => [...prev, ...converted]);
 
       addUserMessage(
         `${converted.length} ${
-          language === 'pt-BR' ? 'arquivo(s) anexado(s)' : language === 'en' ? 'file(s) attached' : 'archivo(s) adjunto(s)'
+          language === "pt-BR"
+            ? "arquivo(s) anexado(s)"
+            : language === "en"
+            ? "file(s) attached"
+            : "archivo(s) adjunto(s)"
         }`
-      )
+      );
 
-      if (rejectedMessages.length > 0) alert(rejectedMessages.join('\n'))
+      if (rejectedMessages.length > 0) alert(rejectedMessages.join("\n"));
 
-      setCurrentStep("moreAttachments")
+      setCurrentStep("moreAttachments");
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
             ? "Deseja adicionar mais anexos?"
             : language === "en"
-              ? "Would you like to add more attachments?"
-              : "¿Desea añadir más archivos adjuntos?",
+            ? "Would you like to add more attachments?"
+            : "¿Desea añadir más archivos adjuntos?",
           300,
           [
             {
-              label: language === "pt-BR" ? "Sim" : language === "en" ? "Yes" : "Sí",
+              label:
+                language === "pt-BR" ? "Sim" : language === "en" ? "Yes" : "Sí",
               value: "yes",
               variant: "outline" as const,
             },
             {
-              label: language === "pt-BR" ? "Não, finalizar" : language === "en" ? "No, finish" : "No, finalizar",
+              label:
+                language === "pt-BR"
+                  ? "Não, finalizar"
+                  : language === "en"
+                  ? "No, finish"
+                  : "No, finalizar",
               value: "no",
               variant: "default" as const,
             },
-          ],
-        )
-      }, 300)
+          ]
+        );
+      }, 300);
     } catch {
       alert(
-        language === 'pt-BR'
-          ? 'Falha ao processar anexos.'
-          : language === 'en'
-            ? 'Failed to process attachments.'
-            : 'Error al procesar los archivos adjuntos.'
-      )
+        language === "pt-BR"
+          ? "Falha ao processar anexos."
+          : language === "en"
+          ? "Failed to process attachments."
+          : "Error al procesar los archivos adjuntos."
+      );
     }
-  }
+  };
 
   const handleMoreAttachments = (answer: string, label: string) => {
-    addUserMessage(label)
+    addUserMessage(label);
 
     if (answer === "yes") {
-      fileInputRef.current?.click()
+      fileInputRef.current?.click();
     } else {
-      completeForm()
+      completeForm();
     }
-  }
+  };
 
   const completeForm = async () => {
-    setCurrentStep("complete")
+    setCurrentStep("complete");
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
           ? "Processando sua solicitação..."
           : language === "en"
-            ? "Processing your request..."
-            : "Procesando su solicitud...",
-        300,
-      )
-    }, 300)
+          ? "Processing your request..."
+          : "Procesando su solicitud...",
+        300
+      );
+    }, 300);
     try {
       // Mapeia tipo de manifestação e formulário aceito pela API CGU
       // 1: Denúncia -> Formulário 4
@@ -852,26 +991,33 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
       // 3: Elogio -> Formulário 1
       // 4: Sugestão -> Formulário 1
       // 5: Solicitação -> Formulário 1
-      const tipoMap: Record<string, { idTipoManifestacao: number; idTipoFormulario: number }> = {
+      const tipoMap: Record<
+        string,
+        { idTipoManifestacao: number; idTipoFormulario: number }
+      > = {
         report: { idTipoManifestacao: 1, idTipoFormulario: 4 },
         complaint: { idTipoManifestacao: 2, idTipoFormulario: 1 },
         compliment: { idTipoManifestacao: 3, idTipoFormulario: 1 },
         suggestion: { idTipoManifestacao: 4, idTipoFormulario: 1 },
         request: { idTipoManifestacao: 5, idTipoFormulario: 1 },
-      }
+      };
 
-  const chosen = tipoMap[formData.manifestationType || "request"] || tipoMap["request"]
-  const isAnonymous = formData.identificationType === "anonymous"
-  const isReport = (formData.manifestationType === "report")
-  // Regra: usar 1 para denúncia anônima; 4 para os demais casos
-  const idTipoIdentificacao = (isReport && isAnonymous) ? 1 : 4
+      const chosen =
+        tipoMap[formData.manifestationType || "request"] || tipoMap["request"];
+      const isAnonymous = formData.identificationType === "anonymous";
+      const isReport = formData.manifestationType === "report";
+      // Regra: usar 1 para denúncia anônima; 4 para os demais casos
+      const idTipoIdentificacao = isReport && isAnonymous ? 1 : 4;
 
       // Montar DTO mínimo para o backend com base no tipo escolhido
       const body = {
-  tipoChave: (typeof formData.manifestationType === "string" ? formData.manifestationType : undefined),
+        tipoChave:
+          typeof formData.manifestationType === "string"
+            ? formData.manifestationType
+            : undefined,
         idTipoFormulario: chosen.idTipoFormulario,
         idTipoManifestacao: chosen.idTipoManifestacao,
-  idTipoIdentificacaoManifestante: idTipoIdentificacao,
+        idTipoIdentificacaoManifestante: idTipoIdentificacao,
         textoUsuario: formData.description || "",
         linguagem: language,
         paisNaturalidade: formData.countryName || undefined,
@@ -884,78 +1030,88 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
               email: formData.email || "",
             },
         anexos: attachments,
-      }
+      };
 
       const res = await fetch("/api/manifestacoes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-      })
+      });
 
-      const json: unknown = await res.json()
-      const obj = (json && typeof json === "object" ? (json as Record<string, unknown>) : {})
+      const json: unknown = await res.json();
+      const obj =
+        json && typeof json === "object"
+          ? (json as Record<string, unknown>)
+          : {};
       if (res.ok && obj && obj.data && typeof obj.data === "object") {
-        const d = obj.data as Record<string, unknown>
+        const d = obj.data as Record<string, unknown>;
         const result: SubmitResult = {
           success: true,
           data: {
-            NumeroProtocolo: (d["NumeroProtocolo"] as string) || (d["NumProtocolo"] as string) || (d["protocolo"] as string) || undefined,
+            NumeroProtocolo:
+              (d["NumeroProtocolo"] as string) ||
+              (d["NumProtocolo"] as string) ||
+              (d["protocolo"] as string) ||
+              undefined,
             CodigoAcesso: (d["CodigoAcesso"] as string) || undefined,
             DataCadastro: (d["DataCadastro"] as string) || undefined,
             PrazoResposta: (d["PrazoResposta"] as string) || undefined,
           },
-        }
-        onComplete(result)
+        };
+        onComplete(result);
       } else {
-        const errMsg = (obj && ((obj["error"] as string) || (obj["message"] as string))) || `HTTP ${res.status}`
-        onComplete({ success: false, error: String(errMsg) })
+        const errMsg =
+          (obj && ((obj["error"] as string) || (obj["message"] as string))) ||
+          `HTTP ${res.status}`;
+        onComplete({ success: false, error: String(errMsg) });
       }
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Erro inesperado ao enviar"
-      onComplete({ success: false, error: message })
+      const message =
+        e instanceof Error ? e.message : "Erro inesperado ao enviar";
+      onComplete({ success: false, error: message });
     }
-  }
+  };
 
   const handleButtonClick = (value: string, label: string) => {
     switch (currentStep) {
       case "initial":
-        handleInitialChoice(value, label)
-        break
+        handleInitialChoice(value, label);
+        break;
       case "manifestationType":
-        handleManifestationType(value, label)
-        break
+        handleManifestationType(value, label);
+        break;
       case "identificationType":
-        handleIdentificationType(value, label)
-        break
+        handleIdentificationType(value, label);
+        break;
       case "unfcccQuestion":
-        handleUnfcccQuestion(value, label)
-        break
+        handleUnfcccQuestion(value, label);
+        break;
       case "unfcccNumber":
         if (value === "skip") {
-          handleSkipUnfccc(label)
+          handleSkipUnfccc(label);
         }
-        break
+        break;
       case "attachmentQuestion":
-        handleAttachmentQuestion(value, label)
-        break
+        handleAttachmentQuestion(value, label);
+        break;
       case "moreAttachments":
-        handleMoreAttachments(value, label)
-        break
+        handleMoreAttachments(value, label);
+        break;
     }
-  }
+  };
 
   const handleInputSubmit = () => {
-    if (!inputValue.trim()) return
+    if (!inputValue.trim()) return;
 
-    handleTextInput(inputValue)
-    setInputValue("")
-  }
+    handleTextInput(inputValue);
+    setInputValue("");
+  };
 
-  const currentMessage = messages[messages.length - 1]
+  const currentMessage = messages[messages.length - 1];
   const showInput =
     currentMessage?.inputType &&
     !isTyping &&
-    currentMessage.inputType !== "file"
+    currentMessage.inputType !== "file";
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -966,35 +1122,36 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           alt=""
           width={200}
           height={280}
-          className="absolute bottom-0 left-0 animate-float"
-          style={{ animationDelay: "0s" }}
+          className="absolute bottom-0 left-0 animate-in fade-in duration-1000"
         />
         <Image
           src="/plant-1.svg"
           alt=""
           width={180}
           height={250}
-          className="absolute bottom-0 right-0 scale-x-[-1] animate-float"
-          style={{ animationDelay: "1.5s" }}
+          className="absolute bottom-0 right-0 scale-x-[-1] animate-in fade-in duration-1000"
+          style={{ animationDelay: "200ms" }}
         />
       </div>
 
-      <header className="bg-gradient-to-r from-emerald-900 via-teal-800 to-emerald-900 text-white shadow-lg animate-in fade-in slide-in-from-top-4 duration-700 relative z-10 border-b-4 border-emerald-700/50">
+      <header className="bg-gradient-to-r from-emerald-900 via-teal-800 to-emerald-900 text-white shadow-lg relative z-10 border-b-4 border-emerald-700/50">
         <div className="container max-w-6xl mx-auto px-4 py-5 md:py-6">
           <div className="flex items-center justify-between gap-4 md:gap-6">
             <div className="flex items-center gap-3 md:gap-5 min-w-0">
               {/* Logo COP30 */}
-              <div className="w-24 md:w-28 h-14 md:h-16 flex items-center justify-center shrink-0 animate-in zoom-in duration-500" style={{ animationDelay: "300ms" }}>
+              <div className="w-24 md:w-28 h-14 md:h-16 flex items-center justify-center shrink-0">
                 <Image
                   src="/cop30logo.svg"
                   alt="COP30 Logo"
                   width={120}
                   height={64}
-                  className="object-contain hover:scale-105 transition-smooth"
+                  className="object-contain"
                 />
               </div>
-              <div className="min-w-0 animate-in fade-in slide-in-from-left-4 duration-700" style={{ animationDelay: "500ms" }}>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight whitespace-pre-wrap">{translations.header[language]}</h1>
+              <div className="min-w-0">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight whitespace-pre-wrap">
+                  {translations.header[language]}
+                </h1>
                 <p className="text-xs md:text-sm lg:text-base opacity-90 mt-0.5">
                   {translations.subtitle[language]}
                 </p>
@@ -1007,24 +1164,34 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full border-white/40 bg-white/15 text-white hover:bg-white/25 hover:scale-105 transition-smooth px-3 md:px-4 shadow-lg backdrop-blur-sm shrink-0 animate-in fade-in zoom-in duration-500"
-                  style={{ animationDelay: "700ms" }}
+                  className="rounded-full border-white/40 bg-white/15 text-white hover:bg-white/25 transition-all duration-200 px-3 md:px-4 shadow-lg backdrop-blur-sm shrink-0"
                 >
                   <Globe className="w-4 h-4 mr-1.5 md:mr-2" />
                   <span className="font-medium tracking-wide text-xs md:text-sm">
-                    {language === "pt-BR" ? "pt-BR" : language === "en" ? "en-US" : "es-ES"}
+                    {language === "pt-BR"
+                      ? "pt-BR"
+                      : language === "en"
+                      ? "en-US"
+                      : "es-ES"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52 animate-in fade-in slide-in-from-top-2 duration-200">
+              <DropdownMenuContent
+                align="end"
+                className="w-52 animate-in fade-in slide-in-from-top-2 duration-200"
+              >
                 {languages.map((lang) => (
                   <DropdownMenuItem
                     key={lang.code}
                     onClick={() => {
-                      onLanguageChange(lang.code)
-                      setIsLangOpen(false)
+                      onLanguageChange(lang.code);
+                      setIsLangOpen(false);
                     }}
-                    className={`${language === lang.code ? "bg-teal-50 text-teal-900 font-medium" : "hover:bg-muted"} gap-3 cursor-pointer transition-smooth`}
+                    className={`${
+                      language === lang.code
+                        ? "bg-teal-50 text-teal-900 font-medium"
+                        : "hover:bg-muted"
+                    } gap-3 cursor-pointer transition-all duration-200`}
                   >
                     <span className="text-lg">{lang.flag}</span>
                     <span>{lang.name}</span>
@@ -1037,105 +1204,132 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
       </header>
 
       <div className="container max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-6 relative z-10">
-        <Card
-          className="shadow-2xl mb-4 animate-in fade-in zoom-in-95 duration-700 border-2 hover:shadow-3xl transition-smooth rounded-2xl overflow-hidden"
-          style={{ animationDelay: "200ms" }}
-        >
+        <Card className="shadow-2xl mb-4 animate-in fade-in duration-500 border-2 rounded-2xl overflow-hidden">
           <ScrollArea className="h-[60vh] md:h-[65vh] p-4 md:p-6 chat-scrollbar">
             <div className="space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex gap-3 animate-message-in ${
-                  message.type === "user" ? "flex-row-reverse" : "flex-row"
-                }`}
-              >
-                <Avatar className={`${
-                  message.type === "bot" 
-                    ? "bg-gradient-to-br from-primary to-primary/80 shadow-md" 
-                    : "bg-gradient-to-br from-muted to-muted/80"
-                } transition-smooth shrink-0`}>
-                  <AvatarFallback className={message.type === "bot" ? "text-primary-foreground text-lg" : "text-lg"}>
-                    {message.type === "bot" ? "🤖" : "👤"}
-                  </AvatarFallback>
-                </Avatar>
+              {messages.map((message, index) => (
+                <div
+                  key={message.id}
+                  className={`flex gap-3 animate-in fade-in duration-300 ${
+                    message.type === "user" ? "flex-row-reverse" : "flex-row"
+                  }`}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <Avatar
+                    className={`${
+                      message.type === "bot"
+                        ? "bg-gradient-to-br from-primary to-primary/80 shadow-md"
+                        : "bg-gradient-to-br from-muted to-muted/80"
+                    } transition-all duration-200 shrink-0`}
+                  >
+                    <AvatarFallback
+                      className={
+                        message.type === "bot"
+                          ? "text-primary-foreground text-lg"
+                          : "text-lg"
+                      }
+                    >
+                      {message.type === "bot" ? "🤖" : "👤"}
+                    </AvatarFallback>
+                  </Avatar>
 
-                <div className={`flex-1 max-w-[78%] md:max-w-[70%] ${message.type === "user" ? "items-end" : "items-start"}`}>
                   <div
-                    className={`rounded-2xl px-4 py-3 transition-smooth hover:shadow-lg ${
-                      message.type === "user"
-                        ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-md"
-                        : message.variant === "info"
-                          ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 text-emerald-900 border-2 border-emerald-200/50 shadow-sm"
-                          : "bg-gradient-to-br from-muted to-muted/80 text-foreground border border-border/50"
+                    className={`flex-1 max-w-[78%] md:max-w-[70%] ${
+                      message.type === "user" ? "items-end" : "items-start"
                     }`}
                   >
-                    <p className="text-sm leading-relaxed whitespace-pre-line">{message.content}</p>
-                  </div>
-
-                  {message.buttons && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {message.buttons.map((button, btnIndex) => (
-                        <Button
-                          key={button.value}
-                          onClick={() => handleButtonClick(button.value, button.label)}
-                          variant={button.variant || "outline"}
-                          size="sm"
-                          className="rounded-full transition-smooth hover:scale-105 active:scale-95 shadow-sm hover:shadow-md animate-in fade-in slide-in-from-bottom-2 duration-300"
-                          style={{ animationDelay: `${btnIndex * 100}ms` }}
-                        >
-                          {button.label}
-                        </Button>
-                      ))}
+                    <div
+                      className={`rounded-2xl px-4 py-3 transition-all duration-200 ${
+                        message.type === "user"
+                          ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-md"
+                          : message.variant === "info"
+                          ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 text-emerald-900 border-2 border-emerald-200/50 shadow-sm"
+                          : "bg-gradient-to-br from-muted to-muted/80 text-foreground border border-border/50"
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed whitespace-pre-line">
+                        {message.content}
+                      </p>
                     </div>
-                  )}
 
-                  <p className="text-xs text-muted-foreground mt-1.5 px-2 opacity-70">
-                    {message.timestamp.toLocaleTimeString(language, {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-              </div>
-            ))}
+                    {message.buttons && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {message.buttons.map((button, btnIndex) => (
+                          <Button
+                            key={button.value}
+                            onClick={() =>
+                              handleButtonClick(button.value, button.label)
+                            }
+                            variant={button.variant || "outline"}
+                            size="sm"
+                            className="rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md animate-in fade-in"
+                            style={{
+                              animationDelay: `${btnIndex * 80}ms`,
+                              animationDuration: "300ms",
+                            }}
+                          >
+                            {button.label}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
 
-            {isTyping && (
-              <div className="flex gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <Avatar className="bg-gradient-to-br from-primary to-primary/80 shadow-md">
-                  <AvatarFallback className="text-primary-foreground text-lg">🤖</AvatarFallback>
-                </Avatar>
-                <div className="bg-muted rounded-2xl px-5 py-4 shadow-sm border border-border/50">
-                  <div className="flex gap-1.5">
-                    <div
-                      className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
-                      style={{ animationDelay: "0ms" }}
-                    />
-                    <div
-                      className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
-                      style={{ animationDelay: "200ms" }}
-                    />
-                    <div
-                      className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
-                      style={{ animationDelay: "400ms" }}
-                    />
+                    <p className="text-xs text-muted-foreground mt-1.5 px-2 opacity-70">
+                      {message.timestamp.toLocaleTimeString(language, {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
                   </div>
                 </div>
-              </div>
-            )}
+              ))}
 
-            <div ref={messagesEndRef} />
+              {isTyping && (
+                <div className="flex gap-3 animate-in fade-in duration-300">
+                  <Avatar className="bg-gradient-to-br from-primary to-primary/80 shadow-md">
+                    <AvatarFallback className="text-primary-foreground text-lg">
+                      🤖
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="bg-muted rounded-2xl px-5 py-4 shadow-sm border border-border/50">
+                    <div className="flex gap-1.5">
+                      <div
+                        className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
+                        style={{ animationDelay: "0ms" }}
+                      />
+                      <div
+                        className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
+                        style={{ animationDelay: "200ms" }}
+                      />
+                      <div
+                        className="w-2.5 h-2.5 bg-muted-foreground/70 rounded-full animate-typing-dot"
+                        style={{ animationDelay: "400ms" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
         </Card>
 
         {attachments.length > 0 && (
-          <Card className="p-4 mb-4 border-2">
+          <Card className="p-4 mb-4 border-2 animate-in fade-in duration-300">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="text-sm font-medium">
-                {language === 'pt-BR' ? 'Anexos' : language === 'en' ? 'Attachments' : 'Adjuntos'}
+                {language === "pt-BR"
+                  ? "Anexos"
+                  : language === "en"
+                  ? "Attachments"
+                  : "Adjuntos"}
                 {`: ${attachments.length}/10 • `}
-                {language === 'pt-BR' ? 'Total' : language === 'en' ? 'Total' : 'Total'}
+                {language === "pt-BR"
+                  ? "Total"
+                  : language === "en"
+                  ? "Total"
+                  : "Total"}
                 {`: ${formatBytes(totalBytes)} / 30 MB`}
               </div>
               <div className="flex gap-2">
@@ -1143,30 +1337,52 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                   variant="outline"
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
+                  className="transition-all duration-200"
                 >
-                  {language === 'pt-BR' ? 'Adicionar mais' : language === 'en' ? 'Add more' : 'Agregar más'}
+                  {language === "pt-BR"
+                    ? "Adicionar mais"
+                    : language === "en"
+                    ? "Add more"
+                    : "Agregar más"}
                 </Button>
                 <Button
                   size="sm"
                   onClick={() => completeForm()}
+                  className="transition-all duration-200"
                 >
-                  {language === 'pt-BR' ? 'Finalizar cadastro' : language === 'en' ? 'Finish submission' : 'Finalizar envío'}
+                  {language === "pt-BR"
+                    ? "Finalizar cadastro"
+                    : language === "en"
+                    ? "Finish submission"
+                    : "Finalizar envío"}
                 </Button>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
               {attachments.map((a, i) => (
-                <div key={`${a.NomeArquivo}-${i}`} className="flex items-center justify-between gap-3 p-2 rounded-md border">
+                <div
+                  key={`${a.NomeArquivo}-${i}`}
+                  className="flex items-center justify-between gap-3 p-2 rounded-md border transition-all duration-200 hover:bg-muted/50"
+                >
                   <div className="min-w-0">
-                    <p className="text-sm truncate" title={a.NomeArquivo}>{a.NomeArquivo}</p>
-                    <p className="text-xs text-muted-foreground">{formatBytes(a.TamanhoArquivo)}</p>
+                    <p className="text-sm truncate" title={a.NomeArquivo}>
+                      {a.NomeArquivo}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatBytes(a.TamanhoArquivo)}
+                    </p>
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleRemoveAttachment(i)}
+                    className="transition-all duration-200"
                   >
-                    {language === 'pt-BR' ? 'Remover' : language === 'en' ? 'Remove' : 'Eliminar'}
+                    {language === "pt-BR"
+                      ? "Remover"
+                      : language === "en"
+                      ? "Remove"
+                      : "Eliminar"}
                   </Button>
                 </div>
               ))}
@@ -1175,7 +1391,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         )}
 
         {showInput && (
-          <Card className="p-4 shadow-xl border-2 animate-in fade-in slide-in-from-bottom-4 duration-300 hover:shadow-2xl transition-smooth">
+          <Card className="p-4 shadow-xl border-2 animate-in fade-in duration-300">
             {currentMessage.inputType === "textarea" ? (
               <div className="flex-1 space-y-3">
                 <Textarea
@@ -1184,14 +1400,16 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                   // Impede ultrapassar o limite permitido (ajustado pelo cabeçalho)
                   maxLength={allowedBody}
                   onChange={(e) => {
-                    const v = e.target.value
-                    setInputValue(v.length > allowedBody ? v.slice(0, allowedBody) : v)
+                    const v = e.target.value;
+                    setInputValue(
+                      v.length > allowedBody ? v.slice(0, allowedBody) : v
+                    );
                   }}
                   placeholder={translations.placeholder[language]}
-                  className="min-h-[120px] resize-none focus:ring-2 focus:ring-primary/20 transition-smooth"
+                  className="min-h-[120px] resize-none focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && e.ctrlKey) {
-                      handleInputSubmit()
+                      handleInputSubmit();
                     }
                   }}
                 />
@@ -1199,23 +1417,48 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                 <div>
                   <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
                     <div
-                      className={`h-1 ${inputValue.length > allowedBody ? 'bg-red-500' : 'bg-primary'}`}
-                      style={{ width: `${Math.min(100, Math.round((inputValue.length / (allowedBody || 1)) * 100))}%` }}
+                      className={`h-1 transition-all duration-200 ${
+                        inputValue.length > allowedBody
+                          ? "bg-red-500"
+                          : "bg-primary"
+                      }`}
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          Math.round(
+                            (inputValue.length / (allowedBody || 1)) * 100
+                          )
+                        )}%`,
+                      }}
                     />
                   </div>
                   <div className="flex justify-between mt-1 text-[11px] text-muted-foreground">
-                    <span>{language === 'pt-BR' ? 'Limite de caracteres do texto' : language === 'en' ? 'Text character limit' : 'Límite de caracteres del texto'}</span>
-                    <span>{inputValue.length}/{allowedBody}</span>
+                    <span>
+                      {language === "pt-BR"
+                        ? "Limite de caracteres do texto"
+                        : language === "en"
+                        ? "Text character limit"
+                        : "Límite de caracteres del texto"}
+                    </span>
+                    <span>
+                      {inputValue.length}/{allowedBody}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-muted-foreground">
-                    {language === "pt-BR" ? "Pressione Ctrl+Enter para enviar" : language === "en" ? "Press Ctrl+Enter to send" : "Presione Ctrl+Enter para enviar"}
+                    {language === "pt-BR"
+                      ? "Pressione Ctrl+Enter para enviar"
+                      : language === "en"
+                      ? "Press Ctrl+Enter to send"
+                      : "Presione Ctrl+Enter para enviar"}
                   </p>
-                  <Button 
-                    onClick={handleInputSubmit} 
-                    className="gap-2 shadow-md hover:shadow-lg transition-smooth hover:scale-105 active:scale-95" 
-                    disabled={!inputValue.trim() || inputValue.length > allowedBody}
+                  <Button
+                    onClick={handleInputSubmit}
+                    className="gap-2 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                    disabled={
+                      !inputValue.trim() || inputValue.length > allowedBody
+                    }
                   >
                     <Send className="w-4 h-4" />
                     {translations.send[language]}
@@ -1229,20 +1472,26 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                   type={currentMessage.inputType === "email" ? "email" : "text"}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={currentStep === 'country'
-                    ? (language === 'pt-BR' ? 'Digite seu país/naturalidade...' : language === 'en' ? 'Type your country/nationality...' : 'Escriba su país/nacionalidad...')
-                    : translations.placeholder[language]}
-                  list={currentStep === 'country' ? 'country-list' : undefined}
-                  className="flex-1 focus:ring-2 focus:ring-primary/20 transition-smooth"
+                  placeholder={
+                    currentStep === "country"
+                      ? language === "pt-BR"
+                        ? "Digite seu país/naturalidade..."
+                        : language === "en"
+                        ? "Type your country/nationality..."
+                        : "Escriba su país/nacionalidad..."
+                      : translations.placeholder[language]
+                  }
+                  list={currentStep === "country" ? "country-list" : undefined}
+                  className="flex-1 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                      handleInputSubmit()
+                      handleInputSubmit();
                     }
                   }}
                 />
-                {currentStep === 'country' && (
+                {currentStep === "country" && (
                   <datalist id="country-list">
-                    {COUNTRIES.map(c => (
+                    {COUNTRIES.map((c) => (
                       <option key={c.codigo} value={c.descricao} />
                     ))}
                   </datalist>
@@ -1251,7 +1500,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                   onClick={handleInputSubmit}
                   size="icon"
                   disabled={!inputValue.trim()}
-                  className="transition-smooth hover:scale-110 active:scale-95 shadow-md hover:shadow-lg shrink-0"
+                  className="transition-all duration-200 hover:scale-110 active:scale-95 shadow-md hover:shadow-lg shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
@@ -1270,5 +1519,5 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         />
       </div>
     </div>
-  )
+  );
 }
