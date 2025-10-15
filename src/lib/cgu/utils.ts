@@ -1,0 +1,125 @@
+import { gzipSync } from "zlib";
+import type { AnexoInput, AnexoPayload, ManifestacaoPayloadMinimo, ManifestacaoRequestDTO } from "./types";
+
+export const MAX_FILES = 10;
+export const MAX_FILE_BYTES = 30 * 1024 * 1024; // 30 MB
+export const TEXTO_MAX_CHARS = 8000;
+
+// Matriz de permissões TipoManifestacao -> Tipos de Formulário aceitos
+// Baseado na tabela fornecida pelo usuário
+const FORM_MAP: Record<number, number[]> = {
+  1: [4], // Denúncia -> Denúncia
+  2: [1], // Reclamação -> Padrão
+  3: [1], // Elogio -> Padrão
+  4: [1], // Sugestão -> Padrão
+  5: [1], // Solicitação -> Padrão
+  6: [],   // Não classificada
+  7: [],   // Comunicação (não lista formulário)
+  8: [],   // Acesso à Informação
+  9: [2], // Simplifique -> Simplifique
+};
+
+export function validarParTipoFormulario(idTipoManifestacao: number, idTipoFormulario: number): { valido: boolean; motivo?: string } {
+  const permitidos = FORM_MAP[idTipoManifestacao] ?? [];
+  if (permitidos.length === 0) {
+    // Alguns tipos não listam formulário; manter flexível e sinalizar ao chamador
+    return { valido: permitidos.includes(idTipoFormulario), motivo: permitidos.length ? undefined : "Tipo de manifestação sem formulário listado; confirmar política da API." };
+  }
+  if (!permitidos.includes(idTipoFormulario)) {
+    return {
+      valido: false,
+      motivo: `Combinação inválida: IdTipoManifestacao=${idTipoManifestacao} não permite IdTipoFormulario=${idTipoFormulario}. Permitidos: ${permitidos.join(", ")}`,
+    };
+  }
+  return { valido: true };
+}
+
+export function buildTextoManifestacao(params: { paisNaturalidade?: string; linguagem?: string; numeroUnfccc?: string | null; textoUsuario: string; }): string {
+  const { paisNaturalidade, linguagem, numeroUnfccc, textoUsuario } = params;
+  const linha1 = "Manifestação recebida no âmbito da COP30.";
+  const linha2 = `País/Naturalidade selecionado: ${paisNaturalidade || "Não Informado"}`;
+  const linha3 = `Linguagem selecionada: ${linguagem || "Não Informado"}`;
+  const linha4 = `Número de inscrição UNFCCC: ${(numeroUnfccc && numeroUnfccc.trim()) ? numeroUnfccc.trim() : "Não Informado"}`;
+  const header = [linha1, linha2, linha3, linha4].join("\n") + "\n";
+
+  const normalizar = (s: string) => s.replace(/[^\x09\x0A\x0D\x20-\x7E\u00A0-\uFFFF]/g, "");
+  const headerNorm = normalizar(header);
+  const restante = TEXTO_MAX_CHARS - headerNorm.length;
+
+  let corpo = normalizar(textoUsuario || "");
+  if (restante <= 0) return headerNorm.slice(0, TEXTO_MAX_CHARS);
+  if (corpo.length > restante) {
+    const ellipsis = "…";
+    corpo = corpo.slice(0, Math.max(0, restante - ellipsis.length)) + ellipsis;
+  }
+  return headerNorm + corpo;
+}
+
+export function validarAnexos(entradas: AnexoInput[] = []): void {
+  if (entradas.length > MAX_FILES) {
+    throw new Error(`Máximo de ${MAX_FILES} anexos. Recebidos: ${entradas.length}`);
+  }
+  for (const a of entradas) {
+    if (a.TamanhoArquivo > MAX_FILE_BYTES) {
+      throw new Error(`Arquivo ${a.NomeArquivo} excede 30MB (${a.TamanhoArquivo} bytes)`);
+    }
+  }
+}
+
+export function base64ToBuffer(b64: string): Buffer {
+  // Suporta Base64 padrão; caso venha com prefixo data: remover
+  const clean = b64.replace(/^data:.*;base64,/, "");
+  return Buffer.from(clean, "base64");
+}
+
+export function anexosToPayload(anexos: AnexoInput[] = []): AnexoPayload[] {
+  return anexos.map((a) => {
+    const buf = base64ToBuffer(a.ConteudoBase64);
+    const gz = gzipSync(buf);
+    const b64gz = gz.toString("base64");
+    return {
+      NomeArquivo: a.NomeArquivo,
+      ConteudoZipadoEBase64: b64gz,
+      TamanhoArquivo: a.TamanhoArquivo,
+      IdAws: "",
+      IdAnexoGenerico: 1,
+    };
+  });
+}
+
+export function toCGUPayload(dto: ManifestacaoRequestDTO) {
+  const { idTipoFormulario, idTipoManifestacao } = dto;
+  const valid = validarParTipoFormulario(idTipoManifestacao, idTipoFormulario);
+  if (!valid.valido) {
+    throw new Error(valid.motivo || "Combinação de tipo/formulário inválida");
+  }
+
+  validarAnexos(dto.anexos);
+
+  const TextoManifestacao = buildTextoManifestacao({
+    paisNaturalidade: dto.paisNaturalidade,
+    linguagem: dto.linguagem,
+    numeroUnfccc: dto.numeroUnfccc,
+    textoUsuario: dto.textoUsuario,
+  });
+
+  const payload: ManifestacaoPayloadMinimo = {
+    IdTipoFormulario: dto.idTipoFormulario,
+    IdTipoManifestacao: dto.idTipoManifestacao,
+    IdOuvidoriaDestino: dto.idOuvidoriaDestino,
+    TextoManifestacao,
+    Anexos: anexosToPayload(dto.anexos),
+    IdModoResposta: dto.idModoResposta,
+    IdTipoIdentificacaoManifestante: dto.idTipoIdentificacaoManifestante,
+  };
+
+  if (dto.manifestante) {
+    payload.Manifestante = {
+      IdPais: dto.manifestante.idPais,
+      Nome: dto.manifestante.nome,
+      Email: dto.manifestante.email,
+    };
+  }
+
+  return payload;
+}
