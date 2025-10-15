@@ -12,6 +12,8 @@ interface ConfirmationScreenProps {
     | { success: true; data: { NumeroProtocolo?: string; CodigoAcesso?: string; DataCadastro?: string; PrazoResposta?: string } }
     | { success: false; error: string }
   onRestart: () => void
+  // When true, do not show protocol/access/dates; only show a completion message
+  isAnonymous?: boolean
 }
 
 const translations = {
@@ -75,6 +77,11 @@ const translations = {
     en: "Try again",
     es: "Intentar de nuevo",
   },
+  anonymousNotice: {
+    "pt-BR": "Sua denúncia anônima foi registrada e enviada com sucesso. Por ser anônima, não exibimos número de protocolo, códigos ou datas nesta tela.",
+    en: "Your anonymous report has been submitted successfully. Because it is anonymous, we do not display protocol numbers, codes, or dates on this screen.",
+    es: "Su denuncia anónima ha sido enviada con éxito. Por ser anónima, no mostramos números de protocolo, códigos ni fechas en esta pantalla.",
+  },
   details: {
     "pt-BR": {
       protocol: "Número do Protocolo",
@@ -97,15 +104,27 @@ const translations = {
   },
 }
 
-export function ConfirmationScreen({ language, result, onRestart }: ConfirmationScreenProps) {
+export function ConfirmationScreen({ language, result, onRestart, isAnonymous = false }: ConfirmationScreenProps) {
   const isSuccess = result.success
   const data = result.success ? result.data : undefined
+
+  // Format protocol from 17 digits to 55555.000467/2025-31
+  const formatProtocol = (raw?: string) => {
+    if (!raw) return "-"
+    const digits = (raw.match(/\d/g) || []).join("")
+    if (digits.length !== 17) return raw // fallback if unexpected
+    const p1 = digits.slice(0, 5)
+    const p2 = digits.slice(5, 11)
+    const p3 = digits.slice(11, 15)
+    const p4 = digits.slice(15, 17)
+    return `${p1}.${p2}/${p3}-${p4}`
+  }
 
   const handleDownload = () => {
     // Create a simple text receipt
     const receipt = `
 COP30 Brasil - Comprovante de Registro
-${translations.details[language].protocol}: ${data?.NumeroProtocolo ?? "-"}
+${translations.details[language].protocol}: ${formatProtocol(data?.NumeroProtocolo)}
 ${translations.details[language].access}: ${data?.CodigoAcesso ?? "-"}
 ${translations.details[language].createdAt}: ${data?.DataCadastro ?? new Date().toLocaleString(language)}
 ${translations.details[language].deadline}: ${data?.PrazoResposta ?? "-"}
@@ -165,31 +184,50 @@ Status: ${isSuccess ? "Registered" : "Error"}
 
           {/* Details card (success) or error card */}
           {isSuccess ? (
-            <Card 
-              className="w-full p-5 md:p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/30 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 hover:shadow-xl transition-smooth"
-              style={{ animationDelay: "400ms" }}
-            >
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wide">{translations.details[language].protocol}</p>
-                  <p className="text-xl md:text-2xl font-bold font-mono tracking-wider text-primary">{data?.NumeroProtocolo ?? "-"}</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wide">{translations.details[language].access}</p>
-                    <p className="text-sm md:text-base font-mono">{data?.CodigoAcesso ?? "-"}</p>
+                <Card 
+                  className="relative w-full p-5 md:p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/30 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 hover:shadow-xl transition-smooth"
+                  style={{ animationDelay: "400ms" }}
+                >
+                  {/* Minimalist download button inside the green card */}
+                  <div className="absolute right-3 top-3">
+                    <Button
+                      onClick={handleDownload}
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-primary hover:bg-primary/10"
+                      aria-label={translations.download[language]}
+                    >
+                      <Download className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wide">{translations.details[language].createdAt}</p>
-                    <p className="text-sm md:text-base">{data?.DataCadastro ?? "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wide">{translations.details[language].deadline}</p>
-                    <p className="text-sm md:text-base">{data?.PrazoResposta ?? "-"}</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
+
+                  {isAnonymous ? (
+                    <p className="text-sm md:text-base text-muted-foreground pr-10">
+                      {translations.anonymousNotice[language]}
+                    </p>
+                  ) : (
+                    <div className="space-y-3 pr-10">
+                      <div>
+                        <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wide">{translations.details[language].protocol}</p>
+                        <p className="text-xl md:text-2xl font-bold font-mono tracking-wider text-primary">{formatProtocol(data?.NumeroProtocolo)}</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wide">{translations.details[language].access}</p>
+                          <p className="text-sm md:text-base font-mono">{data?.CodigoAcesso ?? "-"}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wide">{translations.details[language].createdAt}</p>
+                          <p className="text-sm md:text-base">{data?.DataCadastro ?? "-"}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wide">{translations.details[language].deadline}</p>
+                          <p className="text-sm md:text-base">{data?.PrazoResposta ?? "-"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </Card>
           ) : (
             <Card 
               className="w-full p-5 md:p-6 bg-gradient-to-br from-red-50 to-red-100/70 border-2 border-red-200 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500"
@@ -229,26 +267,15 @@ Status: ${isSuccess ? "Registered" : "Error"}
             style={{ animationDelay: "900ms" }}
           >
             {isSuccess ? (
-              <>
-                <Button 
-                  onClick={() => window.open("https://falabr.cgu.gov.br/web/manifestacao/consultar", "_blank")}
-                  variant="default" 
-                  className="flex-1 gap-2 transition-smooth hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl" 
-                  size="lg"
-                >
-                  <Home className="w-4 h-4" />
-                  {translations.consult[language]}
-                </Button>
-                <Button 
-                  onClick={handleDownload} 
-                  variant="outline" 
-                  className="flex-1 gap-2 bg-transparent transition-smooth hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg border-2" 
-                  size="lg"
-                >
-                  <Download className="w-4 h-4" />
-                  {translations.download[language]}
-                </Button>
-              </>
+              <Button 
+                onClick={() => window.open("https://falabr.cgu.gov.br/web/manifestacao/consultar", "_blank")}
+                variant="default" 
+                className="flex-1 gap-2 transition-smooth hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl" 
+                size="lg"
+              >
+                <Home className="w-4 h-4" />
+                {translations.consult[language]}
+              </Button>
             ) : (
               <Button 
                 onClick={onRestart} 
