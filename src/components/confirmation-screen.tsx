@@ -1,9 +1,9 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Button } from "@/src/components/ui/button"
+import { Card } from "@/src/components/ui/card"
 import { CheckCircle2, Download, Home } from "lucide-react"
-import type { Language } from "@/app/page"
+import type { Language } from "@/src/app/page"
 
 interface ConfirmationScreenProps {
   language: Language

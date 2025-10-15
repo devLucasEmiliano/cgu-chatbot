@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Button } from "@/src/components/ui/button"
+import { Card } from "@/src/components/ui/card"
 import { Globe } from "lucide-react"
-import type { Language } from "@/app/page"
+import type { Language } from "@/src/app/page"
 import Image from "next/image"
 
 interface LanguageSelectionProps {

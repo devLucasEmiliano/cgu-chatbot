@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@/src/components/ui/button"
+import { Card } from "@/src/components/ui/card"
+import { Checkbox } from "@/src/components/ui/checkbox"
+import { ScrollArea } from "@/src/components/ui/scroll-area"
 import { ArrowLeft, Globe } from "lucide-react"
 import Image from "next/image"
-import type { Language } from "@/app/page"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import type { Language } from "@/src/app/page"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 
 interface TermsAcceptanceProps {
   language: Language

@@ -2,14 +2,14 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/src/components/ui/button"
+import { Card } from "@/src/components/ui/card"
+import { Input } from "@/src/components/ui/input"
+import { Textarea } from "@/src/components/ui/textarea"
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import { Send, Globe } from "lucide-react"
-import type { Language } from "@/app/page"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import type { Language } from "@/src/app/page"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 
 interface ChatbotInterfaceProps {
   language: Language

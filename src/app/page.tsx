@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { LanguageSelection } from "@/components/language-selection"
-import { TermsAcceptance } from "@/components/terms-acceptance"
-import { ChatbotInterface } from "@/components/chatbot-interface"
-import { ConfirmationScreen } from "@/components/confirmation-screen"
+import { LanguageSelection } from "@/src/components/language-selection"
+import { TermsAcceptance } from "@/src/components/terms-acceptance"
+import { ChatbotInterface } from "@/src/components/chatbot-interface"
+import { ConfirmationScreen } from "@/src/components/confirmation-screen"
 
 export type Language = "pt-BR" | "en" | "es"
 
