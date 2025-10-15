@@ -2,7 +2,15 @@ import { gzipSync } from "zlib";
 import type { AnexoInput, AnexoPayload, ManifestacaoPayloadMinimo, ManifestacaoRequestDTO } from "./types";
 
 export const MAX_FILES = 10;
-export const MAX_FILE_BYTES = 30 * 1024 * 1024; // 30 MB
+export const MAX_FILE_BYTES = 30 * 1024 * 1024; // 30 MB por arquivo (proteção adicional)
+export const MAX_TOTAL_BYTES = 30 * 1024 * 1024; // 30 MB no total (regra Fala.BR)
+export const ALLOWED_EXT = [
+  ".pdf", ".doc", ".docx", ".txt",
+  ".xls", ".xlsx",
+  ".png", ".jpg", ".jpeg",
+  ".mp3",
+  ".mp4", ".avi",
+];
 export const TEXTO_MAX_CHARS = 8000;
 
 // Matriz de permissões TipoManifestacao -> Tipos de Formulário aceitos
@@ -59,10 +67,23 @@ export function validarAnexos(entradas: AnexoInput[] = []): void {
   if (entradas.length > MAX_FILES) {
     throw new Error(`Máximo de ${MAX_FILES} anexos. Recebidos: ${entradas.length}`);
   }
+  const getExt = (name: string) => {
+    const i = name.lastIndexOf(".");
+    return i >= 0 ? name.slice(i).toLowerCase() : "";
+  };
+  let total = 0;
   for (const a of entradas) {
+    total += a.TamanhoArquivo || 0;
     if (a.TamanhoArquivo > MAX_FILE_BYTES) {
       throw new Error(`Arquivo ${a.NomeArquivo} excede 30MB (${a.TamanhoArquivo} bytes)`);
     }
+    const ext = getExt(a.NomeArquivo || "");
+    if (!ALLOWED_EXT.includes(ext)) {
+      throw new Error(`Tipo de arquivo não permitido: ${a.NomeArquivo || "(sem nome)"}`);
+    }
+  }
+  if (total > MAX_TOTAL_BYTES) {
+    throw new Error(`Soma dos anexos excede 30MB (${total} bytes)`);
   }
 }
 

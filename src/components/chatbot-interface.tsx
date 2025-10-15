@@ -12,6 +12,7 @@ import type { Language, SubmitResult } from "@/src/app/page"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 import Image from "next/image"
 import { ScrollArea } from "@/src/components/ui/scroll-area"
+import { COUNTRIES, findCountryCodeByName } from "@/src/lib/cgu/countries"
 
 interface ChatbotInterfaceProps {
   language: Language
@@ -77,6 +78,7 @@ type FlowStep =
   | "confirmEmail"
   | "unfcccQuestion"
   | "unfcccNumber"
+  | "country"
   | "description"
   | "attachmentQuestion"
   | "moreAttachments"
@@ -88,6 +90,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
   const [inputValue, setInputValue] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [formData, setFormData] = useState<Record<string, string>>({})
+  const [attachments, setAttachments] = useState<{ NomeArquivo: string; ConteudoBase64: string; TamanhoArquivo: number }[]>([])
   const [isLangOpen, setIsLangOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -104,6 +107,34 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
+  // Helpers para anexos
+  const formatBytes = (bytes: number) => {
+    const mb = bytes / (1024 * 1024)
+    if (mb >= 0.1) return `${mb.toFixed(2)} MB`
+    const kb = bytes / 1024
+    if (kb >= 0.1) return `${kb.toFixed(2)} KB`
+    return `${bytes} B`
+  }
+  const totalBytes = attachments.reduce((acc, a) => acc + (a.TamanhoArquivo || 0), 0)
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  // Limite de caracteres: replicar cabeçalho do backend para calcular espaço restante
+  const MAX_CHARS = 8000
+  const computeHeaderLen = () => {
+    const linha1 = "Manifestação recebida no âmbito da COP30."
+    const pais = formData.countryName || "Não Informado"
+    const linha2 = `País/Naturalidade selecionado: ${pais}`
+    const linha3 = `Linguagem selecionada: ${language || "Não Informado"}`
+    const unf = (formData.unfcccNumber && formData.unfcccNumber.trim()) ? formData.unfcccNumber.trim() : "Não Informado"
+    const linha4 = `Número de inscrição UNFCCC: ${unf}`
+    const header = [linha1, linha2, linha3, linha4].join("\n") + "\n"
+    return header.length
+  }
+  const headerLen = computeHeaderLen()
+  const allowedBody = Math.max(0, MAX_CHARS - headerLen)
+
   useEffect(() => {
     scrollToBottom()
   }, [messages])
@@ -117,6 +148,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
       inputRef.current.focus()
     }
   }, [messages])
+
 
   useEffect(() => {
     if (hasInitializedRef.current) return
@@ -513,6 +545,39 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
 
       case "unfcccNumber":
         setFormData((prev) => ({ ...prev, unfcccNumber: value }))
+        setCurrentStep("country")
+        setTimeout(() => {
+          addBotMessage(
+            language === "pt-BR"
+              ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
+              : language === "en"
+                ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
+                : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
+            300,
+            undefined,
+            "text",
+          )
+        }, 300)
+        break
+
+      case "country": {
+        const code = findCountryCodeByName(value)
+        if (!code) {
+          setTimeout(() => {
+            addBotMessage(
+              language === "pt-BR"
+                ? "Não consegui reconhecer o país. Tente novamente usando o nome completo (ex.: Argentina, Espanha, Estados Unidos)."
+                : language === "en"
+                  ? "Could not recognize the country. Please try again with the full name (e.g., Argentina, Spain, United States)."
+                  : "No pude reconocer el país. Intente nuevamente con el nombre completo (ej.: Argentina, España, United States).",
+              300,
+              undefined,
+              "text",
+            )
+          }, 300)
+          return
+        }
+        setFormData((prev) => ({ ...prev, countryName: value, countryCode: String(code) }))
         setCurrentStep("description")
         setTimeout(() => {
           addBotMessage(
@@ -527,6 +592,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           )
         }, 300)
         break
+      }
 
       case "description":
         setFormData((prev) => ({ ...prev, description: value }))
@@ -583,17 +649,17 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         )
       }, 300)
     } else {
-      setCurrentStep("description")
+      setCurrentStep("country")
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Descreva sua solicitação em detalhes:"
+            ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
             : language === "en"
-              ? "Describe your request in detail:"
-              : "Describa su solicitud en detalle:",
+              ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
+              : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
           300,
           undefined,
-          "textarea",
+          "text",
         )
       }, 300)
     }
@@ -601,17 +667,17 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
 
   const handleSkipUnfccc = (label: string) => {
     addUserMessage(label)
-    setCurrentStep("description")
+    setCurrentStep("country")
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "Descreva sua solicitação em detalhes:"
+          ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
           : language === "en"
-            ? "Describe your request in detail:"
-            : "Describa su solicitud en detalle:",
+            ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
+            : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
         300,
-        undefined,
-        "textarea",
+      undefined,
+      "text",
       )
     }, 300)
   }
@@ -626,33 +692,102 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
     }
   }
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    const maxSize = 10 * 1024 * 1024
-    const validFiles = files.filter((file) => {
-      if (file.size > maxSize) {
-        alert(
-          language === "pt-BR"
-            ? `O arquivo ${file.name} excede o tamanho máximo de 10MB.`
-            : language === "en"
-              ? `The file ${file.name} exceeds the maximum size of 10MB.`
-              : `El archivo ${file.name} excede el tamaño máximo de 10MB.`,
+    // Limpeza do input para permitir re-seleção do mesmo arquivo posteriormente
+    e.target.value = ""
+
+    if (files.length === 0) return
+
+    const allowedExt = [
+      ".pdf", ".doc", ".docx", ".txt",
+      ".xls", ".xlsx",
+      ".png", ".jpg", ".jpeg",
+      ".mp3",
+      ".mp4", ".avi",
+    ]
+
+    const maxFiles = 10
+    const maxTotalBytes = 30 * 1024 * 1024 // 30MB no total
+
+    const getExt = (name: string) => {
+      const i = name.lastIndexOf('.')
+      return i >= 0 ? name.slice(i).toLowerCase() : ''
+    }
+
+    const currentTotal = attachments.reduce((acc, a) => acc + a.TamanhoArquivo, 0)
+    const currentCount = attachments.length
+
+  const accepted: File[] = []
+    const rejectedMessages: string[] = []
+
+    // Filtra por extensão e respeita limites de quantidade e tamanho total
+    for (const file of files) {
+      const ext = getExt(file.name)
+      if (!allowedExt.includes(ext)) {
+        rejectedMessages.push(
+          language === 'pt-BR'
+            ? `Tipo não permitido: ${file.name}`
+            : language === 'en'
+              ? `Not allowed type: ${file.name}`
+              : `Tipo no permitido: ${file.name}`
         )
-        return false
+        continue
       }
-      return true
+      if (currentCount + accepted.length + 1 > maxFiles) {
+        rejectedMessages.push(
+          language === 'pt-BR'
+            ? `Limite de ${maxFiles} arquivos atingido.`
+            : language === 'en'
+              ? `Limit of ${maxFiles} files reached.`
+              : `Límite de ${maxFiles} archivos alcanzado.`
+        )
+        break
+      }
+      const projectedTotal = currentTotal + accepted.reduce((acc, f) => acc + f.size, 0) + file.size
+      if (projectedTotal > maxTotalBytes) {
+        rejectedMessages.push(
+          language === 'pt-BR'
+            ? `Tamanho total excede 30MB ao adicionar ${file.name}.`
+            : language === 'en'
+              ? `Total size exceeds 30MB when adding ${file.name}.`
+              : `El tamaño total supera 30MB al agregar ${file.name}.`
+        )
+        continue
+      }
+      accepted.push(file)
+    }
+
+    if (accepted.length === 0) {
+      if (rejectedMessages.length > 0) alert(rejectedMessages.join('\n'))
+      return
+    }
+
+    // Converte arquivos aceitos para Base64
+    const readAsBase64 = (file: File) => new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve((reader.result as string).split(',')[1] || '')
+      reader.onerror = () => reject(reader.error)
+      reader.readAsDataURL(file)
     })
 
-    if (validFiles.length > 0) {
-      addUserMessage(
-        `${validFiles.length} ${
-          language === "pt-BR"
-            ? "arquivo(s) anexado(s)"
-            : language === "en"
-              ? "file(s) attached"
-              : "archivo(s) adjunto(s)"
-        }`,
+    try {
+      const converted = await Promise.all(
+        accepted.map(async (file) => ({
+          NomeArquivo: file.name,
+          ConteudoBase64: await readAsBase64(file),
+          TamanhoArquivo: file.size,
+        }))
       )
+      setAttachments((prev) => [...prev, ...converted])
+
+      addUserMessage(
+        `${converted.length} ${
+          language === 'pt-BR' ? 'arquivo(s) anexado(s)' : language === 'en' ? 'file(s) attached' : 'archivo(s) adjunto(s)'
+        }`
+      )
+
+      if (rejectedMessages.length > 0) alert(rejectedMessages.join('\n'))
 
       setCurrentStep("moreAttachments")
       setTimeout(() => {
@@ -677,6 +812,14 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           ],
         )
       }, 300)
+    } catch {
+      alert(
+        language === 'pt-BR'
+          ? 'Falha ao processar anexos.'
+          : language === 'en'
+            ? 'Failed to process attachments.'
+            : 'Error al procesar los archivos adjuntos.'
+      )
     }
   }
 
@@ -727,12 +870,15 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
         idTipoIdentificacaoManifestante: isAnonymous ? 3 : 1,
         textoUsuario: formData.description || "",
         linguagem: language,
+        paisNaturalidade: formData.countryName || undefined,
         manifestante: isAnonymous
           ? undefined
           : {
+              idPais: formData.countryCode ? Number(formData.countryCode) : 33,
               nome: formData.fullName || "",
               email: formData.email || "",
             },
+        anexos: attachments,
       }
 
       const res = await fetch("/api/manifestacoes", {
@@ -978,6 +1124,51 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           </ScrollArea>
         </Card>
 
+        {attachments.length > 0 && (
+          <Card className="p-4 mb-4 border-2">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="text-sm font-medium">
+                {language === 'pt-BR' ? 'Anexos' : language === 'en' ? 'Attachments' : 'Adjuntos'}
+                {`: ${attachments.length}/10 • `}
+                {language === 'pt-BR' ? 'Total' : language === 'en' ? 'Total' : 'Total'}
+                {`: ${formatBytes(totalBytes)} / 30 MB`}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {language === 'pt-BR' ? 'Adicionar mais' : language === 'en' ? 'Add more' : 'Agregar más'}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => completeForm()}
+                >
+                  {language === 'pt-BR' ? 'Finalizar cadastro' : language === 'en' ? 'Finish submission' : 'Finalizar envío'}
+                </Button>
+              </div>
+            </div>
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+              {attachments.map((a, i) => (
+                <div key={`${a.NomeArquivo}-${i}`} className="flex items-center justify-between gap-3 p-2 rounded-md border">
+                  <div className="min-w-0">
+                    <p className="text-sm truncate" title={a.NomeArquivo}>{a.NomeArquivo}</p>
+                    <p className="text-xs text-muted-foreground">{formatBytes(a.TamanhoArquivo)}</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRemoveAttachment(i)}
+                  >
+                    {language === 'pt-BR' ? 'Remover' : language === 'en' ? 'Remove' : 'Eliminar'}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
         {showInput && (
           <Card className="p-4 shadow-xl border-2 animate-in fade-in slide-in-from-bottom-4 duration-300 hover:shadow-2xl transition-smooth">
             {currentMessage.inputType === "textarea" ? (
@@ -994,6 +1185,19 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                     }
                   }}
                 />
+                {/* Barra de progresso do limite de caracteres considerando o cabeçalho */}
+                <div>
+                  <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                    <div
+                      className={`h-1 ${inputValue.length > allowedBody ? 'bg-red-500' : 'bg-primary'}`}
+                      style={{ width: `${Math.min(100, Math.round((inputValue.length / (allowedBody || 1)) * 100))}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between mt-1 text-[11px] text-muted-foreground">
+                    <span>{language === 'pt-BR' ? 'Limite de caracteres do texto' : language === 'en' ? 'Text character limit' : 'Límite de caracteres del texto'}</span>
+                    <span>{inputValue.length}/{allowedBody}</span>
+                  </div>
+                </div>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-muted-foreground">
                     {language === "pt-BR" ? "Pressione Ctrl+Enter para enviar" : language === "en" ? "Press Ctrl+Enter to send" : "Presione Ctrl+Enter para enviar"}
@@ -1001,7 +1205,7 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                   <Button 
                     onClick={handleInputSubmit} 
                     className="gap-2 shadow-md hover:shadow-lg transition-smooth hover:scale-105 active:scale-95" 
-                    disabled={!inputValue.trim()}
+                    disabled={!inputValue.trim() || inputValue.length > allowedBody}
                   >
                     <Send className="w-4 h-4" />
                     {translations.send[language]}
@@ -1015,7 +1219,10 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                   type={currentMessage.inputType === "email" ? "email" : "text"}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={translations.placeholder[language]}
+                  placeholder={currentStep === 'country'
+                    ? (language === 'pt-BR' ? 'Digite seu país/naturalidade...' : language === 'en' ? 'Type your country/nationality...' : 'Escriba su país/nacionalidad...')
+                    : translations.placeholder[language]}
+                  list={currentStep === 'country' ? 'country-list' : undefined}
                   className="flex-1 focus:ring-2 focus:ring-primary/20 transition-smooth"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -1023,6 +1230,13 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
                     }
                   }}
                 />
+                {currentStep === 'country' && (
+                  <datalist id="country-list">
+                    {COUNTRIES.map(c => (
+                      <option key={c.codigo} value={c.descricao} />
+                    ))}
+                  </datalist>
+                )}
                 <Button
                   onClick={handleInputSubmit}
                   size="icon"
@@ -1036,7 +1250,14 @@ export function ChatbotInterface({ language, onComplete, onLanguageChange }: Cha
           </Card>
         )}
 
-        <input ref={fileInputRef} type="file" multiple onChange={handleFileUpload} className="hidden" />
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.png,.jpg,.jpeg,.mp3,.mp4,.avi"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
       </div>
     </div>
   )
