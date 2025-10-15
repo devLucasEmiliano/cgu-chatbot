@@ -27,7 +27,7 @@ flowchart TD
     C -->|Nao| B
     D --> E[Chatbot coleta dados do manifestante]
     E --> F{Ha anexos?}
-    F -->|Sim| G[Upload e validacao dos arquivos<br/>(tamanho, extensao, quantidade)]
+    F -->|Sim| G[Upload e validacao dos arquivos \n (tamanho, extensao, quantidade)]
     F -->|Nao| H[Preparar payload para CGU]
     G --> H
     H --> I[Envio para API /api/manifestacoes]
