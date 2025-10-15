@@ -1,0 +1,33 @@
+import type { CGUResponse, ManifestacaoPayloadMinimo } from "./types";
+
+const BASE_URL = process.env.CGU_API_BASE_URL || "https://treinafalabr.cgu.gov.br";
+const API_PATH = "/api/manifestacoes";
+
+export async function postManifestacao(payload: ManifestacaoPayloadMinimo, opts?: { token?: string; timeoutMs?: number }): Promise<CGUResponse> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), opts?.timeoutMs ?? 30000);
+  try {
+    const res = await fetch(`${BASE_URL}${API_PATH}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(opts?.token ? { Authorization: `Bearer ${opts.token}` } : {}),
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    const text = await res.text();
+    let parsed: unknown = {};
+    try { parsed = text ? JSON.parse(text) : {}; } catch { parsed = { raw: text } as unknown; }
+
+    if (!res.ok) {
+      const obj = (parsed && typeof parsed === "object") ? (parsed as Record<string, unknown>) : {};
+      const message = (obj["message"] as string) || (obj["Message"] as string) || res.statusText || "Erro ao enviar manifestação";
+      throw new Error(`CGU API ${res.status}: ${message}`);
+    }
+    return (parsed ?? {}) as CGUResponse;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
