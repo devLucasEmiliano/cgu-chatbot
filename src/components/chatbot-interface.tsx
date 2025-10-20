@@ -72,6 +72,77 @@ const translations = {
   },
 };
 
+type ManifestationTypeKey =
+  | "report"
+  | "compliment"
+  | "complaint"
+  | "request"
+  | "suggestion";
+
+const manifestationTypeDescriptions: Record<
+  ManifestationTypeKey,
+  Record<Language, string>
+> = {
+  report: {
+    "pt-BR":
+      "Denúncia: para comunicar a ocorrência de um ato ilícito, irregularidade, violação de direitos humanos ou prática de má conduta por agentes públicos.",
+    en: "Report: used to communicate suspected illicit acts, irregularities, human rights violations, or misconduct by public agents.",
+    es: "Denuncia: se usa para comunicar la ocurrencia de un acto ilícito, irregularidad, violación de derechos humanos o mala conducta de agentes públicos.",
+  },
+  compliment: {
+    "pt-BR": "Elogio: para expressar satisfação com um atendimento ou serviço público.",
+    en: "Compliment: used to express satisfaction with a public service or assistance received.",
+    es: "Elogio: se utiliza para expresar satisfacción con un servicio o atención pública.",
+  },
+  complaint: {
+    "pt-BR": "Reclamação: para manifestar insatisfação com um serviço, obra ou atendimento público e solicitar providências.",
+    en: "Complaint: used to express dissatisfaction with a public service, work, or assistance and request corrective measures.",
+    es: "Queja: se utiliza para manifestar insatisfacción con un servicio, obra o atención pública y solicitar medidas correctivas.",
+  },
+  request: {
+    "pt-BR": "Solicitação: para requerer o atendimento ou a prestação de um serviço público.",
+    en: "Request: used to ask for the delivery of a public service or specific assistance.",
+    es: "Solicitud: se utiliza para requerir la prestación de un servicio público.",
+  },
+  suggestion: {
+    "pt-BR": "Sugestão: para apresentar ideias ou propostas de melhoria para serviços ou atendimentos.",
+    en: "Suggestion: used to present ideas or proposals to improve services or assistance.",
+    es: "Sugerencia: se utiliza para presentar ideas o propuestas de mejora para servicios o atenciones.",
+  },
+};
+
+const getManifestationDescription = (
+  type: string,
+  lang: Language
+): string | undefined => {
+  const descriptions = manifestationTypeDescriptions[type as ManifestationTypeKey];
+  if (!descriptions) return undefined;
+  return descriptions[lang] ?? descriptions["pt-BR"];
+};
+
+const manifestationConfirmationTexts = {
+  question: {
+    "pt-BR": "Deseja prosseguir com este tipo de manifestação ou selecionar outro?",
+    en: "Do you want to proceed with this type of manifestation or select another one?",
+    es: "¿Desea continuar con este tipo de manifestación o seleccionar otro?",
+  },
+  proceed: {
+    "pt-BR": "Prosseguir",
+    en: "Proceed",
+    es: "Continuar",
+  },
+  change: {
+    "pt-BR": "Selecionar outro tipo",
+    en: "Choose another type",
+    es: "Elegir otro tipo",
+  },
+  changeAck: {
+    "pt-BR": "Tudo bem! Vamos escolher outro tipo de manifestação.",
+    en: "No problem! Let's choose another type of manifestation.",
+    es: "¡Sin problema! Vamos elegir otro tipo de manifestación.",
+  },
+};
+
 const languages = [
   { code: "pt-BR" as Language, flag: "🇧🇷", name: "Português" },
   { code: "en" as Language, flag: "🇺🇸", name: "English" },
@@ -81,6 +152,7 @@ const languages = [
 type FlowStep =
   | "initial"
   | "manifestationType"
+  | "confirmManifestationType"
   | "identificationType"
   | "fullName"
   | "email"
@@ -246,11 +318,12 @@ export function ChatbotInterface({
       variant?: "default" | "outline" | "secondary";
     }[],
     inputType?: "text" | "textarea" | "email" | "file",
-    variant: "default" | "info" = "default"
+    variant: "default" | "info" = "default",
+    force: boolean = false
   ) => {
     // Prevent duplicate messages
     const messageKey = `${content}-${currentStep}`;
-    if (askedQuestionsRef.current.has(messageKey)) {
+    if (!force && askedQuestionsRef.current.has(messageKey)) {
       return;
     }
     askedQuestionsRef.current.add(messageKey);
@@ -285,6 +358,75 @@ export function ChatbotInterface({
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMessage]);
+  };
+
+  const promptManifestationType = (
+    delay: number = 100,
+    force: boolean = false
+  ) => {
+    const question =
+      language === "pt-BR"
+        ? "Que tipo de manifestação você gostaria de fazer?"
+        : language === "en"
+        ? "What type of manifestation would you like to make?"
+        : "¿Qué tipo de manifestación le gustaría hacer?";
+
+    const options = [
+      {
+        label:
+          language === "pt-BR"
+            ? "Denúncia"
+            : language === "en"
+            ? "Report"
+            : "Denuncia",
+        value: "report",
+        variant: "outline" as const,
+      },
+      {
+        label:
+          language === "pt-BR"
+            ? "Elogio"
+            : language === "en"
+            ? "Compliment"
+            : "Elogio",
+        value: "compliment",
+        variant: "outline" as const,
+      },
+      {
+        label:
+          language === "pt-BR"
+            ? "Reclamação"
+            : language === "en"
+            ? "Complaint"
+            : "Queja",
+        value: "complaint",
+        variant: "outline" as const,
+      },
+      {
+        label:
+          language === "pt-BR"
+            ? "Solicitação"
+            : language === "en"
+            ? "Request"
+            : "Solicitud",
+        value: "request",
+        variant: "outline" as const,
+      },
+      {
+        label:
+          language === "pt-BR"
+            ? "Sugestão"
+            : language === "en"
+            ? "Suggestion"
+            : "Sugerencia",
+        value: "suggestion",
+        variant: "outline" as const,
+      },
+    ];
+
+    setTimeout(() => {
+      addBotMessage(question, 0, options, undefined, "default", force);
+    }, delay);
   };
 
   const handleInitialChoice = (choice: string, label: string) => {
@@ -374,79 +516,79 @@ export function ChatbotInterface({
 
     if (choice === "continue") {
       setCurrentStep("manifestationType");
-      setTimeout(() => {
-        addBotMessage(
-          language === "pt-BR"
-            ? "Que tipo de manifestação você gostaria de fazer?"
-            : language === "en"
-            ? "What type of manifestation would you like to make?"
-            : "¿Qué tipo de manifestación le gustaría hacer?",
-          0,
-          [
-            {
-              label:
-                language === "pt-BR"
-                  ? "Denúncia"
-                  : language === "en"
-                  ? "Report"
-                  : "Denuncia",
-              value: "report",
-              variant: "outline" as const,
-            },
-            {
-              label:
-                language === "pt-BR"
-                  ? "Elogio"
-                  : language === "en"
-                  ? "Compliment"
-                  : "Elogio",
-              value: "compliment",
-              variant: "outline" as const,
-            },
-            {
-              label:
-                language === "pt-BR"
-                  ? "Reclamação"
-                  : language === "en"
-                  ? "Complaint"
-                  : "Queja",
-              value: "complaint",
-              variant: "outline" as const,
-            },
-            {
-              label:
-                language === "pt-BR"
-                  ? "Solicitação"
-                  : language === "en"
-                  ? "Request"
-                  : "Solicitud",
-              value: "request",
-              variant: "outline" as const,
-            },
-            {
-              label:
-                language === "pt-BR"
-                  ? "Sugestão"
-                  : language === "en"
-                  ? "Suggestion"
-                  : "Sugerencia",
-              value: "suggestion",
-              variant: "outline" as const,
-            },
-          ]
-        );
-      }, 100);
+      promptManifestationType(100);
     }
   };
 
   const handleManifestationType = (type: string, label: string) => {
     addUserMessage(label);
     setFormData((prev) => ({ ...prev, manifestationType: type }));
+    setCurrentStep("confirmManifestationType");
 
+    const description = getManifestationDescription(type, language);
+    const question =
+      manifestationConfirmationTexts.question[language] ??
+      manifestationConfirmationTexts.question["pt-BR"];
+    const proceedLabel =
+      manifestationConfirmationTexts.proceed[language] ??
+      manifestationConfirmationTexts.proceed["pt-BR"];
+    const changeLabel =
+      manifestationConfirmationTexts.change[language] ??
+      manifestationConfirmationTexts.change["pt-BR"];
+
+    const baseDelay = 120;
+
+    if (description) {
+      // Mostra primeiro a descrição com leve atraso para manter a animação suave
+      addBotMessage(description, baseDelay, undefined, undefined, "info", true);
+      // Aguarda a primeira mensagem concluir (800ms) antes de iniciar a digitação da próxima
+      addBotMessage(
+        question,
+        baseDelay + 1100,
+        [
+          {
+            label: proceedLabel,
+            value: "proceed",
+            variant: "default" as const,
+          },
+          {
+            label: changeLabel,
+            value: "change",
+            variant: "outline" as const,
+          },
+        ],
+        undefined,
+        "default",
+        true
+      );
+    } else {
+      addBotMessage(
+        question,
+        baseDelay,
+        [
+          {
+            label: proceedLabel,
+            value: "proceed",
+            variant: "default" as const,
+          },
+          {
+            label: changeLabel,
+            value: "change",
+            variant: "outline" as const,
+          },
+        ],
+        undefined,
+        "default",
+        true
+      );
+    }
+  };
+
+  const continueAfterManifestationType = (type: string) => {
     if (type === "report") {
       setCurrentStep("identificationType");
       setTimeout(() => {
-        // Aviso informativo para denuncias (identificada vs anônima)
+        // Aviso informativo para denúncias (identificada vs anônima)
         addBotMessage(
           language === "pt-BR"
             ? "Identificada: você poderá receber informações sobre as providências adotadas. Denúncia anônima: não será possível acompanhar ou receber respostas."
@@ -456,7 +598,8 @@ export function ChatbotInterface({
           0,
           undefined,
           undefined,
-          "info"
+          "info",
+          true
         );
       }, 100);
       setTimeout(() => {
@@ -488,7 +631,10 @@ export function ChatbotInterface({
               value: "anonymous",
               variant: "secondary" as const,
             },
-          ]
+          ],
+          undefined,
+          "default",
+          true
         );
       }, 1000);
     } else {
@@ -503,9 +649,41 @@ export function ChatbotInterface({
             : "¿Cuál es su nombre completo?",
           0,
           undefined,
-          "text"
+          "text",
+          "default",
+          true
         );
       }, 100);
+    }
+  };
+
+  const handleManifestationConfirmation = (value: string, label: string) => {
+    addUserMessage(label);
+
+    if (value === "proceed") {
+      const selectedType = formData.manifestationType;
+      if (selectedType) {
+        continueAfterManifestationType(selectedType);
+      } else {
+        setCurrentStep("manifestationType");
+        promptManifestationType(100, true);
+      }
+      return;
+    }
+
+    if (value === "change") {
+      setFormData((prev) => {
+        const { manifestationType, ...rest } = prev;
+        return rest;
+      });
+      const changeAck =
+        manifestationConfirmationTexts.changeAck[language] ??
+        manifestationConfirmationTexts.changeAck["pt-BR"];
+      setCurrentStep("manifestationType");
+      setTimeout(() => {
+        addBotMessage(changeAck, 0, undefined, undefined, "info", true);
+      }, 100);
+      promptManifestationType(900, true);
     }
   };
 
@@ -1090,6 +1268,9 @@ export function ChatbotInterface({
         break;
       case "manifestationType":
         handleManifestationType(value, label);
+        break;
+      case "confirmManifestationType":
+        handleManifestationConfirmation(value, label);
         break;
       case "identificationType":
         handleIdentificationType(value, label);
