@@ -1020,6 +1020,7 @@ export function ChatbotInterface({
     ];
 
     const maxFiles = 10;
+    const maxFileBytes = 30 * 1024 * 1024; // 30MB por arquivo
     const maxTotalBytes = 30 * 1024 * 1024; // 30MB no total
 
     const getExt = (name: string) => {
@@ -1046,6 +1047,16 @@ export function ChatbotInterface({
             : language === "en"
             ? `Not allowed type: ${file.name}`
             : `Tipo no permitido: ${file.name}`
+        );
+        continue;
+      }
+      if (file.size > maxFileBytes) {
+        rejectedMessages.push(
+          language === "pt-BR"
+            ? `Arquivo ${file.name} excede 30MB.`
+            : language === "en"
+            ? `File ${file.name} exceeds 30MB.`
+            : `El archivo ${file.name} supera 30MB.`
         );
         continue;
       }
