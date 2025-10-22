@@ -673,8 +673,9 @@ export function ChatbotInterface({
 
     if (value === "change") {
       setFormData((prev) => {
-        const { manifestationType, ...rest } = prev;
-        return rest;
+        const updated = { ...prev };
+        delete updated.manifestationType;
+        return updated;
       });
       const changeAck =
         manifestationConfirmationTexts.changeAck[language] ??
