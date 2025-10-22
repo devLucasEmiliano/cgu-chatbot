@@ -6,7 +6,11 @@ import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
 import { Textarea } from "@/src/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/src/components/ui/avatar";
 import { Send, Globe, ChevronDown } from "lucide-react";
 import type { Language, SubmitResult } from "@/src/app/page";
 import {
@@ -90,22 +94,26 @@ const manifestationTypeDescriptions: Record<
     es: "Denuncia: se usa para comunicar la ocurrencia de un acto ilícito, irregularidad, violación de derechos humanos o mala conducta de agentes públicos.",
   },
   compliment: {
-    "pt-BR": "Elogio: para expressar satisfação com um atendimento ou serviço público.",
+    "pt-BR":
+      "Elogio: para expressar satisfação com um atendimento ou serviço público.",
     en: "Compliment: used to express satisfaction with a public service or assistance received.",
     es: "Elogio: se utiliza para expresar satisfacción con un servicio o atención pública.",
   },
   complaint: {
-    "pt-BR": "Reclamação: para manifestar insatisfação com um serviço, obra ou atendimento público e solicitar providências.",
+    "pt-BR":
+      "Reclamação: para manifestar insatisfação com um serviço, obra ou atendimento público e solicitar providências.",
     en: "Complaint: used to express dissatisfaction with a public service, work, or assistance and request corrective measures.",
     es: "Queja: se utiliza para manifestar insatisfacción con un servicio, obra o atención pública y solicitar medidas correctivas.",
   },
   request: {
-    "pt-BR": "Solicitação: para requerer o atendimento ou a prestação de um serviço público.",
+    "pt-BR":
+      "Solicitação: para requerer o atendimento ou a prestação de um serviço público.",
     en: "Request: used to ask for the delivery of a public service or specific assistance.",
     es: "Solicitud: se utiliza para requerir la prestación de un servicio público.",
   },
   suggestion: {
-    "pt-BR": "Sugestão: para apresentar ideias ou propostas de melhoria para serviços ou atendimentos.",
+    "pt-BR":
+      "Sugestão: para apresentar ideias ou propostas de melhoria para serviços ou atendimentos.",
     en: "Suggestion: used to present ideas or proposals to improve services or assistance.",
     es: "Sugerencia: se utiliza para presentar ideas o propuestas de mejora para servicios o atenciones.",
   },
@@ -116,29 +124,29 @@ const manifestationTypePlaceholders: Record<
   Record<Language, string>
 > = {
   report: {
-    "pt-BR": "Descreva sua denúncia em detalhes...",
-    en: "Describe your report in detail...",
-    es: "Describa su denuncia en detalle...",
+    "pt-BR": "Escreva aqui sua denúncia em detalhes....",
+    en: "Write here your report in detail....",
+    es: "Escriba aquí su denuncia en detalle....",
   },
   compliment: {
-    "pt-BR": "Compartilhe seu elogio em detalhes...",
-    en: "Share your compliment in detail...",
-    es: "Comparta su elogio en detalle...",
+    "pt-BR": "Escreva aqui seu elogio em detalhes....",
+    en: "Write here your compliment in detail....",
+    es: "Escriba aquí su elogio en detalle....",
   },
   complaint: {
-    "pt-BR": "Descreva sua reclamação em detalhes...",
-    en: "Describe your complaint in detail...",
-    es: "Describa su queja en detalle...",
+    "pt-BR": "Escreva aqui sua reclamação em detalhes....",
+    en: "Write here your complaint in detail....",
+    es: "Escriba aquí su queja en detalle....",
   },
   request: {
-    "pt-BR": "Descreva sua solicitação em detalhes...",
-    en: "Describe your request in detail...",
-    es: "Describa su solicitud en detalle...",
+    "pt-BR": "Escreva aqui sua solicitação em detalhes....",
+    en: "Write here your request in detail....",
+    es: "Escriba aquí su solicitud en detalle....",
   },
   suggestion: {
-    "pt-BR": "Descreva sua sugestão em detalhes...",
-    en: "Describe your suggestion in detail...",
-    es: "Describa su sugerencia en detalle...",
+    "pt-BR": "Escreva aqui sua sugestão em detalhes....",
+    en: "Write here your suggestion in detail....",
+    es: "Escriba aquí su sugerencia en detalle....",
   },
 };
 
@@ -146,7 +154,8 @@ const getManifestationDescription = (
   type: string,
   lang: Language
 ): string | undefined => {
-  const descriptions = manifestationTypeDescriptions[type as ManifestationTypeKey];
+  const descriptions =
+    manifestationTypeDescriptions[type as ManifestationTypeKey];
   if (!descriptions) return undefined;
   return descriptions[lang] ?? descriptions["pt-BR"];
 };
@@ -158,7 +167,8 @@ const getManifestationPlaceholder = (
   if (!type) {
     return translations.placeholder[lang] ?? translations.placeholder["pt-BR"];
   }
-  const placeholders = manifestationTypePlaceholders[type as ManifestationTypeKey];
+  const placeholders =
+    manifestationTypePlaceholders[type as ManifestationTypeKey];
   if (!placeholders) {
     return translations.placeholder[lang] ?? translations.placeholder["pt-BR"];
   }
@@ -167,7 +177,8 @@ const getManifestationPlaceholder = (
 
 const manifestationConfirmationTexts = {
   question: {
-    "pt-BR": "Deseja prosseguir com este tipo de manifestação ou selecionar outro?",
+    "pt-BR":
+      "Deseja prosseguir com este tipo de manifestação ou selecionar outro?",
     en: "Do you want to proceed with this type of manifestation or select another one?",
     es: "¿Desea continuar con este tipo de manifestación o seleccionar otro?",
   },
