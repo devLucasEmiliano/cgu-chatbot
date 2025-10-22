@@ -778,10 +778,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Descreva sua solicitação em detalhes:"
+            ? "Descreva sua manifestaçao em detalhes:"
             : language === "en"
-            ? "Describe your request in detail:"
-            : "Describa su solicitud en detalle:",
+            ? "Describe your manifestation in detail:"
+            : "Describa su manifestación en detalle:",
           300,
           undefined,
           "textarea"
@@ -939,10 +939,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Descreva sua solicitação em detalhes:"
+              ? "Descreva sua manifestaçao em detalhes:"
               : language === "en"
-              ? "Describe your request in detail:"
-              : "Describa su solicitud en detalle:",
+              ? "Describe your manifestation in detail:"
+              : "Describa su manifestación en detalle:",
             300,
             undefined,
             "textarea"
