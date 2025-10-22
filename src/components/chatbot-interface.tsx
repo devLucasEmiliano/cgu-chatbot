@@ -1411,7 +1411,7 @@ export function ChatbotInterface({
               {/* Logo COP30 */}
               <div className="w-24 md:w-28 h-14 md:h-16 flex items-center justify-center shrink-0">
                 <Image
-                  src="/cop30logo.svg"
+                  src="/cop30logo-white.svg"
                   alt="COP30 Logo"
                   width={120}
                   height={64}

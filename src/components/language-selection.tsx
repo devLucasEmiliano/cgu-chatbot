@@ -63,6 +63,28 @@ export function LanguageSelection({
 
       <Card className="w-full max-w-md p-6 md:p-8 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-500 rounded-2xl border-2">
         <div className="flex flex-col items-center gap-5 md:gap-6">
+          <div className="flex items-center gap-3 md:gap-4 animate-in fade-in slide-in-from-bottom-2 duration-400">
+            <Image
+              src="/cop30logo.svg"
+              alt="COP30 logo"
+              width={72}
+              height={72}
+              className="h-12 w-auto md:h-14"
+              priority
+            />
+            <span className="text-sm font-medium text-muted-foreground md:text-base">
+              +
+            </span>
+            <Image
+              src="/falabrilogo.ico"
+              alt="Fala.BR logo"
+              width={72}
+              height={72}
+              className="h-12 w-auto md:h-14"
+              priority
+            />
+          </div>
+
           {/* Globe icon with pulse animation */}
           <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center animate-in zoom-in-95 duration-300 shadow-lg">
             <Globe className="w-8 h-8 md:w-10 md:h-10 text-primary" />
