@@ -1480,6 +1480,13 @@ export function ChatbotInterface({
                         : "bg-teal-500"
                     } transition-all duration-200 shrink-0 w-10 h-10`}
                   >
+                    {message.type === "bot" && (
+                      <AvatarImage
+                        src="/fabi-chatbot.png"
+                        alt="Chatbot assistant avatar"
+                        className="object-cover"
+                      />
+                    )}
                     <AvatarFallback
                       className={
                         message.type === "bot"
@@ -1555,6 +1562,11 @@ export function ChatbotInterface({
               {isTyping && (
                 <div className="flex gap-3 animate-in fade-in duration-300">
                   <Avatar className="bg-teal-100 border-2 border-teal-200 w-10 h-10">
+                    <AvatarImage
+                      src="/fabi-chatbot.png"
+                      alt="Chatbot assistant avatar"
+                      className="object-cover"
+                    />
                     <AvatarFallback className="text-teal-700 text-lg">
                       🤖
                     </AvatarFallback>
