@@ -84,7 +84,7 @@ public/            # Assets estaticos (icones, ilustracoes, manifest.json etc.)
 | `CGU_ID_OUVIDORIA_DESTINO` | ID da ouvidoria destino exigido pelo payload minimo. |
 | `CGU_ID_MODO_RESPOSTA` | ID do modo de resposta (ex.: eletronico, postal). |
 
-> O utilitario `toCGUPayload` valida combinacoes de tipo de manifestacao/formulario, tamanho de anexos e campos obrigatorios. Erros sao propagados para a camada de UI, permitindo feedback imediato ao usuario.
+> O utilitario `toCguPayload` valida combinacoes de tipo de manifestacao/formulario, tamanho de anexos e campos obrigatorios. Erros sao propagados para a camada de UI, permitindo feedback imediato ao usuario.
 
 ## API interna
 A rota `src/app/api/manifestacoes/route.ts` recebe o `ManifestacaoRequestDTO` gerado pelo chatbot, normaliza os dados (incluindo compactacao de anexos), e envia para a API oficial via `src/lib/cgu/client.ts`. O tempo limite padrao e 30 s e a resposta da CGU e devolvida integralmente a interface.

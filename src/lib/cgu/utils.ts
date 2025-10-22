@@ -1,22 +1,34 @@
-﻿import { gzip } from "zlib";
+import { gzip } from "zlib";
 import { promisify } from "util";
 import { fileTypeFromBuffer } from "file-type";
-import type { AnexoInput, AnexoPayload, ManifestacaoPayloadMinimo, ManifestacaoRequestDTO } from "./types";
+import type {
+  AnexoInput,
+  AnexoPayload,
+  ManifestacaoPayloadMinimo,
+  ManifestacaoRequestDTO,
+} from "./types";
 
-export const MAX_FILES = 10;
-export const MAX_FILE_BYTES = 30 * 1024 * 1024; // 30 MB processados por arquivo (limite Falabr individual)
-export const MAX_TOTAL_BYTES = 30 * 1024 * 1024; // 30 MB no total (regra Fala.BR)
-export const ALLOWED_EXT = [
-  ".pdf", ".doc", ".docx", ".txt",
-  ".xls", ".xlsx",
-  ".png", ".jpg", ".jpeg",
+export const maxFiles = 10;
+export const maxFileBytes = 30 * 1024 * 1024; // 30 MB processed per file (Falabr individual limit)
+export const maxTotalBytes = 30 * 1024 * 1024; // 30 MB total (Fala.BR rule)
+export const allowedExtensions = [
+  ".pdf",
+  ".doc",
+  ".docx",
+  ".txt",
+  ".xls",
+  ".xlsx",
+  ".png",
+  ".jpg",
+  ".jpeg",
   ".mp3",
-  ".mp4", ".avi",
+  ".mp4",
+  ".avi",
 ];
-export const TEXTO_MAX_CHARS = 8000;
-const MAX_BASE64_LENGTH = Math.ceil((MAX_FILE_BYTES / 3)) * 4; // falha cedo para blobs Base64 grandes
+export const maxTextChars = 8000;
+const maxBase64Length = Math.ceil(maxFileBytes / 3) * 4; // fail fast for oversized Base64 blobs
 const gzipAsync = promisify(gzip);
-const ALLOWED_MIME_BY_EXT: Record<string, readonly string[]> = {
+const allowedMimeByExtension: Record<string, readonly string[]> = {
   ".pdf": ["application/pdf"],
   ".doc": ["application/msword"],
   ".docx": ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
@@ -30,122 +42,155 @@ const ALLOWED_MIME_BY_EXT: Record<string, readonly string[]> = {
   ".mp4": ["video/mp4"],
   ".avi": ["video/x-msvideo", "video/avi"],
 };
-const EXT_ALLOWING_UNKNOWN_MAGIC = new Set<string>([".txt"]);
+const extensionsAllowingUnknownMagic = new Set<string>([".txt"]);
 
-const getExtension = (name: string): string => {
-  const idx = name.lastIndexOf(".");
-  return idx >= 0 ? name.slice(idx).toLowerCase() : "";
+const getFileExtension = (name: string): string => {
+  const lastDotIndex = name.lastIndexOf(".");
+  return lastDotIndex >= 0 ? name.slice(lastDotIndex).toLowerCase() : "";
 };
 
-// Matriz de permissÃµes TipoManifestacao -> Tipos de FormulÃ¡rio aceitos
-// Baseado na tabela fornecida pelo usuÃ¡rio
-const FORM_MAP: Record<number, number[]> = {
-  1: [4], // DenÃºncia -> DenÃºncia
-  2: [1], // ReclamaÃ§Ã£o -> PadrÃ£o
-  3: [1], // Elogio -> PadrÃ£o
-  4: [1], // SugestÃ£o -> PadrÃ£o
-  5: [1], // SolicitaÃ§Ã£o -> PadrÃ£o
-  6: [],   // NÃ£o classificada
-  7: [],   // ComunicaÃ§Ã£o (nÃ£o lista formulÃ¡rio)
-  8: [],   // Acesso Ã  InformaÃ§Ã£o
-  9: [2], // Simplifique -> Simplifique
+// ManifestationType -> accepted form types matrix (mirrors the table shared by the client)
+const formTypeMatrix: Record<number, number[]> = {
+  1: [4], // Report -> Report form
+  2: [1], // Complaint -> Standard form
+  3: [1], // Compliment -> Standard form
+  4: [1], // Suggestion -> Standard form
+  5: [1], // Request -> Standard form
+  6: [], // Unclassified
+  7: [], // Communication (no form listed)
+  8: [], // Access to Information
+  9: [2], // Simplifique -> Simplifique form
 };
 
-export function validarParTipoFormulario(idTipoManifestacao: number, idTipoFormulario: number): { valido: boolean; motivo?: string } {
-  const permitidos = FORM_MAP[idTipoManifestacao] ?? [];
-  if (permitidos.length === 0) {
-    // Alguns tipos nÃ£o listam formulÃ¡rio; manter flexÃ­vel e sinalizar ao chamador
-    return { valido: permitidos.includes(idTipoFormulario), motivo: permitidos.length ? undefined : "Tipo de manifestaÃ§Ã£o sem formulÃ¡rio listado; confirmar polÃ­tica da API." };
-  }
-  if (!permitidos.includes(idTipoFormulario)) {
+export function validateFormTypePair(
+  manifestationTypeId: number,
+  formTypeId: number
+): { valid: boolean; reason?: string } {
+  const allowedForms = formTypeMatrix[manifestationTypeId] ?? [];
+  if (allowedForms.length === 0) {
     return {
-      valido: false,
-      motivo: `CombinaÃ§Ã£o invÃ¡lida: IdTipoManifestacao=${idTipoManifestacao} nÃ£o permite IdTipoFormulario=${idTipoFormulario}. Permitidos: ${permitidos.join(", ")}`,
+      valid: allowedForms.includes(formTypeId),
+      reason: allowedForms.length
+        ? undefined
+        : "Manifestation type does not list accepted forms; confirm API policy.",
     };
   }
-  return { valido: true };
+  if (!allowedForms.includes(formTypeId)) {
+    return {
+      valid: false,
+      reason: `Invalid combination: manifestationTypeId=${manifestationTypeId} does not allow formTypeId=${formTypeId}. Allowed values: ${allowedForms.join(
+        ", "
+      )}`,
+    };
+  }
+  return { valid: true };
 }
 
-export function buildTextoManifestacao(params: { paisNaturalidade?: string; linguagem?: string; numeroUnfccc?: string | null; textoUsuario: string; }): string {
-  const { paisNaturalidade, linguagem, numeroUnfccc, textoUsuario } = params;
-  const linha1 = "ManifestaÃ§Ã£o recebida no Ã¢mbito da COP30.";
-  const linha2 = `PaÃ­s/Naturalidade selecionado: ${paisNaturalidade || "NÃ£o Informado"}`;
-  const linha3 = `Linguagem selecionada: ${linguagem || "NÃ£o Informado"}`;
-  const linha4 = `NÃºmero de inscriÃ§Ã£o UNFCCC: ${(numeroUnfccc && numeroUnfccc.trim()) ? numeroUnfccc.trim() : "NÃ£o Informado"}`;
-  const header = [linha1, linha2, linha3, linha4].join("\n") + "\n";
+export function buildManifestationText(params: {
+  paisNaturalidade?: string;
+  linguagem?: string;
+  numeroUnfccc?: string | null;
+  textoUsuario: string;
+}): string {
+  const {
+    paisNaturalidade: countryOrNationality,
+    linguagem: language,
+    numeroUnfccc: unfcccNumber,
+    textoUsuario: userText,
+  } = params;
 
-  const normalizar = (s: string) => s.replace(/[^\x09\x0A\x0D\x20-\x7E\u00A0-\uFFFF]/g, "");
-  const headerNorm = normalizar(header);
-  const restante = TEXTO_MAX_CHARS - headerNorm.length;
+  const line1 = "Manifestation received within the scope of COP30.";
+  const line2 = `Selected country/nationality: ${countryOrNationality || "Not provided"}`;
+  const line3 = `Selected language: ${language || "Not provided"}`;
+  const line4 = `UNFCCC registration number: ${unfcccNumber?.trim() || "Not provided"}`;
+  const header = [line1, line2, line3, line4].join("\n") + "\n";
 
-  let corpo = normalizar(textoUsuario || "");
-  if (restante <= 0) return headerNorm.slice(0, TEXTO_MAX_CHARS);
-  if (corpo.length > restante) {
-    const ellipsis = "â€¦";
-    corpo = corpo.slice(0, Math.max(0, restante - ellipsis.length)) + ellipsis;
+  const normalize = (value: string) =>
+    value.replace(/[^\x09\x0A\x0D\x20-\x7E\u00A0-\uFFFF]/g, "");
+  const normalizedHeader = normalize(header);
+  const remainingCharacters = maxTextChars - normalizedHeader.length;
+
+  let body = normalize(userText || "");
+  if (remainingCharacters <= 0) {
+    return normalizedHeader.slice(0, maxTextChars);
   }
-  return headerNorm + corpo;
+  if (body.length > remainingCharacters) {
+    const ellipsis = "...";
+    body = body.slice(0, Math.max(0, remainingCharacters - ellipsis.length)) + ellipsis;
+  }
+  return normalizedHeader + body;
 }
 
-export function validarAnexos(entradas: AnexoInput[] = []): void {
-  if (entradas.length > MAX_FILES) {
-    throw new Error(`MÃ¡ximo de ${MAX_FILES} anexos. Recebidos: ${entradas.length}`);
+export function validateAttachments(attachments: AnexoInput[] = []): void {
+  if (attachments.length > maxFiles) {
+    throw new Error(`Maximum of ${maxFiles} attachments. Received: ${attachments.length}.`);
   }
-  let total = 0;
-  for (const a of entradas) {
-    total += a.TamanhoArquivo || 0;
-    if (a.TamanhoArquivo > MAX_FILE_BYTES) {
-      throw new Error(`Arquivo ${a.NomeArquivo} excede ${MAX_FILE_BYTES / (1024 * 1024)}MB (${a.TamanhoArquivo} bytes)`);
+  let totalBytes = 0;
+  for (const attachment of attachments) {
+    const fileSize = attachment.TamanhoArquivo ?? 0;
+    totalBytes += fileSize;
+    if (fileSize > maxFileBytes) {
+      throw new Error(
+        `File ${attachment.NomeArquivo} exceeds ${maxFileBytes / (1024 * 1024)}MB (${fileSize} bytes).`
+      );
     }
-    const ext = getExtension(a.NomeArquivo || "");
-    if (!ALLOWED_EXT.includes(ext)) {
-      throw new Error(`Tipo de arquivo nÃ£o permitido: ${a.NomeArquivo || "(sem nome)"}`);
+    const extension = getFileExtension(attachment.NomeArquivo || "");
+    if (!allowedExtensions.includes(extension)) {
+      throw new Error(`File type not allowed: ${attachment.NomeArquivo || "(no name)"}.`);
     }
   }
-  if (total > MAX_TOTAL_BYTES) {
-    throw new Error(`Soma dos anexos excede ${MAX_TOTAL_BYTES / (1024 * 1024)}MB (${total} bytes)`);
+  if (totalBytes > maxTotalBytes) {
+    throw new Error(
+      `Total attachment size exceeds ${maxTotalBytes / (1024 * 1024)}MB (${totalBytes} bytes).`
+    );
   }
 }
 
-export function base64ToBuffer(b64: string): Buffer {
-  // Suporta Base64 padrÃ£o; caso venha com prefixo data: remover
-  const clean = b64.replace(/^data:.*;base64,/, "");
-  if (clean.length > MAX_BASE64_LENGTH) {
-    throw new Error(`Arquivo Base64 excede o limite de ${MAX_FILE_BYTES / (1024 * 1024)}MB.`);
+export function base64ToBuffer(base64: string): Buffer {
+  // Supports standard Base64; strip data URI prefix when present
+  const clean = base64.replace(/^data:.*;base64,/, "");
+  if (clean.length > maxBase64Length) {
+    throw new Error(`Base64 file exceeds the limit of ${maxFileBytes / (1024 * 1024)}MB.`);
   }
-  const buf = Buffer.from(clean, "base64");
-  if (buf.length > MAX_FILE_BYTES) {
-    throw new Error(`Arquivo decodificado excede o limite de ${MAX_FILE_BYTES / (1024 * 1024)}MB.`);
+  const buffer = Buffer.from(clean, "base64");
+  if (buffer.length > maxFileBytes) {
+    throw new Error(`Decoded file exceeds the limit of ${maxFileBytes / (1024 * 1024)}MB.`);
   }
-  return buf;
+  return buffer;
 }
 
-export async function anexosToPayload(anexos: AnexoInput[] = []): Promise<AnexoPayload[]> {
+export async function attachmentsToPayload(
+  attachments: AnexoInput[] = []
+): Promise<AnexoPayload[]> {
   const payloads: AnexoPayload[] = [];
   let totalBytes = 0;
 
-  for (const a of anexos) {
-    const buf = base64ToBuffer(a.ConteudoBase64);
-    totalBytes += buf.length;
-    if (totalBytes > MAX_TOTAL_BYTES) {
-      throw new Error(`Soma dos anexos excede ${MAX_TOTAL_BYTES / (1024 * 1024)}MB (${totalBytes} bytes).`);
+  for (const attachment of attachments) {
+    const buffer = base64ToBuffer(attachment.ConteudoBase64);
+    totalBytes += buffer.length;
+    if (totalBytes > maxTotalBytes) {
+      throw new Error(
+        `Total attachment size exceeds ${maxTotalBytes / (1024 * 1024)}MB (${totalBytes} bytes).`
+      );
     }
-    const ext = getExtension(a.NomeArquivo || "");
-    const allowedMimes = ALLOWED_MIME_BY_EXT[ext] ?? [];
-    const detectedMime = (await fileTypeFromBuffer(buf))?.mime;
+    const extension = getFileExtension(attachment.NomeArquivo || "");
+    const allowedMimes = allowedMimeByExtension[extension] ?? [];
+    const detectedMime = (await fileTypeFromBuffer(buffer))?.mime;
     if (detectedMime) {
       if (!allowedMimes.includes(detectedMime)) {
-        throw new Error(`Arquivo ${a.NomeArquivo} apresenta tipo MIME ${detectedMime} não permitido.`);
+        throw new Error(
+          `File ${attachment.NomeArquivo} reports MIME type ${detectedMime}, which is not allowed.`
+        );
       }
-    } else if (!EXT_ALLOWING_UNKNOWN_MAGIC.has(ext)) {
-      throw new Error(`Não foi possível verificar o tipo do arquivo ${a.NomeArquivo}.`);
+    } else if (!extensionsAllowingUnknownMagic.has(extension)) {
+      throw new Error(`Unable to verify the type of file ${attachment.NomeArquivo}.`);
     }
-    const gz = await gzipAsync(buf);
-    const b64gz = gz.toString("base64");
+    const gzipped = await gzipAsync(buffer);
+    const gzippedBase64 = gzipped.toString("base64");
     payloads.push({
-      NomeArquivo: a.NomeArquivo,
-      ConteudoZipadoEBase64: b64gz,
-      TamanhoArquivo: buf.length,
+      NomeArquivo: attachment.NomeArquivo,
+      ConteudoZipadoEBase64: gzippedBase64,
+      TamanhoArquivo: buffer.length,
       IdAws: "",
       IdAnexoGenerico: 1,
     });
@@ -154,76 +199,82 @@ export async function anexosToPayload(anexos: AnexoInput[] = []): Promise<AnexoP
   return payloads;
 }
 
-export async function toCGUPayload(dto: ManifestacaoRequestDTO) {
-  // Mapeamento robusto com base em tipoChave (se fornecido) e variÃ¡veis de ambiente para override
-  const mapFromKey: Record<string, { tipo: number; form: number }> = {
-    report: { tipo: 1, form: 4 },
-    complaint: { tipo: 2, form: 1 },
-    compliment: { tipo: 3, form: 1 },
-    suggestion: { tipo: 4, form: 1 },
-    request: { tipo: 5, form: 1 },
+export async function toCguPayload(dto: ManifestacaoRequestDTO) {
+  // Leverage the stable key mapping first; environment variables act as fallbacks
+  const manifestationTypeByKey: Record<string, { type: number; form: number }> = {
+    report: { type: 1, form: 4 },
+    complaint: { type: 2, form: 1 },
+    compliment: { type: 3, form: 1 },
+    suggestion: { type: 4, form: 1 },
+    request: { type: 5, form: 1 },
   };
 
-  const fromEnv = (name: string): number | undefined => {
-    const v = process.env[name];
-    if (!v) return undefined;
-    const n = Number(v);
-    return Number.isFinite(n) ? n : undefined;
+  const readEnvNumber = (name: string): number | undefined => {
+    const value = process.env[name];
+    if (!value) return undefined;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
   };
 
-  let idTipoManifestacao = dto.idTipoManifestacao;
-  let idTipoFormulario = dto.idTipoFormulario;
+  let manifestationTypeId = dto.idTipoManifestacao;
+  let formTypeId = dto.idTipoFormulario;
 
-  if (dto.tipoChave && mapFromKey[dto.tipoChave]) {
-    // Se o front mandou a chave, prioriza mapeamento estÃ¡vel e nÃ£o sobrescreve por env
-    idTipoManifestacao = mapFromKey[dto.tipoChave].tipo;
-    idTipoFormulario = mapFromKey[dto.tipoChave].form;
+  if (dto.tipoChave && manifestationTypeByKey[dto.tipoChave]) {
+    // When the key is provided by the client, trust the mapping and do not override via env
+    manifestationTypeId = manifestationTypeByKey[dto.tipoChave].type;
+    formTypeId = manifestationTypeByKey[dto.tipoChave].form;
   } else {
-    // Sem chave explÃ­cita, permite override por ambiente
-    idTipoManifestacao = fromEnv("CGU_ID_TIPO_MANIFESTACAO") ?? idTipoManifestacao;
-    idTipoFormulario = fromEnv("CGU_ID_TIPO_FORMULARIO") ?? idTipoFormulario;
+    // Without an explicit key, allow environment overrides
+    manifestationTypeId = readEnvNumber("CGU_ID_TIPO_MANIFESTACAO") ?? manifestationTypeId;
+    formTypeId = readEnvNumber("CGU_ID_TIPO_FORMULARIO") ?? formTypeId;
   }
 
-  const valid = validarParTipoFormulario(idTipoManifestacao, idTipoFormulario);
-  if (!valid.valido) {
-    throw new Error(valid.motivo || "CombinaÃ§Ã£o de tipo/formulÃ¡rio invÃ¡lida");
+  const validation = validateFormTypePair(manifestationTypeId, formTypeId);
+  if (!validation.valid) {
+    throw new Error(validation.reason || "Invalid manifestation/form combination.");
   }
 
-  validarAnexos(dto.anexos);
-  const anexosProcessados = await anexosToPayload(dto.anexos);
+  validateAttachments(dto.anexos);
+  const processedAttachments = await attachmentsToPayload(dto.anexos);
 
-  const TextoManifestacao = buildTextoManifestacao({
+  const manifestationText = buildManifestationText({
     paisNaturalidade: dto.paisNaturalidade,
     linguagem: dto.linguagem,
     numeroUnfccc: dto.numeroUnfccc,
     textoUsuario: dto.textoUsuario,
   });
 
-  // Resolver IDs configurÃ¡veis: prioriza valor vindo do DTO; se ausente, usa env no servidor
-  const parseEnvInt = (name: string): number | undefined => {
+  // Resolve configurable IDs: prefer the DTO, fall back to server-side environment variables
+  const parseEnvInteger = (name: string): number | undefined => {
     const raw = process.env[name];
     if (!raw) return undefined;
-    const n = Number(raw);
-    return Number.isFinite(n) ? n : undefined;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : undefined;
   };
 
-  const efetivoIdOuvidoriaDestino = dto.idOuvidoriaDestino ?? parseEnvInt("CGU_ID_OUVIDORIA_DESTINO");
-  const efetivoIdModoResposta = dto.idModoResposta ?? parseEnvInt("CGU_ID_MODO_RESPOSTA");
+  const resolvedDestinationOmbudsmanId =
+    dto.idOuvidoriaDestino ?? parseEnvInteger("CGU_ID_OUVIDORIA_DESTINO");
+  const resolvedResponseModeId =
+    dto.idModoResposta ?? parseEnvInteger("CGU_ID_MODO_RESPOSTA");
 
-  if (efetivoIdOuvidoriaDestino == null) {
-    throw new Error("IdOuvidoriaDestino nÃ£o informado e variÃ¡vel de ambiente CGU_ID_OUVIDORIA_DESTINO nÃ£o definida.");
+  if (resolvedDestinationOmbudsmanId == null) {
+    throw new Error(
+      "Destination ombudsman ID not provided and CGU_ID_OUVIDORIA_DESTINO environment variable is not set."
+    );
   }
-  if (efetivoIdModoResposta == null) {
-    throw new Error("IdModoResposta nÃ£o informado e variÃ¡vel de ambiente CGU_ID_MODO_RESPOSTA nÃ£o definida.");
+  if (resolvedResponseModeId == null) {
+    throw new Error(
+      "Response mode ID not provided and CGU_ID_MODO_RESPOSTA environment variable is not set."
+    );
   }
 
   const payload: ManifestacaoPayloadMinimo = {
-    IdTipoFormulario: idTipoFormulario,
-    IdTipoManifestacao: idTipoManifestacao,
-    IdOuvidoriaDestino: efetivoIdOuvidoriaDestino,
-    TextoManifestacao,
-    Anexos: anexosProcessados,
-    IdModoResposta: efetivoIdModoResposta,
+    IdTipoFormulario: formTypeId,
+    IdTipoManifestacao: manifestationTypeId,
+    IdOuvidoriaDestino: resolvedDestinationOmbudsmanId,
+    TextoManifestacao: manifestationText,
+    Anexos: processedAttachments,
+    IdModoResposta: resolvedResponseModeId,
     IdTipoIdentificacaoManifestante: dto.idTipoIdentificacaoManifestante,
   };
 
@@ -237,4 +288,3 @@ export async function toCGUPayload(dto: ManifestacaoRequestDTO) {
 
   return payload;
 }
-

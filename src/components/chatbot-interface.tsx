@@ -1,12 +1,12 @@
 "use client";
 
 import type React from "react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
 import { Textarea } from "@/src/components/ui/textarea";
-import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
 import { Send, Globe, ChevronDown } from "lucide-react";
 import type { Language, SubmitResult } from "@/src/app/page";
 import {
@@ -111,6 +111,37 @@ const manifestationTypeDescriptions: Record<
   },
 };
 
+const manifestationTypePlaceholders: Record<
+  ManifestationTypeKey,
+  Record<Language, string>
+> = {
+  report: {
+    "pt-BR": "Descreva sua denúncia em detalhes...",
+    en: "Describe your report in detail...",
+    es: "Describa su denuncia en detalle...",
+  },
+  compliment: {
+    "pt-BR": "Compartilhe seu elogio em detalhes...",
+    en: "Share your compliment in detail...",
+    es: "Comparta su elogio en detalle...",
+  },
+  complaint: {
+    "pt-BR": "Descreva sua reclamação em detalhes...",
+    en: "Describe your complaint in detail...",
+    es: "Describa su queja en detalle...",
+  },
+  request: {
+    "pt-BR": "Descreva sua solicitação em detalhes...",
+    en: "Describe your request in detail...",
+    es: "Describa su solicitud en detalle...",
+  },
+  suggestion: {
+    "pt-BR": "Descreva sua sugestão em detalhes...",
+    en: "Describe your suggestion in detail...",
+    es: "Describa su sugerencia en detalle...",
+  },
+};
+
 const getManifestationDescription = (
   type: string,
   lang: Language
@@ -118,6 +149,20 @@ const getManifestationDescription = (
   const descriptions = manifestationTypeDescriptions[type as ManifestationTypeKey];
   if (!descriptions) return undefined;
   return descriptions[lang] ?? descriptions["pt-BR"];
+};
+
+const getManifestationPlaceholder = (
+  type: string | undefined,
+  lang: Language
+): string => {
+  if (!type) {
+    return translations.placeholder[lang] ?? translations.placeholder["pt-BR"];
+  }
+  const placeholders = manifestationTypePlaceholders[type as ManifestationTypeKey];
+  if (!placeholders) {
+    return translations.placeholder[lang] ?? translations.placeholder["pt-BR"];
+  }
+  return placeholders[lang] ?? translations.placeholder["pt-BR"];
 };
 
 const manifestationConfirmationTexts = {
@@ -186,6 +231,16 @@ export function ChatbotInterface({
   } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const descriptionPlaceholder = useMemo(
+    () =>
+      getManifestationPlaceholder(
+        typeof formData.manifestationType === "string"
+          ? formData.manifestationType
+          : undefined,
+        language
+      ),
+    [formData.manifestationType, language]
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Evita executar mensagens iniciais duas vezes em modo Strict (Next.js/React dev)
@@ -1618,7 +1673,7 @@ export function ChatbotInterface({
                       v.length > allowedBody ? v.slice(0, allowedBody) : v
                     );
                   }}
-                  placeholder={translations.placeholder[language]}
+                  placeholder={descriptionPlaceholder}
                   className="min-h-[120px] max-h-[300px] resize-y focus:ring-2 focus:ring-primary/20 transition-all duration-200 overflow-y-auto"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && e.ctrlKey) {

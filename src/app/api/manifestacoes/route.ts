@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { toCGUPayload } from "@/src/lib/cgu/utils";
+import { toCguPayload } from "@/src/lib/cgu/utils";
 import { postManifestacao } from "@/src/lib/cgu/client";
 import type { ManifestacaoRequestDTO } from "@/src/lib/cgu/types";
 
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
 
     // Token opcional via env ou header de forward
     const token = process.env.CGU_API_TOKEN || req.headers.get("x-cgu-token") || undefined;
-    const payload = await toCGUPayload(dto);
+    const payload = await toCguPayload(dto);
     const data = await postManifestacao(payload, { token });
     return NextResponse.json({ ok: true, data }, { status: 200 });
   } catch (err) {
