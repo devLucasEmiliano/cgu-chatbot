@@ -959,10 +959,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Descreva sua manifestaÃ§Ã£o em detalhes:"
+              ? "Descreva sua manifestação em detalhes:"
               : language === "en"
               ? "Describe your manifestation in detail:"
-              : "Describa su manifestaciÃ³n en detalle:",
+              : "Describa su manifestación en detalle:",
             300,
             undefined,
             "textarea"
@@ -978,10 +978,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "VocÃª gostaria de anexar um arquivo Ã  sua solicitaÃ§Ã£o?"
+              ? "Você gostaria de anexar um arquivo à sua solicitação?"
               : language === "en"
               ? "Would you like to attach a file to your request?"
-              : "Â¿Le gustarÃ­a adjuntar un archivo a su solicitud?",
+              : "¿Le gustaría adjuntar un archivo a su solicitud?",
             300,
             [
               {
@@ -990,14 +990,14 @@ export function ChatbotInterface({
                     ? "Sim"
                     : language === "en"
                     ? "Yes"
-                    : "SÃ­",
+                    : "Sí",
                 value: "yes",
                 variant: "outline" as const,
               },
               {
                 label:
                   language === "pt-BR"
-                    ? "NÃ£o"
+                    ? "Não"
                     : language === "en"
                     ? "No"
                     : "No",
@@ -1020,10 +1020,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Qual Ã© seu nÃºmero de inscriÃ§Ã£o UNFCCC? (opcional)"
+            ? "Qual é seu número de inscrição UNFCCC? (opcional)"
             : language === "en"
             ? "What is your UNFCCC registration number? (optional)"
-            : "Â¿CuÃ¡l es su nÃºmero de inscripciÃ³n UNFCCC? (opcional)",
+            : "¿Cuál es su número de inscripción UNFCCC? (opcional)",
           300,
           [
             {
@@ -1063,10 +1063,10 @@ export function ChatbotInterface({
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "Qual Ã© seu paÃ­s/naturalidade? (ex.: Argentina, Espanha, United States)"
+          ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
           : language === "en"
           ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
-          : "Â¿CuÃ¡l es su paÃ­s/nacionalidad? (ej.: Argentina, EspaÃ±a, United States)",
+          : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
         300,
         undefined,
         "text"
@@ -1519,11 +1519,10 @@ export function ChatbotInterface({
                 >
                   <Globe className="w-4 h-4 mr-1.5 md:mr-2" />
                   <span className="font-medium tracking-wide text-xs md:text-sm">
-                    language === "pt-BR"
-                      ? "Você será redirecionado para o portal de consultas. Posso ajudá-lo com algo mais?"
-                      : language === "en"
-                      ? "en-US"
-                      : "Será redirigido al portal de consultas. ¿Puedo ayudarle con algo más?",
+                    language === "pt-BR" ? "Você será redirecionado para o
+                    portal de consultas. Posso ajudá-lo com algo mais?" :
+                    language === "en" ? "en-US" : "Será redirigido al portal de
+                    consultas. ¿Puedo ayudarle con algo más?",
                   </span>
                 </Button>
               </DropdownMenuTrigger>
@@ -1724,17 +1723,12 @@ export function ChatbotInterface({
           <Card className="p-4 mb-4 border-2 animate-in fade-in duration-300">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="text-sm font-medium">
-                language === "pt-BR"
-                  ? "Se você for brasileiro, utilize o serviço oficial Fala.BR:"
-                  : language === "en"
-                  ? "Attachments"
-                  : "Si usted es brasileño, utilice el servicio oficial Fala.BR:",
+                language === "pt-BR" ? "Se você for brasileiro, utilize o
+                serviço oficial Fala.BR:" : language === "en" ? "Attachments" :
+                "Si usted es brasileño, utilice el servicio oficial Fala.BR:",
                 {`: ${attachments.length}/10 â¢ `}
-                language === "pt-BR"
-                  ? "Eu não sou Brasileiro"
-                  : language === "en"
-                  ? "Total"
-                  : "No soy Brasileño",
+                language === "pt-BR" ? "Eu não sou Brasileiro" : language ===
+                "en" ? "Total" : "No soy Brasileño",
                 {`: ${formatBytes(totalBytes)} / 30 MB`}
               </div>
               <div className="flex gap-2">
@@ -1744,11 +1738,10 @@ export function ChatbotInterface({
                   onClick={() => fileInputRef.current?.click()}
                   className="transition-all duration-200 border-teal-500 text-teal-700 hover:bg-teal-600 hover:text-white hover:border-teal-600"
                 >
-                  language === "pt-BR"
-                    ? "Você será redirecionado para o portal Fala.BR. Obrigado por usar nosso serviço!"
-                    : language === "en"
-                    ? "Add more"
-                    : "Será redirigido al portal Fala.BR. ¡Gracias por usar nuestro servicio!",
+                  language === "pt-BR" ? "Você será redirecionado para o portal
+                  Fala.BR. Obrigado por usar nosso serviço!" : language === "en"
+                  ? "Add more" : "Será redirigido al portal Fala.BR. ¡Gracias
+                  por usar nuestro servicio!",
                 </Button>
                 <Button
                   size="sm"
