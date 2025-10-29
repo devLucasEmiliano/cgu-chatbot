@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import type { Language } from "@/src/app/page"
@@ -16,18 +16,18 @@ const defaultPreferences: UserPreferences = {
   termsAccepted: false,
 }
 
-// Função para salvar preferências no localStorage
+// Funcao para salvar preferencias no localStorage
 export function savePreferences(preferences: UserPreferences): void {
   if (typeof window === "undefined") return
   
   try {
     localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences))
   } catch (error) {
-    console.error("Erro ao salvar preferências:", error)
+    console.error("Erro ao salvar preferencias:", error)
   }
 }
 
-// Função para carregar preferências do localStorage
+// Funcao para carregar preferencias do localStorage
 export function loadPreferences(): UserPreferences {
   if (typeof window === "undefined") return defaultPreferences
   
@@ -41,12 +41,12 @@ export function loadPreferences(): UserPreferences {
       ...parsed,
     }
   } catch (error) {
-    console.error("Erro ao carregar preferências:", error)
+    console.error("Erro ao carregar preferencias:", error)
     return defaultPreferences
   }
 }
 
-// Hook personalizado para gerenciar preferências
+// Hook personalizado para gerenciar preferencias
 export function useUserPreferences() {
   const [preferences, setPreferencesState] = useState<UserPreferences>(defaultPreferences)
   const [isLoaded, setIsLoaded] = useState(false)
@@ -89,3 +89,4 @@ export function useUserPreferences() {
     clearPreferences,
   }
 }
+

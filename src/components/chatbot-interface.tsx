@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import type React from "react";
 import { useState, useRef, useEffect, useMemo } from "react";
@@ -45,14 +45,14 @@ interface Message {
 
 const translations = {
   header: {
-    "pt-BR": "Registro de Manifestação",
+    "pt-BR": "Registro de Manifestacao",
     en: "Manifestation Registration",
-    es: "Registro de Manifestación",
+    es: "Registro de Manifestacion",
   },
   subtitle: {
-    "pt-BR": "Controladoria-Geral da União • Governo Federal do Brasil",
-    en: "Office of the Comptroller General • Federal Government of Brazil",
-    es: "Contraloría General de la Unión • Gobierno Federal de Brasil",
+    "pt-BR": "Controladoria-Geral da Uniao â€¢ Governo Federal do Brasil",
+    en: "Office of the Comptroller General â€¢ Federal Government of Brazil",
+    es: "Contraloria General de la Union â€¢ Gobierno Federal de Brasil",
   },
   placeholder: {
     "pt-BR": "Digite sua resposta...",
@@ -94,31 +94,31 @@ const manifestationTypeDescriptions: Record<
 > = {
   report: {
     "pt-BR":
-      "Denúncia: para comunicar a ocorrência de um ato ilícito, irregularidade, violação de direitos humanos ou prática de má conduta por agentes públicos.",
+      "Denuncia: para comunicar a ocorrencia de um ato ilicito, irregularidade, violacao de direitos humanos ou pratica de ma conduta por agentes publicos.",
     en: "Report: used to communicate suspected illicit acts, irregularities, human rights violations, or misconduct by public agents.",
-    es: "Denuncia: se usa para comunicar la ocurrencia de un acto ilícito, irregularidad, violación de derechos humanos o mala conducta de agentes públicos.",
+    es: "Denuncia: se usa para comunicar la ocurrencia de un acto ilicito, irregularidad, violacion de derechos humanos o mala conducta de agentes publicos.",
   },
   compliment: {
     "pt-BR":
-      "Elogio: para expressar satisfação com um atendimento ou serviço público.",
+      "Elogio: para expressar satisfacao com um atendimento ou servico publico.",
     en: "Compliment: used to express satisfaction with a public service or assistance received.",
-    es: "Elogio: se utiliza para expresar satisfacción con un servicio o atención pública.",
+    es: "Elogio: se utiliza para expresar satisfaccion con un servicio o atencion publica.",
   },
   complaint: {
     "pt-BR":
-      "Reclamação: para manifestar insatisfação com um serviço, obra ou atendimento público e solicitar providências.",
+      "Reclamacao: para manifestar insatisfacao com um servico, obra ou atendimento publico e solicitar providencias.",
     en: "Complaint: used to express dissatisfaction with a public service, work, or assistance and request corrective measures.",
-    es: "Queja: se utiliza para manifestar insatisfacción con un servicio, obra o atención pública y solicitar medidas correctivas.",
+    es: "Queja: se utiliza para manifestar insatisfaccion con un servicio, obra o atencion publica y solicitar medidas correctivas.",
   },
   request: {
     "pt-BR":
-      "Solicitação: para requerer o atendimento ou a prestação de um serviço público.",
+      "Solicitacao: para requerer o atendimento ou a prestacao de um servico publico.",
     en: "Request: used to ask for the delivery of a public service or specific assistance.",
-    es: "Solicitud: se utiliza para requerir la prestación de un servicio público.",
+    es: "Solicitud: se utiliza para requerir la prestacion de un servicio publico.",
   },
   suggestion: {
     "pt-BR":
-      "Sugestão: para apresentar ideias ou propostas de melhoria para serviços ou atendimentos.",
+      "Sugestao: para apresentar ideias ou propostas de melhoria para servicos ou atendimentos.",
     en: "Suggestion: used to present ideas or proposals to improve services or assistance.",
     es: "Sugerencia: se utiliza para presentar ideas o propuestas de mejora para servicios o atenciones.",
   },
@@ -129,29 +129,29 @@ const manifestationTypePlaceholders: Record<
   Record<Language, string>
 > = {
   report: {
-    "pt-BR": "Escreva aqui sua denúncia em detalhes....",
+    "pt-BR": "Escreva aqui sua denuncia em detalhes....",
     en: "Write here your report in detail....",
-    es: "Escriba aquí su denuncia en detalle....",
+    es: "Escriba aqui su denuncia en detalle....",
   },
   compliment: {
     "pt-BR": "Escreva aqui seu elogio em detalhes....",
     en: "Write here your compliment in detail....",
-    es: "Escriba aquí su elogio en detalle....",
+    es: "Escriba aqui su elogio en detalle....",
   },
   complaint: {
-    "pt-BR": "Escreva aqui sua reclamação em detalhes....",
+    "pt-BR": "Escreva aqui sua reclamacao em detalhes....",
     en: "Write here your complaint in detail....",
-    es: "Escriba aquí su queja en detalle....",
+    es: "Escriba aqui su queja en detalle....",
   },
   request: {
-    "pt-BR": "Escreva aqui sua solicitação em detalhes....",
+    "pt-BR": "Escreva aqui sua solicitacao em detalhes....",
     en: "Write here your request in detail....",
-    es: "Escriba aquí su solicitud en detalle....",
+    es: "Escriba aqui su solicitud en detalle....",
   },
   suggestion: {
-    "pt-BR": "Escreva aqui sua sugestão em detalhes....",
+    "pt-BR": "Escreva aqui sua sugestao em detalhes....",
     en: "Write here your suggestion in detail....",
-    es: "Escriba aquí su sugerencia en detalle....",
+    es: "Escriba aqui su sugerencia en detalle....",
   },
 };
 
@@ -183,9 +183,9 @@ const getManifestationPlaceholder = (
 const manifestationConfirmationTexts = {
   question: {
     "pt-BR":
-      "Deseja prosseguir com este tipo de manifestação ou selecionar outro?",
+      "Deseja prosseguir com este tipo de manifestacao ou selecionar outro?",
     en: "Do you want to proceed with this type of manifestation or select another one?",
-    es: "¿Desea continuar con este tipo de manifestación o seleccionar otro?",
+    es: "?Desea continuar con este tipo de manifestacion o seleccionar otro?",
   },
   proceed: {
     "pt-BR": "Prosseguir",
@@ -198,16 +198,16 @@ const manifestationConfirmationTexts = {
     es: "Elegir otro tipo",
   },
   changeAck: {
-    "pt-BR": "Tudo bem! Vamos escolher outro tipo de manifestação.",
+    "pt-BR": "Tudo bem! Vamos escolher outro tipo de manifestacao.",
     en: "No problem! Let's choose another type of manifestation.",
-    es: "¡Sin problema! Vamos elegir otro tipo de manifestación.",
+    es: "!Sin problema! Vamos elegir otro tipo de manifestacion.",
   },
 };
 
 const languages = [
-  { code: "pt-BR" as Language, flag: "🇧🇷", name: "Português" },
-  { code: "en" as Language, flag: "🇺🇸", name: "English" },
-  { code: "es" as Language, flag: "🇪🇸", name: "Español" },
+  { code: "pt-BR" as Language, flag: "ðŸ‡§ðŸ‡·", name: "Portugues" },
+  { code: "en" as Language, flag: "ðŸ‡ºðŸ‡¸", name: "English" },
+  { code: "es" as Language, flag: "ðŸ‡ªðŸ‡¸", name: "Espanol" },
 ];
 
 type FlowStep =
@@ -288,18 +288,18 @@ export function ChatbotInterface({
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Limite de caracteres: replicar cabeçalho do backend para calcular espaço restante
+  // Limite de caracteres: replicar cabecalho do backend para calcular espaco restante
   const MAX_CHARS = 7500;
   const computeHeaderLen = () => {
-    const linha1 = "Manifestação recebida no âmbito da COP30.";
-    const pais = formData.countryName || "Não Informado";
-    const linha2 = `País/Naturalidade selecionado: ${pais}`;
-    const linha3 = `Linguagem selecionada: ${language || "Não Informado"}`;
+    const linha1 = "Manifestacao recebida no ambito da COP30.";
+    const pais = formData.countryName || "Nao Informado";
+    const linha2 = `Pais/Naturalidade selecionado: ${pais}`;
+    const linha3 = `Linguagem selecionada: ${language || "Nao Informado"}`;
     const unf =
       formData.unfcccNumber && formData.unfcccNumber.trim()
         ? formData.unfcccNumber.trim()
-        : "Não Informado";
-    const linha4 = `Número de inscrição UNFCCC: ${unf}`;
+        : "Nao Informado";
+    const linha4 = `Numero de inscricao UNFCCC: ${unf}`;
     const header = [linha1, linha2, linha3, linha4].join("\n") + "\n";
     return header.length;
   };
@@ -327,33 +327,33 @@ export function ChatbotInterface({
     // Mensagem inicial
     addBotMessage(
       language === "pt-BR"
-        ? "Olá! Bem-vindo ao sistema de atendimento da COP30."
+        ? "Ola! Bem-vindo ao sistema de atendimento da COP30."
         : language === "en"
         ? "Hello! Welcome to the COP30 service system."
-        : "¡Hola! Bienvenido al sistema de atención de la COP30.",
+        : "!Hola! Bienvenido al sistema de atencion de la COP30.",
       0
     );
 
-    // Segunda mensagem após a primeira (800ms de digitação + delay)
+    // Segunda mensagem apos a primeira (800ms de digitacao + delay)
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "Você já leu e aceitou os Termos de Uso."
+          ? "Voce ja leu e aceitou os Termos de Uso."
           : language === "en"
           ? "You have read and accepted the Terms of Use."
-          : "Usted ha leído y aceptado los Términos de Uso.",
+          : "Usted ha leido y aceptado los Terminos de Uso.",
         0
       );
     }, 1000);
 
-    // Terceira mensagem após a segunda (mais 800ms + delay)
+    // Terceira mensagem apos a segunda (mais 800ms + delay)
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "Você gostaria de Consultar ou Cadastrar uma manifestação?"
+          ? "Voce gostaria de Consultar ou Cadastrar uma manifestacao?"
           : language === "en"
           ? "Would you like to Consult or Register a manifestation?"
-          : "¿Le gustaría Consultar o Registrar una manifestación?",
+          : "?Le gustaria Consultar o Registrar una manifestacion?",
         0,
         [
           {
@@ -401,12 +401,12 @@ export function ChatbotInterface({
     }
     askedQuestionsRef.current.add(messageKey);
 
-    // Aguarda um pouco antes de mostrar a animação de digitação
+    // Aguarda um pouco antes de mostrar a animacao de digitacao
     setTimeout(() => {
       setIsTyping(true);
     }, delay);
 
-    // Mostra a mensagem após a animação de digitação (mínimo 800ms)
+    // Mostra a mensagem apos a animacao de digitacao (minimo 800ms)
     setTimeout(() => {
       const newMessage: Message = {
         id: Date.now().toString() + Math.random(),
@@ -439,16 +439,16 @@ export function ChatbotInterface({
   ) => {
     const question =
       language === "pt-BR"
-        ? "Que tipo de manifestação você gostaria de fazer?"
+        ? "Que tipo de manifestacao voce gostaria de fazer?"
         : language === "en"
         ? "What type of manifestation would you like to make?"
-        : "¿Qué tipo de manifestación le gustaría hacer?";
+        : "?Que tipo de manifestacion le gustaria hacer?";
 
     const options = [
       {
         label:
           language === "pt-BR"
-            ? "Denúncia"
+            ? "Denuncia"
             : language === "en"
             ? "Report"
             : "Denuncia",
@@ -468,7 +468,7 @@ export function ChatbotInterface({
       {
         label:
           language === "pt-BR"
-            ? "Reclamação"
+            ? "Reclamacao"
             : language === "en"
             ? "Complaint"
             : "Queja",
@@ -478,7 +478,7 @@ export function ChatbotInterface({
       {
         label:
           language === "pt-BR"
-            ? "Solicitação"
+            ? "Solicitacao"
             : language === "en"
             ? "Request"
             : "Solicitud",
@@ -488,7 +488,7 @@ export function ChatbotInterface({
       {
         label:
           language === "pt-BR"
-            ? "Sugestão"
+            ? "Sugestao"
             : language === "en"
             ? "Suggestion"
             : "Sugerencia",
@@ -513,10 +513,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Você será redirecionado para o portal de consultas. Posso ajudá-lo com algo mais?"
+            ? "Voce sera redirecionado para o portal de consultas. Posso ajuda-lo com algo mais?"
             : language === "en"
             ? "You will be redirected to the consultation portal. Can I help you with something else?"
-            : "Será redirigido al portal de consultas. ¿Puedo ayudarle con algo más?",
+            : "Sera redirigido al portal de consultas. ?Puedo ayudarle con algo mas?",
           0,
           [
             {
@@ -540,10 +540,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Se você for brasileiro, utilize o serviço oficial Fala.BR:"
+            ? "Se voce for brasileiro, utilize o servico oficial Fala.BR:"
             : language === "en"
             ? "If you are Brazilian, please use the official Fala.BR service:"
-            : "Si usted es brasileño, utilice el servicio oficial Fala.BR:",
+            : "Si usted es brasileno, utilice el servicio oficial Fala.BR:",
           0,
           [
             {
@@ -559,10 +559,10 @@ export function ChatbotInterface({
             {
               label:
                 language === "pt-BR"
-                  ? "Eu não sou Brasileiro"
+                  ? "Eu nao sou Brasileiro"
                   : language === "en"
                   ? "I am not Brazilian"
-                  : "No soy Brasileño",
+                  : "No soy Brasileno",
               value: "continue",
               variant: "outline" as const,
             },
@@ -577,10 +577,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Você será redirecionado para o portal Fala.BR. Obrigado por usar nosso serviço!"
+            ? "Voce sera redirecionado para o portal Fala.BR. Obrigado por usar nosso servico!"
             : language === "en"
             ? "You will be redirected to the Fala.BR portal. Thank you for using our service!"
-            : "Será redirigido al portal Fala.BR. ¡Gracias por usar nuestro servicio!",
+            : "Sera redirigido al portal Fala.BR. !Gracias por usar nuestro servicio!",
           0
         );
       }, 100);
@@ -612,9 +612,9 @@ export function ChatbotInterface({
     const baseDelay = 120;
 
     if (description) {
-      // Mostra primeiro a descrição com leve atraso para manter a animação suave
+      // Mostra primeiro a descricao com leve atraso para manter a animacao suave
       addBotMessage(description, baseDelay, undefined, undefined, "info", true);
-      // Aguarda a primeira mensagem concluir (800ms) antes de iniciar a digitação da próxima
+      // Aguarda a primeira mensagem concluir (800ms) antes de iniciar a digitacao da proxima
       addBotMessage(
         question,
         baseDelay + 1100,
@@ -661,13 +661,13 @@ export function ChatbotInterface({
     if (type === "report") {
       setCurrentStep("identificationType");
       setTimeout(() => {
-        // Aviso informativo para denúncias (identificada vs anônima)
+        // Aviso informativo para denuncias (identificada vs anonima)
         addBotMessage(
           language === "pt-BR"
-            ? "Identificada: você poderá receber informações sobre as providências adotadas. Denúncia anônima: não será possível acompanhar ou receber respostas."
+            ? "Identificada: voce podera receber informacoes sobre as providencias adotadas. Denuncia anonima: nao sera possivel acompanhar ou receber respostas."
             : language === "en"
             ? "Identified: you will be able to receive information about the measures taken. Anonymous report: it will not be possible to track or receive responses."
-            : "Identificada: podrá recibir información sobre las medidas adoptadas. Denuncia anónima: no será posible hacer seguimiento ni recibir respuestas.",
+            : "Identificada: podra recibir informacion sobre las medidas adoptadas. Denuncia anonima: no sera posible hacer seguimiento ni recibir respuestas.",
           0,
           undefined,
           undefined,
@@ -678,10 +678,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Você deseja se identificar ou permanecer anônimo(a)?"
+            ? "Voce deseja se identificar ou permanecer anonimo(a)?"
             : language === "en"
             ? "Do you wish to identify yourself or remain anonymous?"
-            : "¿Desea identificarse o permanecer anónimo(a)?",
+            : "?Desea identificarse o permanecer anonimo(a)?",
           0,
           [
             {
@@ -697,10 +697,10 @@ export function ChatbotInterface({
             {
               label:
                 language === "pt-BR"
-                  ? "Anônima"
+                  ? "Anonima"
                   : language === "en"
                   ? "Anonymous"
-                  : "Anónima",
+                  : "Anonima",
               value: "anonymous",
               variant: "secondary" as const,
             },
@@ -711,15 +711,15 @@ export function ChatbotInterface({
         );
       }, 1000);
     } else {
-      // Para outros tipos, vai direto para identificação
+      // Para outros tipos, vai direto para identificacao
       setCurrentStep("fullName");
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Qual é seu nome completo?"
+            ? "Qual e seu nome completo?"
             : language === "en"
             ? "What is your full name?"
-            : "¿Cuál es su nombre completo?",
+            : "?Cual es su nombre completo?",
           0,
           undefined,
           "text",
@@ -770,25 +770,25 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Qual é seu nome completo?"
+            ? "Qual e seu nome completo?"
             : language === "en"
             ? "What is your full name?"
-            : "¿Cuál es su nombre completo?",
+            : "?Cual es su nombre completo?",
           300,
           undefined,
           "text"
         );
       }, 300);
     } else {
-      // Anônimo vai direto para descrição
+      // Anonimo vai direto para descricao
       setCurrentStep("description");
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Descreva sua manifestaçao em detalhes:"
+            ? "Descreva sua manifestacao em detalhes:"
             : language === "en"
             ? "Describe your manifestation in detail:"
-            : "Describa su manifestación en detalle:",
+            : "Describa su manifestacion en detalle:",
           300,
           undefined,
           "textarea"
@@ -807,10 +807,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Qual é seu e-mail?"
+              ? "Qual e seu e-mail?"
               : language === "en"
               ? "What is your email?"
-              : "¿Cuál es su correo electrónico?",
+              : "?Cual es su correo electronico?",
             300,
             undefined,
             "email"
@@ -824,10 +824,10 @@ export function ChatbotInterface({
           setTimeout(() => {
             addBotMessage(
               language === "pt-BR"
-                ? "Por favor, insira um e-mail válido."
+                ? "Por favor, insira um e-mail valido."
                 : language === "en"
                 ? "Please enter a valid email."
-                : "Por favor, ingrese un correo electrónico válido.",
+                : "Por favor, ingrese un correo electronico valido.",
               300,
               undefined,
               "email"
@@ -843,7 +843,7 @@ export function ChatbotInterface({
               ? "Confirme seu e-mail:"
               : language === "en"
               ? "Confirm your email:"
-              : "Confirme su correo electrónico:",
+              : "Confirme su correo electronico:",
             300,
             undefined,
             "email"
@@ -856,10 +856,10 @@ export function ChatbotInterface({
           setTimeout(() => {
             addBotMessage(
               language === "pt-BR"
-                ? "Os e-mails não coincidem. Por favor, tente novamente."
+                ? "Os e-mails nao coincidem. Por favor, tente novamente."
                 : language === "en"
                 ? "Emails do not match. Please try again."
-                : "Los correos electrónicos no coinciden. Por favor, inténtelo de nuevo.",
+                : "Los correos electronicos no coinciden. Por favor, intentelo de nuevo.",
               300,
               undefined,
               "email"
@@ -872,10 +872,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Você possui afiliação UNFCCC?"
+              ? "Voce possui afiliacao UNFCCC?"
               : language === "en"
               ? "Do you have UNFCCC affiliation?"
-              : "¿Tiene afiliación UNFCCC?",
+              : "?Tiene afiliacion UNFCCC?",
             300,
             [
               {
@@ -884,14 +884,14 @@ export function ChatbotInterface({
                     ? "Sim"
                     : language === "en"
                     ? "Yes"
-                    : "Sí",
+                    : "Si",
                 value: "yes",
                 variant: "outline" as const,
               },
               {
                 label:
                   language === "pt-BR"
-                    ? "Não"
+                    ? "Nao"
                     : language === "en"
                     ? "No"
                     : "No",
@@ -909,10 +909,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
+              ? "Qual e seu pais/naturalidade? (ex.: Argentina, Espanha, United States)"
               : language === "en"
               ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
-              : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
+              : "?Cual es su pais/nacionalidad? (ej.: Argentina, Espana, United States)",
             300,
             undefined,
             "text"
@@ -926,10 +926,10 @@ export function ChatbotInterface({
           setTimeout(() => {
             addBotMessage(
               language === "pt-BR"
-                ? "Não consegui reconhecer o país. Tente novamente usando o nome completo (ex.: Argentina, Espanha, Estados Unidos)."
+                ? "Nao consegui reconhecer o pais. Tente novamente usando o nome completo (ex.: Argentina, Espanha, Estados Unidos)."
                 : language === "en"
                 ? "Could not recognize the country. Please try again with the full name (e.g., Argentina, Spain, United States)."
-                : "No pude reconocer el país. Intente nuevamente con el nombre completo (ej.: Argentina, España, United States).",
+                : "No pude reconocer el pais. Intente nuevamente con el nombre completo (ej.: Argentina, Espana, United States).",
               300,
               undefined,
               "text"
@@ -959,10 +959,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Descreva sua manifestaçao em detalhes:"
+              ? "Descreva sua manifestacao em detalhes:"
               : language === "en"
               ? "Describe your manifestation in detail:"
-              : "Describa su manifestación en detalle:",
+              : "Describa su manifestacion en detalle:",
             300,
             undefined,
             "textarea"
@@ -973,15 +973,15 @@ export function ChatbotInterface({
 
       case "description":
         setFormData((prev) => ({ ...prev, description: value }));
-        // Pula a pergunta de nacionalidade já que foi verificado no início
+        // Pula a pergunta de nacionalidade ja que foi verificado no inicio
         setCurrentStep("attachmentQuestion");
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Você gostaria de anexar um arquivo à sua solicitação?"
+              ? "Voce gostaria de anexar um arquivo a sua solicitacao?"
               : language === "en"
               ? "Would you like to attach a file to your request?"
-              : "¿Le gustaría adjuntar un archivo a su solicitud?",
+              : "?Le gustaria adjuntar un archivo a su solicitud?",
             300,
             [
               {
@@ -990,14 +990,14 @@ export function ChatbotInterface({
                     ? "Sim"
                     : language === "en"
                     ? "Yes"
-                    : "Sí",
+                    : "Si",
                 value: "yes",
                 variant: "outline" as const,
               },
               {
                 label:
                   language === "pt-BR"
-                    ? "Não"
+                    ? "Nao"
                     : language === "en"
                     ? "No"
                     : "No",
@@ -1020,10 +1020,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Qual é seu número de inscrição UNFCCC? (opcional)"
+            ? "Qual e seu numero de inscricao UNFCCC? (opcional)"
             : language === "en"
             ? "What is your UNFCCC registration number? (optional)"
-            : "¿Cuál es su número de inscripción UNFCCC? (opcional)",
+            : "?Cual es su numero de inscripcion UNFCCC? (opcional)",
           300,
           [
             {
@@ -1045,10 +1045,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
+            ? "Qual e seu pais/naturalidade? (ex.: Argentina, Espanha, United States)"
             : language === "en"
             ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
-            : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
+            : "?Cual es su pais/nacionalidad? (ej.: Argentina, Espana, United States)",
           300,
           undefined,
           "text"
@@ -1063,10 +1063,10 @@ export function ChatbotInterface({
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
+          ? "Qual e seu pais/naturalidade? (ex.: Argentina, Espanha, United States)"
           : language === "en"
           ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
-          : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
+          : "?Cual es su pais/nacionalidad? (ej.: Argentina, Espana, United States)",
         300,
         undefined,
         "text"
@@ -1086,7 +1086,7 @@ export function ChatbotInterface({
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    // Limpeza do input para permitir re-seleção do mesmo arquivo posteriormente
+    // Limpeza do input para permitir re-selecao do mesmo arquivo posteriormente
     e.target.value = "";
 
     if (files.length === 0) return;
@@ -1124,13 +1124,13 @@ export function ChatbotInterface({
     const accepted: File[] = [];
     const rejectedMessages: string[] = [];
 
-    // Filtra por extensão e respeita limites de quantidade e tamanho total
+    // Filtra por extensao e respeita limites de quantidade e tamanho total
     for (const file of files) {
       const ext = getExt(file.name);
       if (!allowedExt.includes(ext)) {
         rejectedMessages.push(
           language === "pt-BR"
-            ? `Tipo não permitido: ${file.name}`
+            ? `Tipo nao permitido: ${file.name}`
             : language === "en"
             ? `Not allowed type: ${file.name}`
             : `Tipo no permitido: ${file.name}`
@@ -1153,7 +1153,7 @@ export function ChatbotInterface({
             ? `Limite de ${maxFiles} arquivos atingido.`
             : language === "en"
             ? `Limit of ${maxFiles} files reached.`
-            : `Límite de ${maxFiles} archivos alcanzado.`
+            : `Limite de ${maxFiles} archivos alcanzado.`
         );
         break;
       }
@@ -1165,7 +1165,7 @@ export function ChatbotInterface({
             ? `Tamanho total excede 30MB ao adicionar ${file.name}.`
             : language === "en"
             ? `Total size exceeds 30MB when adding ${file.name}.`
-            : `El tamaño total supera 30MB al agregar ${file.name}.`
+            : `El tamano total supera 30MB al agregar ${file.name}.`
         );
         continue;
       }
@@ -1260,19 +1260,19 @@ export function ChatbotInterface({
             ? "Deseja adicionar mais anexos?"
             : language === "en"
             ? "Would you like to add more attachments?"
-            : "¿Desea añadir más archivos adjuntos?",
+            : "?Desea anadir mas archivos adjuntos?",
           300,
           [
             {
               label:
-                language === "pt-BR" ? "Sim" : language === "en" ? "Yes" : "Sí",
+                language === "pt-BR" ? "Sim" : language === "en" ? "Yes" : "Si",
               value: "yes",
               variant: "outline" as const,
             },
             {
               label:
                 language === "pt-BR"
-                  ? "Não, finalizar"
+                  ? "Nao, finalizar"
                   : language === "en"
                   ? "No, finish"
                   : "No, finalizar",
@@ -1319,7 +1319,7 @@ export function ChatbotInterface({
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "Processando sua solicitação..."
+          ? "Processando sua solicitacao..."
           : language === "en"
           ? "Processing your request..."
           : "Procesando su solicitud...",
@@ -1327,12 +1327,12 @@ export function ChatbotInterface({
       );
     }, 300);
     try {
-      // Mapeia tipo de manifestação e formulário aceito pela API CGU
-      // 1: Denúncia -> Formulário 4
-      // 2: Reclamação -> Formulário 1
-      // 3: Elogio -> Formulário 1
-      // 4: Sugestão -> Formulário 1
-      // 5: Solicitação -> Formulário 1
+      // Mapeia tipo de manifestacao e formulario aceito pela API CGU
+      // 1: Denuncia -> Formulario 4
+      // 2: Reclamacao -> Formulario 1
+      // 3: Elogio -> Formulario 1
+      // 4: Sugestao -> Formulario 1
+      // 5: Solicitacao -> Formulario 1
       const tipoMap: Record<
         string,
         { idTipoManifestacao: number; idTipoFormulario: number }
@@ -1348,10 +1348,10 @@ export function ChatbotInterface({
         tipoMap[formData.manifestationType || "request"] || tipoMap["request"];
       const isAnonymous = formData.identificationType === "anonymous";
       const isReport = formData.manifestationType === "report";
-      // Regra: usar 1 para denúncia anônima; 4 para os demais casos
+      // Regra: usar 1 para denuncia anonima; 4 para os demais casos
       const idTipoIdentificacao = isReport && isAnonymous ? 1 : 4;
 
-      // Montar DTO mínimo para o backend com base no tipo escolhido
+      // Montar DTO minimo para o backend com base no tipo escolhido
       const body = {
         tipoChave:
           typeof formData.manifestationType === "string"
@@ -1583,7 +1583,7 @@ export function ChatbotInterface({
                           : "text-white text-lg"
                       }
                     >
-                      {message.type === "bot" ? "🤖" : "👤"}
+                      {message.type === "bot" ? "ðŸ¤–" : "ðŸ‘¤"}
                     </AvatarFallback>
                   </Avatar>
 
@@ -1657,7 +1657,7 @@ export function ChatbotInterface({
                       className="object-cover"
                     />
                     <AvatarFallback className="text-teal-700 text-lg">
-                      🤖
+                      ðŸ¤–
                     </AvatarFallback>
                   </Avatar>
                   <div className="bg-gray-100 rounded-2xl px-5 py-4 shadow-sm">
@@ -1726,7 +1726,7 @@ export function ChatbotInterface({
                   : language === "en"
                   ? "Attachments"
                   : "Adjuntos"}
-                {`: ${attachments.length}/10 • `}
+                {`: ${attachments.length}/10 â€¢ `}
                 {language === "pt-BR"
                   ? "Total"
                   : language === "en"
@@ -1745,7 +1745,7 @@ export function ChatbotInterface({
                     ? "Adicionar mais"
                     : language === "en"
                     ? "Add more"
-                    : "Agregar más"}
+                    : "Agregar mas"}
                 </Button>
                 <Button
                   size="sm"
@@ -1756,7 +1756,7 @@ export function ChatbotInterface({
                     ? "Finalizar cadastro"
                     : language === "en"
                     ? "Finish submission"
-                    : "Finalizar envío"}
+                    : "Finalizar envio"}
                 </Button>
               </div>
             </div>
@@ -1799,7 +1799,7 @@ export function ChatbotInterface({
                 <Textarea
                   ref={textareaRef}
                   value={inputValue}
-                  // Impede ultrapassar o limite permitido (ajustado pelo cabeçalho)
+                  // Impede ultrapassar o limite permitido (ajustado pelo cabecalho)
                   maxLength={allowedBody}
                   onChange={(e) => {
                     const v = e.target.value;
@@ -1815,7 +1815,7 @@ export function ChatbotInterface({
                     }
                   }}
                 />
-                {/* Barra de progresso do limite de caracteres considerando o cabeçalho */}
+                {/* Barra de progresso do limite de caracteres considerando o cabecalho */}
                 <div>
                   <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
                     <div
@@ -1840,7 +1840,7 @@ export function ChatbotInterface({
                         ? "Limite de caracteres do texto"
                         : language === "en"
                         ? "Text character limit"
-                        : "Límite de caracteres del texto"}
+                        : "Limite de caracteres del texto"}
                     </span>
                     <span>
                       {inputValue.length}/{allowedBody}
@@ -1888,10 +1888,10 @@ export function ChatbotInterface({
                         {selectedCountry
                           ? selectedCountry.descricao
                           : language === "pt-BR"
-                          ? "Selecione seu país/naturalidade..."
+                          ? "Selecione seu pais/naturalidade..."
                           : language === "en"
                           ? "Select your country/nationality..."
-                          : "Seleccione su país/nacionalidad..."}
+                          : "Seleccione su pais/nacionalidad..."}
                       </span>
                       <ChevronDown className="h-4 w-4 opacity-50" />
                     </Button>
@@ -1974,3 +1974,4 @@ export function ChatbotInterface({
     </div>
   );
 }
+

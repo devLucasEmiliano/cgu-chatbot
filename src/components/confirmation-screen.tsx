@@ -17,41 +17,41 @@ interface ConfirmationScreenProps {
 
 const translations = {
   title: {
-    "pt-BR": "SolicitaÃ§Ã£o Enviada com Sucesso!",
+    "pt-BR": "Solicitacao Enviada com Sucesso!",
     en: "Request Submitted Successfully!",
-    es: "Â¡Solicitud Enviada con Ã‰xito!",
+    es: "Solicitud Enviada con Exito!",
   },
   subtitle: {
     "pt-BR":
-      "Sua manifestaÃ§Ã£o foi registrada e serÃ¡ processada pela Plataforma Fala.BR",
+      "Sua manifestacao foi registrada e sera processada pela Plataforma Fala.BR",
     en: "Your manifestation has been registered and will be processed by the Fala.BR Platform",
-    es: "Su manifestaciÃ³n ha sido registrada y serÃ¡ procesada por la Plataforma Fala.BR",
+    es: "Su manifestacion ha sido registrada y sera procesada por la Plataforma Fala.BR",
   },
   protocolLabel: {
-    "pt-BR": "NÃºmero do Protocolo",
+    "pt-BR": "Numero do Protocolo",
     en: "Protocol Number",
-    es: "NÃºmero de Protocolo",
+    es: "Numero de Protocolo",
   },
   protocolInfo: {
-    "pt-BR": "Guarde este nÃºmero para acompanhar sua solicitaÃ§Ã£o",
+    "pt-BR": "Guarde este numero para acompanhar sua solicitacao",
     en: "Save this number to track your request",
-    es: "Guarde este nÃºmero para seguir su solicitud",
+    es: "Guarde este numero para seguir su solicitud",
   },
   nextSteps: {
-    "pt-BR": "PrÃ³ximos Passos",
+    "pt-BR": "Proximos Passos",
     en: "Next Steps",
-    es: "PrÃ³ximos Pasos",
+    es: "Proximos Pasos",
   },
   step2: {
     "pt-BR":
-      "O prazo para resposta Ã© de 30 dias, prorrogÃ¡vel por igual perÃ­odo",
+      "O prazo para resposta e de 30 dias, prorrogavel por igual periodo",
     en: "The response deadline is 30 days, extendable for an equal period",
-    es: "El plazo de respuesta es de 30 dÃ­as, prorrogable por igual perÃ­odo",
+    es: "El plazo de respuesta es de 30 dias, prorrogable por igual periodo",
   },
   step3: {
-    "pt-BR": "VocÃª pode acompanhar o status atravÃ©s do nÃºmero do protocolo",
+    "pt-BR": "Voce pode acompanhar o status atraves do numero do protocolo",
     en: "You can track the status using the protocol number",
-    es: "Puede seguir el estado usando el nÃºmero de protocolo",
+    es: "Puede seguir el estado usando el numero de protocolo",
   },
   download: {
     "pt-BR": "Baixar Comprovante",
@@ -64,7 +64,7 @@ const translations = {
     es: "Consultar en Fala.BR",
   },
   newRequest: {
-    "pt-BR": "Nova SolicitaÃ§Ã£o",
+    "pt-BR": "Nova Solicitacao",
     en: "New Request",
     es: "Nueva Solicitud",
   },
@@ -108,8 +108,8 @@ const translations = {
   },
   details: {
     "pt-BR": {
-      protocol: "NÃºmero do Protocolo",
-      access: "CÃ³digo de Acesso",
+      protocol: "Numero do Protocolo",
+      access: "Codigo de Acesso",
       createdAt: "Data de Cadastro",
       deadline: "Prazo de Resposta",
     },
@@ -120,8 +120,8 @@ const translations = {
       deadline: "Response Deadline",
     },
     es: {
-      protocol: "NÃºmero de Protocolo",
-      access: "CÃ³digo de Acceso",
+      protocol: "Numero de Protocolo",
+      access: "Codigo de Acceso",
       createdAt: "Fecha de Registro",
       deadline: "Plazo de Respuesta",
     },
@@ -230,7 +230,7 @@ export function ConfirmationScreen({
     // Footer
     doc.setFontSize(9);
     doc.setTextColor(100, 100, 100);
-    doc.text("Controladoria-Geral da UniÃ£o", 105, 280, { align: "center" });
+    doc.text("Controladoria-Geral da Uniao", 105, 280, { align: "center" });
     doc.text("Governo Federal do Brasil", 105, 285, { align: "center" });
 
     // Save the PDF
@@ -439,4 +439,8 @@ export function ConfirmationScreen({
     </div>
   );
 }
+
+
+
+
 

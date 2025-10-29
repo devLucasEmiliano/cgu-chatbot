@@ -1,4 +1,4 @@
-import type { CGUResponse, ManifestacaoPayloadMinimo } from "./types";
+﻿import type { CGUResponse, ManifestacaoPayloadMinimo } from "./types";
 
 const BASE_URL = process.env.CGU_API_BASE_URL || "https://treinafalabr.cgu.gov.br";
 const API_PATH = "/api/manifestacoes";
@@ -36,7 +36,7 @@ export async function postManifestacao(payload: ManifestacaoPayloadMinimo, opts?
 
     if (!res.ok) {
       const obj = (parsed && typeof parsed === "object") ? (parsed as Record<string, unknown>) : {};
-      const message = (obj["message"] as string) || (obj["Message"] as string) || res.statusText || "Erro ao enviar manifestação";
+      const message = (obj["message"] as string) || (obj["Message"] as string) || res.statusText || "Erro ao enviar manifestacao";
       throw new Error(`CGU API ${res.status}: ${message}`);
     }
     return (parsed ?? {}) as CGUResponse;
@@ -44,3 +44,4 @@ export async function postManifestacao(payload: ManifestacaoPayloadMinimo, opts?
     clearTimeout(timeout);
   }
 }
+

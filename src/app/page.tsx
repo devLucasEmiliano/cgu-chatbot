@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { LanguageSelection } from "@/src/components/language-selection"
@@ -26,20 +26,20 @@ export default function Home() {
   const [selectedLanguage, setSelectedLanguage] = useState<Language>("pt-BR")
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null)
 
-  // Carregar preferências salvas quando o componente montar
+  // Carregar preferencias salvas quando o componente montar
   useEffect(() => {
     if (!isLoaded) return
 
-    // Se já tem idioma salvo, usa ele
+    // Se ja tem idioma salvo, usa ele
     if (preferences.language) {
       setSelectedLanguage(preferences.language)
     }
 
-    // Se já aceitou os termos e tem idioma, vai direto pro chat
+    // Se ja aceitou os termos e tem idioma, vai direto pro chat
     if (preferences.termsAccepted && preferences.language) {
       setCurrentStep("chat")
     } else if (preferences.language && !preferences.termsAccepted) {
-      // Se tem idioma mas não aceitou termos, vai pra tela de termos
+      // Se tem idioma mas nao aceitou termos, vai pra tela de termos
       setCurrentStep("terms")
     }
   }, [isLoaded, preferences])
@@ -66,7 +66,7 @@ export default function Home() {
   }
 
   const handleRestart = () => {
-    // Volta direto para o chat, mantendo idioma já escolhido e termos aceitos
+    // Volta direto para o chat, mantendo idioma ja escolhido e termos aceitos
     setSubmitResult(null)
     setCurrentStep("chat")
   }
@@ -74,7 +74,7 @@ export default function Home() {
   const isAnonymousSubmission =
     submitResult && submitResult.success ? Boolean(submitResult.meta?.isAnonymousReport) : false
 
-  // Mostrar loading enquanto carrega preferências
+  // Mostrar loading enquanto carrega preferencias
   if (!isLoaded) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -112,3 +112,4 @@ export default function Home() {
     </main>
   )
 }
+

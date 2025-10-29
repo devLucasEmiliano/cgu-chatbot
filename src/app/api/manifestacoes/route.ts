@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { toCguPayload } from "@/src/lib/cgu/utils";
 import { postManifestacao } from "@/src/lib/cgu/client";
 import type { ManifestacaoRequestDTO } from "@/src/lib/cgu/types";
@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 60;
-const RATE_LIMIT_MESSAGE = "Muitas solicitações. Tente novamente em breve.";
+const RATE_LIMIT_MESSAGE = "Muitas solicitacoes. Tente novamente em breve.";
 const rateLimitBucket = new Map<string, { count: number; expiresAt: number }>();
 
 const getClientIdentifier = (req: NextRequest): string => {
@@ -39,7 +39,7 @@ const enforceRateLimit = (identifier: string): { allowed: boolean; retryAfterMs:
 
 const sanitizeErrorMessage = (input: string): string => {
   const normalized = input.replace(/[\r\n\t]+/g, " ").replace(/\s{2,}/g, " ").trim();
-  const fallback = "Erro ao processar a solicitação.";
+  const fallback = "Erro ao processar a solicitacao.";
   return normalized ? normalized.slice(0, 200) : fallback;
 };
 
@@ -70,7 +70,8 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const rawMessage = err instanceof Error ? err.message : "Erro desconhecido";
     const msg = sanitizeErrorMessage(rawMessage);
-    const status = /combina[cç][aã]o.*inv[aá]lida/i.test(msg) || /\d+MB|anexos|manifestante|texto/i.test(msg) ? 400 : 500;
+    const status = /combina[cc][aa]o.*inv[aa]lida/i.test(msg) || /\d+MB|anexos|manifestante|texto/i.test(msg) ? 400 : 500;
     return NextResponse.json({ ok: false, error: msg }, { status });
   }
 }
+
