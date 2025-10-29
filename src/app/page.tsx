@@ -11,7 +11,12 @@ export type Language = "pt-BR" | "en" | "es"
 
 export type Step = "language" | "terms" | "chat" | "confirmation"
 
-type SuccessResult = { success: true; data: { NumeroProtocolo?: string; CodigoAcesso?: string; DataCadastro?: string; PrazoResposta?: string } }
+type SubmissionMeta = { isAnonymousReport?: boolean; redirectToFalaBr?: boolean }
+type SuccessResult = {
+  success: true
+  data: { NumeroProtocolo?: string; CodigoAcesso?: string; DataCadastro?: string; PrazoResposta?: string }
+  meta?: SubmissionMeta
+}
 type ErrorResult = { success: false; error: string }
 export type SubmitResult = SuccessResult | ErrorResult
 
@@ -66,6 +71,9 @@ export default function Home() {
     setCurrentStep("chat")
   }
 
+  const isAnonymousSubmission =
+    submitResult && submitResult.success ? Boolean(submitResult.meta?.isAnonymousReport) : false
+
   // Mostrar loading enquanto carrega preferências
   if (!isLoaded) {
     return (
@@ -94,7 +102,12 @@ export default function Home() {
         />
       )}
       {currentStep === "confirmation" && submitResult && (
-        <ConfirmationScreen language={selectedLanguage} result={submitResult} onRestart={handleRestart} />
+        <ConfirmationScreen
+          language={selectedLanguage}
+          result={submitResult}
+          onRestart={handleRestart}
+          isAnonymous={isAnonymousSubmission}
+        />
       )}
     </main>
   )

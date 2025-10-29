@@ -1,25 +1,15 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { CheckCircle2, Download, Home } from "lucide-react";
-import type { Language } from "@/src/app/page";
+import type { Language, SubmitResult } from "@/src/app/page";
 import Image from "next/image";
 import { jsPDF } from "jspdf";
 
 interface ConfirmationScreenProps {
   language: Language;
-  result:
-    | {
-        success: true;
-        data: {
-          NumeroProtocolo?: string;
-          CodigoAcesso?: string;
-          DataCadastro?: string;
-          PrazoResposta?: string;
-        };
-      }
-    | { success: false; error: string };
+  result: SubmitResult;
   onRestart: () => void;
   // When true, do not show protocol/access/dates; only show a completion message
   isAnonymous?: boolean;
@@ -27,41 +17,41 @@ interface ConfirmationScreenProps {
 
 const translations = {
   title: {
-    "pt-BR": "Solicitação Enviada com Sucesso!",
+    "pt-BR": "SolicitaÃ§Ã£o Enviada com Sucesso!",
     en: "Request Submitted Successfully!",
-    es: "¡Solicitud Enviada con Éxito!",
+    es: "Â¡Solicitud Enviada con Ã‰xito!",
   },
   subtitle: {
     "pt-BR":
-      "Sua manifestação foi registrada e será processada pela Plataforma Fala.BR",
+      "Sua manifestaÃ§Ã£o foi registrada e serÃ¡ processada pela Plataforma Fala.BR",
     en: "Your manifestation has been registered and will be processed by the Fala.BR Platform",
-    es: "Su manifestación ha sido registrada y será procesada por la Plataforma Fala.BR",
+    es: "Su manifestaciÃ³n ha sido registrada y serÃ¡ procesada por la Plataforma Fala.BR",
   },
   protocolLabel: {
-    "pt-BR": "Número do Protocolo",
+    "pt-BR": "NÃºmero do Protocolo",
     en: "Protocol Number",
-    es: "Número de Protocolo",
+    es: "NÃºmero de Protocolo",
   },
   protocolInfo: {
-    "pt-BR": "Guarde este número para acompanhar sua solicitação",
+    "pt-BR": "Guarde este nÃºmero para acompanhar sua solicitaÃ§Ã£o",
     en: "Save this number to track your request",
-    es: "Guarde este número para seguir su solicitud",
+    es: "Guarde este nÃºmero para seguir su solicitud",
   },
   nextSteps: {
-    "pt-BR": "Próximos Passos",
+    "pt-BR": "PrÃ³ximos Passos",
     en: "Next Steps",
-    es: "Próximos Pasos",
+    es: "PrÃ³ximos Pasos",
   },
   step2: {
     "pt-BR":
-      "O prazo para resposta é de 30 dias, prorrogável por igual período",
+      "O prazo para resposta Ã© de 30 dias, prorrogÃ¡vel por igual perÃ­odo",
     en: "The response deadline is 30 days, extendable for an equal period",
-    es: "El plazo de respuesta es de 30 días, prorrogable por igual período",
+    es: "El plazo de respuesta es de 30 dÃ­as, prorrogable por igual perÃ­odo",
   },
   step3: {
-    "pt-BR": "Você pode acompanhar o status através do número do protocolo",
+    "pt-BR": "VocÃª pode acompanhar o status atravÃ©s do nÃºmero do protocolo",
     en: "You can track the status using the protocol number",
-    es: "Puede seguir el estado usando el número de protocolo",
+    es: "Puede seguir el estado usando el nÃºmero de protocolo",
   },
   download: {
     "pt-BR": "Baixar Comprovante",
@@ -74,7 +64,7 @@ const translations = {
     es: "Consultar en Fala.BR",
   },
   newRequest: {
-    "pt-BR": "Nova Solicitação",
+    "pt-BR": "Nova SolicitaÃ§Ã£o",
     en: "New Request",
     es: "Nueva Solicitud",
   },
@@ -90,14 +80,36 @@ const translations = {
   },
   anonymousNotice: {
     "pt-BR":
-      "Sua denúncia anônima foi registrada e enviada com sucesso. Por ser anônima, não exibimos número de protocolo, códigos ou datas nesta tela.",
-    en: "Your anonymous report has been submitted successfully. Because it is anonymous, we do not display protocol numbers, codes, or dates on this screen.",
-    es: "Su denuncia anónima ha sido enviada con éxito. Por ser anónima, no mostramos números de protocolo, códigos ni fechas en esta pantalla.",
+      "Por se tratar de uma manifestacao anonima, nao sera possivel acompanhar o andamento pelo sistema.",
+    en: "Because this is an anonymous report, it will not be possible to follow the progress through the system.",
+    es: "Por tratarse de una denuncia anonima, no sera posible seguir el progreso en el sistema.",
+  },
+  redirectTitle: {
+    "pt-BR": "Atendimento encerrado",
+    en: "Service closed",
+    es: "Atencion finalizada",
+  },
+  redirectSubtitle: {
+    "pt-BR":
+      "Para manifestacoes originadas no Brasil, utilize o servico oficial Fala.BR.",
+    en: "For manifestations originating in Brazil, please use the official Fala.BR service.",
+    es: "Para manifestaciones originadas en Brasil, utilice el servicio oficial Fala.BR.",
+  },
+  redirectNotice: {
+    "pt-BR":
+      "Para prosseguir com seu registro, acesse https://falabr.cgu.gov.br. Este atendimento foi encerrado aqui.",
+    en: "To continue your submission, visit https://falabr.cgu.gov.br. This session is now closed here.",
+    es: "Para continuar con su registro, acceda a https://falabr.cgu.gov.br. Esta atencion se cerro aqui.",
+  },
+  redirectButton: {
+    "pt-BR": "Ir para o Fala.BR",
+    en: "Go to Fala.BR",
+    es: "Ir a Fala.BR",
   },
   details: {
     "pt-BR": {
-      protocol: "Número do Protocolo",
-      access: "Código de Acesso",
+      protocol: "NÃºmero do Protocolo",
+      access: "CÃ³digo de Acesso",
       createdAt: "Data de Cadastro",
       deadline: "Prazo de Resposta",
     },
@@ -108,8 +120,8 @@ const translations = {
       deadline: "Response Deadline",
     },
     es: {
-      protocol: "Número de Protocolo",
-      access: "Código de Acceso",
+      protocol: "NÃºmero de Protocolo",
+      access: "CÃ³digo de Acceso",
       createdAt: "Fecha de Registro",
       deadline: "Plazo de Respuesta",
     },
@@ -124,6 +136,27 @@ export function ConfirmationScreen({
 }: ConfirmationScreenProps) {
   const isSuccess = result.success;
   const data = result.success ? result.data : undefined;
+  const meta = result.success ? result.meta : undefined;
+  const isBrazilRedirect = Boolean(meta?.redirectToFalaBr);
+  const anonymousView = isAnonymous || Boolean(meta?.isAnonymousReport);
+  const titleText = isSuccess
+    ? isBrazilRedirect
+      ? translations.redirectTitle[language]
+      : translations.title[language]
+    : translations.errorTitle[language];
+  const subtitleText =
+    isSuccess && isBrazilRedirect
+      ? translations.redirectSubtitle[language]
+      : translations.subtitle[language];
+  const showDownload = isSuccess && !anonymousView && !isBrazilRedirect;
+  const showPrimarySuccessButton =
+    isSuccess && (isBrazilRedirect || !anonymousView);
+  const primarySuccessLabel = isBrazilRedirect
+    ? translations.redirectButton[language]
+    : translations.consult[language];
+  const primaryButtonUrl = isBrazilRedirect
+    ? "https://falabr.cgu.gov.br"
+    : "https://falabr.cgu.gov.br/web/manifestacao/consultar";
 
   // Format protocol from 17 digits to 55555.000467/2025-31
   const formatProtocol = (raw?: string) => {
@@ -197,7 +230,7 @@ export function ConfirmationScreen({
     // Footer
     doc.setFontSize(9);
     doc.setTextColor(100, 100, 100);
-    doc.text("Controladoria-Geral da União", 105, 280, { align: "center" });
+    doc.text("Controladoria-Geral da UniÃ£o", 105, 280, { align: "center" });
     doc.text("Governo Federal do Brasil", 105, 285, { align: "center" });
 
     // Save the PDF
@@ -242,12 +275,10 @@ export function ConfirmationScreen({
             style={{ animationDelay: "300ms" }}
           >
             <h1 className="text-2xl md:text-3xl font-bold text-balance">
-              {isSuccess
-                ? translations.title[language]
-                : translations.errorTitle[language]}
+              {titleText}
             </h1>
             <p className="text-sm md:text-base text-muted-foreground text-balance px-2">
-              {translations.subtitle[language]}
+              {subtitleText}
             </p>
           </div>
 
@@ -258,19 +289,25 @@ export function ConfirmationScreen({
               style={{ animationDelay: "400ms" }}
             >
               {/* Minimalist download button inside the green card */}
-              <div className="absolute right-3 top-3">
-                <Button
-                  onClick={handleDownload}
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-primary hover:bg-primary/10"
-                  aria-label={translations.download[language]}
-                >
-                  <Download className="w-4 h-4" />
-                </Button>
-              </div>
+              {showDownload && (
+                <div className="absolute right-3 top-3">
+                  <Button
+                    onClick={handleDownload}
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-primary hover:bg-primary/10"
+                    aria-label={translations.download[language]}
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
 
-              {isAnonymous ? (
+              {isBrazilRedirect ? (
+                <p className="text-sm md:text-base text-muted-foreground pr-10">
+                  {translations.redirectNotice[language]}
+                </p>
+              ) : anonymousView ? (
                 <p className="text-sm md:text-base text-muted-foreground pr-10">
                   {translations.anonymousNotice[language]}
                 </p>
@@ -325,7 +362,7 @@ export function ConfirmationScreen({
           )}
 
           {/* Optional next steps (without email confirmation step) */}
-          {isSuccess && (
+          {isSuccess && !anonymousView && !isBrazilRedirect && (
             <div
               className="w-full text-left space-y-4 pt-2 md:pt-4 animate-in fade-in slide-in-from-bottom-4 duration-500"
               style={{ animationDelay: "500ms" }}
@@ -366,20 +403,17 @@ export function ConfirmationScreen({
             style={{ animationDelay: "900ms" }}
           >
             {isSuccess ? (
-              <Button
-                onClick={() =>
-                  window.open(
-                    "https://falabr.cgu.gov.br/web/manifestacao/consultar",
-                    "_blank"
-                  )
-                }
-                variant="default"
-                className="flex-1 gap-2 transition-smooth hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl bg-emerald-600 hover:bg-emerald-700 text-white"
-                size="lg"
-              >
-                <Home className="w-4 h-4" />
-                {translations.consult[language]}
-              </Button>
+              showPrimarySuccessButton && (
+                <Button
+                  onClick={() => window.open(primaryButtonUrl, "_blank")}
+                  variant="default"
+                  className="flex-1 gap-2 transition-smooth hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+                  size="lg"
+                >
+                  <Home className="w-4 h-4" />
+                  {primarySuccessLabel}
+                </Button>
+              )
             ) : (
               <Button
                 onClick={onRestart}
@@ -405,3 +439,4 @@ export function ConfirmationScreen({
     </div>
   );
 }
+

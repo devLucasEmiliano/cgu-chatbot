@@ -937,6 +937,19 @@ export function ChatbotInterface({
           }, 300);
           return;
         }
+        if (code === 1058) {
+          setFormData((prev) => ({
+            ...prev,
+            countryName: value,
+            countryCode: String(code),
+          }));
+          onComplete({
+            success: true,
+            data: {},
+            meta: { redirectToFalaBr: true },
+          });
+          return;
+        }
         setFormData((prev) => ({
           ...prev,
           countryName: value,
@@ -1385,6 +1398,9 @@ export function ChatbotInterface({
             CodigoAcesso: (d["CodigoAcesso"] as string) || undefined,
             DataCadastro: (d["DataCadastro"] as string) || undefined,
             PrazoResposta: (d["PrazoResposta"] as string) || undefined,
+          },
+          meta: {
+            isAnonymousReport: isReport && isAnonymous,
           },
         };
         onComplete(result);
