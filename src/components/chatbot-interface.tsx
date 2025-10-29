@@ -664,10 +664,10 @@ export function ChatbotInterface({
         // Aviso informativo para denuncias (identificada vs anonima)
         addBotMessage(
           language === "pt-BR"
-            ? "Identificada: você poderá receber informações sobre as providências adotadas. Denúncia anônima: não será possível acompanhar ou receber respostas."
+            ? "Identificada: vocÃª poderÃ¡ receber informaÃ§Ãµes sobre as providÃªncias adotadas. DenÃºncia anÃ´nima: nÃ£o serÃ¡ possÃ­vel acompanhar ou receber respostas."
             : language === "en"
             ? "Identified: you will be able to receive information about the measures taken. Anonymous report: it will not be possible to track or receive responses."
-            : "Identificada: podrá recibir información sobre las medidas adoptadas. Denuncia anónima: no será posible hacer seguimiento ni recibir respuestas.",
+            : "Identificada: podrÃ¡ recibir informaciÃ³n sobre las medidas adoptadas. Denuncia anÃ³nima: no serÃ¡ posible hacer seguimiento ni recibir respuestas.",
           0,
           undefined,
           undefined,
@@ -678,10 +678,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Você deseja se identificar ou permanecer anônimo(a)?"
+            ? "VocÃª deseja se identificar ou permanecer anÃ´nimo(a)?"
             : language === "en"
             ? "Do you wish to identify yourself or remain anonymous?"
-            : "¿Desea identificarse o permanecer anónimo(a)?",
+            : "Â¿Desea identificarse o permanecer anÃ³nimo(a)?",
           0,
           [
             {
@@ -697,10 +697,10 @@ export function ChatbotInterface({
             {
               label:
                 language === "pt-BR"
-                  ? "Anônima"
+                  ? "AnÃ´nima"
                   : language === "en"
                   ? "Anonymous"
-                  : "Anónima",
+                  : "AnÃ³nima",
               value: "anonymous",
               variant: "secondary" as const,
             },
@@ -716,10 +716,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Qual é seu nome completo?"
+            ? "Qual Ã© seu nome completo?"
             : language === "en"
             ? "What is your full name?"
-            : "¿Cuál es su nombre completo?",
+            : "Â¿CuÃ¡l es su nombre completo?",
           0,
           undefined,
           "text",
@@ -785,10 +785,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Descreva sua manifestação em detalhes:"
+            ? "Descreva sua manifestaÃ§Ã£o em detalhes:"
             : language === "en"
             ? "Describe your manifestation in detail:"
-            : "Describa su manifestación en detalle:",
+            : "Describa su manifestaciÃ³n en detalle:",
           300,
           undefined,
           "textarea"
@@ -807,10 +807,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Qual é seu e-mail?"
+              ? "Qual Ã© seu e-mail?"
               : language === "en"
               ? "What is your email?"
-              : "¿Cuál es su correo electrónico?",
+              : "Â¿CuÃ¡l es su correo electrÃ³nico?",
             300,
             undefined,
             "email"
@@ -824,10 +824,10 @@ export function ChatbotInterface({
           setTimeout(() => {
             addBotMessage(
               language === "pt-BR"
-                ? "Por favor, insira um e-mail válido."
+                ? "Por favor, insira um e-mail vÃ¡lido."
                 : language === "en"
                 ? "Please enter a valid email."
-                : "Por favor, ingrese un correo electrónico válido.",
+                : "Por favor, ingrese un correo electrÃ³nico vÃ¡lido.",
               300,
               undefined,
               "email"
@@ -843,7 +843,7 @@ export function ChatbotInterface({
               ? "Confirme seu e-mail:"
               : language === "en"
               ? "Confirm your email:"
-              : "Confirme su correo electrónico:",
+              : "Confirme su correo electrÃ³nico:",
             300,
             undefined,
             "email"
@@ -856,10 +856,10 @@ export function ChatbotInterface({
           setTimeout(() => {
             addBotMessage(
               language === "pt-BR"
-                ? "Os e-mails não coincidem. Por favor, tente novamente."
+                ? "Os e-mails nÃ£o coincidem. Por favor, tente novamente."
                 : language === "en"
                 ? "Emails do not match. Please try again."
-                : "Los correos electrónicos no coinciden. Por favor, inténtelo de nuevo.",
+                : "Los correos electrÃ³nicos no coinciden. Por favor, intÃ©ntelo de nuevo.",
               300,
               undefined,
               "email"
@@ -872,10 +872,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Você possui afiliação UNFCCC?"
+              ? "VocÃª possui afiliaÃ§Ã£o UNFCCC?"
               : language === "en"
               ? "Do you have UNFCCC affiliation?"
-              : "¿Tiene afiliación UNFCCC?",
+              : "Â¿Tiene afiliaciÃ³n UNFCCC?",
             300,
             [
               {
@@ -884,14 +884,14 @@ export function ChatbotInterface({
                     ? "Sim"
                     : language === "en"
                     ? "Yes"
-                    : "Sí",
+                    : "SÃ­",
                 value: "yes",
                 variant: "outline" as const,
               },
               {
                 label:
                   language === "pt-BR"
-                    ? "Não"
+                    ? "NÃ£o"
                     : language === "en"
                     ? "No"
                     : "No",
@@ -909,10 +909,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
+              ? "Qual Ã© seu paÃ­s/naturalidade? (ex.: Argentina, Espanha, United States)"
               : language === "en"
               ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
-              : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
+              : "Â¿CuÃ¡l es su paÃ­s/nacionalidad? (ej.: Argentina, EspaÃ±a, United States)",
             300,
             undefined,
             "text"
@@ -926,10 +926,10 @@ export function ChatbotInterface({
           setTimeout(() => {
             addBotMessage(
               language === "pt-BR"
-                ? "Não consegui reconhecer o país. Tente novamente usando o nome completo (ex.: Argentina, Espanha, Estados Unidos)."
+                ? "NÃ£o consegui reconhecer o paÃ­s. Tente novamente usando o nome completo (ex.: Argentina, Espanha, Estados Unidos)."
                 : language === "en"
                 ? "Could not recognize the country. Please try again with the full name (e.g., Argentina, Spain, United States)."
-                : "No pude reconocer el país. Intente nuevamente con el nombre completo (ej.: Argentina, España, United States).",
+                : "No pude reconocer el paÃ­s. Intente nuevamente con el nombre completo (ej.: Argentina, EspaÃ±a, United States).",
               300,
               undefined,
               "text"
@@ -959,10 +959,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Descreva sua manifestação em detalhes:"
+              ? "Descreva sua manifestaÃ§Ã£o em detalhes:"
               : language === "en"
               ? "Describe your manifestation in detail:"
-              : "Describa su manifestación en detalle:",
+              : "Describa su manifestaciÃ³n en detalle:",
             300,
             undefined,
             "textarea"
@@ -978,10 +978,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Você gostaria de anexar um arquivo à sua solicitação?"
+              ? "VocÃª gostaria de anexar um arquivo Ã  sua solicitaÃ§Ã£o?"
               : language === "en"
               ? "Would you like to attach a file to your request?"
-              : "¿Le gustaría adjuntar un archivo a su solicitud?",
+              : "Â¿Le gustarÃ­a adjuntar un archivo a su solicitud?",
             300,
             [
               {
@@ -990,14 +990,14 @@ export function ChatbotInterface({
                     ? "Sim"
                     : language === "en"
                     ? "Yes"
-                    : "Sí",
+                    : "SÃ­",
                 value: "yes",
                 variant: "outline" as const,
               },
               {
                 label:
                   language === "pt-BR"
-                    ? "Não"
+                    ? "NÃ£o"
                     : language === "en"
                     ? "No"
                     : "No",
@@ -1020,10 +1020,10 @@ export function ChatbotInterface({
       setTimeout(() => {
         addBotMessage(
           language === "pt-BR"
-            ? "Qual é seu número de inscrição UNFCCC? (opcional)"
+            ? "Qual Ã© seu nÃºmero de inscriÃ§Ã£o UNFCCC? (opcional)"
             : language === "en"
             ? "What is your UNFCCC registration number? (optional)"
-            : "¿Cuál es su número de inscripción UNFCCC? (opcional)",
+            : "Â¿CuÃ¡l es su nÃºmero de inscripciÃ³n UNFCCC? (opcional)",
           300,
           [
             {
@@ -1063,10 +1063,10 @@ export function ChatbotInterface({
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "Qual é seu país/naturalidade? (ex.: Argentina, Espanha, United States)"
+          ? "Qual Ã© seu paÃ­s/naturalidade? (ex.: Argentina, Espanha, United States)"
           : language === "en"
           ? "What is your country/nationality? (e.g., Argentina, Spain, United States)"
-          : "¿Cuál es su país/nacionalidad? (ej.: Argentina, España, United States)",
+          : "Â¿CuÃ¡l es su paÃ­s/nacionalidad? (ej.: Argentina, EspaÃ±a, United States)",
         300,
         undefined,
         "text"
@@ -1519,10 +1519,11 @@ export function ChatbotInterface({
                 >
                   <Globe className="w-4 h-4 mr-1.5 md:mr-2" />
                   <span className="font-medium tracking-wide text-xs md:text-sm">
-                    language === "pt-BR" ? "Você será redirecionado para o
-                    portal de consultas. Posso ajudá-lo com algo mais?" :
-                    language === "en" ? "en-US" : "Será redirigido al portal de
-                    consultas. ¿Puedo ayudarle con algo más?",
+                    {language === "pt-BR"
+                      ? "pt-BR"
+                      : language === "en"
+                      ? "en-US"
+                      : "es-ES"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
@@ -1723,12 +1724,17 @@ export function ChatbotInterface({
           <Card className="p-4 mb-4 border-2 animate-in fade-in duration-300">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="text-sm font-medium">
-                language === "pt-BR" ? "Se você for brasileiro, utilize o
-                serviço oficial Fala.BR:" : language === "en" ? "Attachments" :
-                "Si usted es brasileño, utilice el servicio oficial Fala.BR:",
+                {language === "pt-BR"
+                  ? "Anexos"
+                  : language === "en"
+                  ? "Attachments"
+                  : "Adjuntos"}
                 {`: ${attachments.length}/10 â¢ `}
-                language === "pt-BR" ? "Eu não sou Brasileiro" : language ===
-                "en" ? "Total" : "No soy Brasileño",
+                {language === "pt-BR"
+                  ? "Total"
+                  : language === "en"
+                  ? "Total"
+                  : "Total"}
                 {`: ${formatBytes(totalBytes)} / 30 MB`}
               </div>
               <div className="flex gap-2">
@@ -1738,10 +1744,11 @@ export function ChatbotInterface({
                   onClick={() => fileInputRef.current?.click()}
                   className="transition-all duration-200 border-teal-500 text-teal-700 hover:bg-teal-600 hover:text-white hover:border-teal-600"
                 >
-                  language === "pt-BR" ? "Você será redirecionado para o portal
-                  Fala.BR. Obrigado por usar nosso serviço!" : language === "en"
-                  ? "Add more" : "Será redirigido al portal Fala.BR. ¡Gracias
-                  por usar nuestro servicio!",
+                  {language === "pt-BR"
+                    ? "Adicionar mais"
+                    : language === "en"
+                    ? "Add more"
+                    : "Agregar mÃ¡s"}
                 </Button>
                 <Button
                   size="sm"
