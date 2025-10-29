@@ -11,7 +11,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/src/components/ui/avatar";
-import { Send, Globe, ChevronDown } from "lucide-react";
+import { Send, Globe, ChevronDown, Loader2 } from "lucide-react";
 import type { Language, SubmitResult } from "@/src/app/page";
 import {
   DropdownMenu,
@@ -73,6 +73,11 @@ const translations = {
     "pt-BR": "Pular anexos",
     en: "Skip attachments",
     es: "Omitir archivos adjuntos",
+  },
+  uploading: {
+    "pt-BR": "Carregando anexos",
+    en: "Uploading attachments",
+    es: "Cargando adjuntos",
   },
 };
 
@@ -234,6 +239,8 @@ export function ChatbotInterface({
   const [attachments, setAttachments] = useState<
     { NomeArquivo: string; ConteudoBase64: string; TamanhoArquivo: number }[]
   >([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<{
@@ -1157,24 +1164,68 @@ export function ChatbotInterface({
       return;
     }
 
-    // Converte arquivos aceitos para Base64
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    const totalBytes = accepted.reduce((acc, file) => acc + file.size, 0);
+    const totalBytesForProgress =
+      totalBytes > 0 ? totalBytes : accepted.length;
+    let loadedBytes = 0;
+
+    // Converte arquivos aceitos para Base64 com feedback de progresso
     const readAsBase64 = (file: File) =>
       new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () =>
+        reader.onprogress = (event) => {
+          if (
+            !event.lengthComputable ||
+            totalBytesForProgress === 0 ||
+            file.size === 0
+          ) {
+            return;
+          }
+          const currentLoaded = loadedBytes + event.loaded;
+          const percent = Math.min(
+            99,
+            Math.round((currentLoaded / totalBytesForProgress) * 100)
+          );
+          setUploadProgress(percent);
+        };
+        reader.onload = () => {
+          const incremental =
+            totalBytes > 0
+              ? file.size
+              : totalBytesForProgress / accepted.length;
+          loadedBytes += incremental;
+          const percent = Math.min(
+            100,
+            Math.round((loadedBytes / totalBytesForProgress) * 100)
+          );
+          setUploadProgress(percent);
           resolve((reader.result as string).split(",")[1] || "");
+        };
         reader.onerror = () => reject(reader.error);
         reader.readAsDataURL(file);
       });
 
+    let hasError = false;
+
     try {
-      const converted = await Promise.all(
-        accepted.map(async (file) => ({
+      const converted: {
+        NomeArquivo: string;
+        ConteudoBase64: string;
+        TamanhoArquivo: number;
+      }[] = [];
+
+      for (const file of accepted) {
+        converted.push({
           NomeArquivo: file.name,
           ConteudoBase64: await readAsBase64(file),
           TamanhoArquivo: file.size,
-        }))
-      );
+        });
+      }
+
+      setUploadProgress(100);
       setAttachments((prev) => [...prev, ...converted]);
 
       addUserMessage(
@@ -1219,6 +1270,7 @@ export function ChatbotInterface({
         );
       }, 300);
     } catch {
+      hasError = true;
       alert(
         language === "pt-BR"
           ? "Falha ao processar anexos."
@@ -1226,6 +1278,16 @@ export function ChatbotInterface({
           ? "Failed to process attachments."
           : "Error al procesar los archivos adjuntos."
       );
+    } finally {
+      if (hasError) {
+        setIsUploading(false);
+        setUploadProgress(0);
+      } else {
+        setTimeout(() => {
+          setIsUploading(false);
+          setUploadProgress(0);
+        }, 400);
+      }
     }
   };
 
@@ -1605,6 +1667,39 @@ export function ChatbotInterface({
             </div>
           </ScrollArea>
         </Card>
+
+        {isUploading && (
+          <Card
+            className="p-4 mb-4 border-2 bg-muted/40 backdrop-blur-sm animate-in fade-in duration-300"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Loader2
+                className="w-4 h-4 animate-spin text-primary"
+                aria-hidden="true"
+              />
+              <span>
+                {translations.uploading[language]} {`(${uploadProgress}%)`}
+              </span>
+            </div>
+            <div
+              className="mt-3 h-2 rounded-full bg-muted overflow-hidden"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={uploadProgress}
+              aria-valuetext={`${translations.uploading[language]} ${uploadProgress}%`}
+            >
+              <div
+                className="h-full bg-primary transition-all duration-200"
+                style={{ width: `${uploadProgress}%` }}
+                aria-hidden="true"
+              />
+            </div>
+          </Card>
+        )}
 
         {attachments.length > 0 && (
           <Card className="p-4 mb-4 border-2 animate-in fade-in duration-300">

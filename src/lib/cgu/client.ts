@@ -2,10 +2,23 @@ import type { CGUResponse, ManifestacaoPayloadMinimo } from "./types";
 
 const BASE_URL = process.env.CGU_API_BASE_URL || "https://treinafalabr.cgu.gov.br";
 const API_PATH = "/api/manifestacoes";
+const DEFAULT_TIMEOUT_MS = (() => {
+  const raw = process.env.CGU_API_TIMEOUT_MS?.trim();
+  if (!raw) {
+    return 60000;
+  }
+  const parsed = Number(raw);
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+  return 60000;
+})();
 
 export async function postManifestacao(payload: ManifestacaoPayloadMinimo, opts?: { token?: string; timeoutMs?: number }): Promise<CGUResponse> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), opts?.timeoutMs ?? 30000);
+  const effectiveTimeout =
+    typeof opts?.timeoutMs === "number" && opts.timeoutMs > 0 ? opts.timeoutMs : DEFAULT_TIMEOUT_MS;
+  const timeout = setTimeout(() => controller.abort(), effectiveTimeout);
   try {
     const res = await fetch(`${BASE_URL}${API_PATH}`, {
       method: "POST",

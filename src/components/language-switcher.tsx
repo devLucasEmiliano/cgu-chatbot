@@ -17,10 +17,25 @@ const languages = [
   { code: "es" as Language, flag: "🇪🇸", name: "Español" },
 ]
 
+const triggerLabels: Record<Language, string> = {
+  "pt-BR": "Alterar idioma. Idioma atual: {language}",
+  en: "Change language. Current language: {language}",
+  es: "Cambiar idioma. Idioma actual: {language}",
+}
+
+const triggerFallback: Record<Language, string> = {
+  "pt-BR": "Selecionar idioma",
+  en: "Select language",
+  es: "Seleccionar idioma",
+}
+
 export function LanguageSwitcher({ currentLanguage, onLanguageChange }: LanguageSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const currentLang = languages.find((lang) => lang.code === currentLanguage)
+  const accessibleLabel = currentLang
+    ? triggerLabels[currentLanguage].replace("{language}", currentLang.name)
+    : triggerFallback[currentLanguage]
 
   return (
     <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-4 duration-500">
@@ -30,6 +45,10 @@ export function LanguageSwitcher({ currentLanguage, onLanguageChange }: Language
             variant="outline"
             size="sm"
             className="gap-2 bg-background/95 backdrop-blur-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border-2"
+            aria-label={accessibleLabel}
+            aria-haspopup="listbox"
+            aria-expanded={isOpen}
+            type="button"
           >
             <Globe className="w-4 h-4" />
             <span className="font-medium">{currentLang?.flag}</span>

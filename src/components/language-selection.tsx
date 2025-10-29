@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, type KeyboardEvent } from "react";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { Globe } from "lucide-react";
@@ -39,6 +39,53 @@ export function LanguageSelection({
   onLanguageSelect,
 }: LanguageSelectionProps) {
   const [selected, setSelected] = useState<Language | null>(null);
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const handleLanguageKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number
+  ) => {
+    if (languages.length === 0) return;
+
+    const moveFocus = (nextIndex: number) => {
+      const nextLang = languages[nextIndex];
+      setSelected(nextLang.code);
+      optionRefs.current[nextIndex]?.focus();
+    };
+
+    switch (event.key) {
+      case "ArrowDown":
+      case "ArrowRight": {
+        event.preventDefault();
+        const nextIndex = (index + 1) % languages.length;
+        moveFocus(nextIndex);
+        break;
+      }
+      case "ArrowUp":
+      case "ArrowLeft": {
+        event.preventDefault();
+        const prevIndex = (index - 1 + languages.length) % languages.length;
+        moveFocus(prevIndex);
+        break;
+      }
+      case "Home": {
+        event.preventDefault();
+        moveFocus(0);
+        break;
+      }
+      case "End": {
+        event.preventDefault();
+        moveFocus(languages.length - 1);
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
+  const groupLabel = selected
+    ? translations.title[selected]
+    : translations.title["pt-BR"];
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-background">
@@ -105,11 +152,19 @@ export function LanguageSelection({
           </div>
 
           {/* Language options */}
-          <div className="w-full space-y-3">
+          <div
+            className="w-full space-y-3"
+            role="radiogroup"
+            aria-label={groupLabel}
+          >
             {languages.map((lang, index) => (
               <button
                 key={lang.code}
                 onClick={() => setSelected(lang.code)}
+                type="button"
+                role="radio"
+                aria-checked={selected === lang.code}
+                aria-label={lang.name}
                 className={`w-full p-4 rounded-xl border-2 transition-all duration-200 text-left flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 hover:scale-[1.02] active:scale-[0.98] ${
                   selected === lang.code
                     ? "border-primary bg-primary/10 shadow-lg ring-2 ring-primary/20"
@@ -119,6 +174,13 @@ export function LanguageSelection({
                   animationDelay: `${200 + index * 80}ms`,
                   animationDuration: "400ms",
                 }}
+                ref={(el) => {
+                  optionRefs.current[index] = el;
+                }}
+                onKeyDown={(event) => handleLanguageKeyDown(event, index)}
+                tabIndex={
+                  selected === lang.code || (!selected && index === 0) ? 0 : -1
+                }
               >
                 <span className="text-2xl md:text-3xl">{lang.flag}</span>
                 <span className="font-medium text-sm md:text-base">
