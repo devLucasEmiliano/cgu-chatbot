@@ -23,7 +23,7 @@ export const COUNTRIES: Country[] = [
   { codigo: 647, descricao: "Armenia, Republica da" },
   { codigo: 655, descricao: "Aruba" },
   { codigo: 698, descricao: "Australia" },
-  { codigo: 728, descricao: "Ãustria" },
+  { codigo: 728, descricao: "Austria" },
   { codigo: 736, descricao: "Azerbaijao, Republica do" },
   { codigo: 779, descricao: "Bahamas, Ilhas" },
   { codigo: 809, descricao: "Bahrein, Ilhas" },
@@ -72,7 +72,7 @@ export const COUNTRIES: Country[] = [
   { codigo: 2399, descricao: "Equador" },
   { codigo: 2402, descricao: "Egito" },
   { codigo: 2437, descricao: "Eritreia" },
-  { codigo: 2445, descricao: "Emirados Ãrabes Unidos" },
+  { codigo: 2445, descricao: "Emirados Arabes Unidos" },
   { codigo: 2453, descricao: "Espanha" },
   { codigo: 2461, descricao: "Eslovenia, Republica da" },
   { codigo: 2470, descricao: "Eslovaca, Republica" },
@@ -106,7 +106,7 @@ export const COUNTRIES: Country[] = [
   { codigo: 3557, descricao: "Hungria, Republica da" },
   { codigo: 3573, descricao: "Iemen" },
   { codigo: 3595, descricao: "Man, Ilhas" },
-  { codigo: 3611, descricao: "Ãndia" },
+  { codigo: 3611, descricao: "India" },
   { codigo: 3654, descricao: "Indonesia" },
   { codigo: 3697, descricao: "Iraque" },
   { codigo: 3727, descricao: "Ira, Republica Islamica do" },
@@ -205,11 +205,11 @@ export const COUNTRIES: Country[] = [
   { codigo: 7315, descricao: "Seychelles" },
   { codigo: 7358, descricao: "Serra Leoa" },
   { codigo: 7412, descricao: "Cingapura" },
-  { codigo: 7447, descricao: "Siria, Republica Ãrabe da" },
+  { codigo: 7447, descricao: "Siria, Republica Arabe da" },
   { codigo: 7480, descricao: "Somalia" },
   { codigo: 7501, descricao: "Sri Lanka" },
   { codigo: 7544, descricao: "Suazilandia" },
-  { codigo: 7560, descricao: "Ãfrica do Sul" },
+  { codigo: 7560, descricao: "Africa do Sul" },
   { codigo: 7595, descricao: "Sudao" },
   { codigo: 7641, descricao: "Suecia" },
   { codigo: 7676, descricao: "Suica" },
@@ -217,7 +217,7 @@ export const COUNTRIES: Country[] = [
   { codigo: 7722, descricao: "Tadjiquistao" },
   { codigo: 7765, descricao: "Tailandia" },
   { codigo: 7803, descricao: "Tanzania, Republica Unida da" },
-  { codigo: 7820, descricao: "Territorio Britanico Oc. Ãndico" },
+  { codigo: 7820, descricao: "Territorio Britanico Oc. Indico" },
   { codigo: 7838, descricao: "Djibuti" },
   { codigo: 7889, descricao: "Chade" },
   { codigo: 7919, descricao: "Tcheca, Republica" },
@@ -340,4 +340,5 @@ export function getCountryLabel(code: number): string | undefined {
 export function getCountryOptions(): { label: string; value: number }[] {
   return COUNTRIES.map((c) => ({ label: c.descricao, value: c.codigo }));
 }
+
 

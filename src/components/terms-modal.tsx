@@ -220,3 +220,4 @@ export function TermsModal({ language, isOpen, onAccept, onClose }: TermsModalPr
   )
 }
 
+
