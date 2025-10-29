@@ -3,7 +3,6 @@
 import { useRef, useState, type KeyboardEvent } from "react";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
-import { Globe } from "lucide-react";
 import type { Language } from "@/src/app/page";
 import Image from "next/image";
 
@@ -12,9 +11,9 @@ interface LanguageSelectionProps {
 }
 
 const languages = [
-  { code: "pt-BR" as Language, flag: "🇧🇷", name: "Português (Brasil)" },
-  { code: "en" as Language, flag: "🇺🇸", name: "English" },
-  { code: "es" as Language, flag: "🇪🇸", name: "Español" },
+  { code: "pt-BR" as Language, flag: "BR", name: "Português (Brasil)" },
+  { code: "en" as Language, flag: "US", name: "English" },
+  { code: "es" as Language, flag: "ES", name: "Español" },
 ];
 
 const translations = {
@@ -132,11 +131,6 @@ export function LanguageSelection({
             />
           </div>
 
-          {/* Globe icon with pulse animation */}
-          <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center animate-in zoom-in-95 duration-300 shadow-lg">
-            <Globe className="w-8 h-8 md:w-10 md:h-10 text-primary" />
-          </div>
-
           {/* Title and subtitle */}
           <div className="text-center space-y-2 animate-in fade-in slide-in-from-bottom-3 duration-400">
             <h1 className="text-2xl md:text-3xl font-bold text-balance">
@@ -188,7 +182,7 @@ export function LanguageSelection({
                 </span>
                 {selected === lang.code && (
                   <span className="ml-auto text-primary animate-in zoom-in-95 duration-200">
-                    ✓
+                    OK
                   </span>
                 )}
               </button>

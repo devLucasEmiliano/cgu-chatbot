@@ -17,41 +17,41 @@ interface ConfirmationScreenProps {
 
 const translations = {
   title: {
-    "pt-BR": "Solicitacao Enviada com Sucesso!",
+    "pt-BR": "Solicitação Enviada com Sucesso!",
     en: "Request Submitted Successfully!",
-    es: "Solicitud Enviada con Exito!",
+    es: "¡Solicitud Enviada con Éxito!",
   },
   subtitle: {
     "pt-BR":
-      "Sua manifestacao foi registrada e sera processada pela Plataforma Fala.BR",
+      "Sua manifestação foi registrada e será processada pela Plataforma Fala.BR",
     en: "Your manifestation has been registered and will be processed by the Fala.BR Platform",
-    es: "Su manifestacion ha sido registrada y sera procesada por la Plataforma Fala.BR",
+    es: "Su manifestación ha sido registrada y será procesada por la Plataforma Fala.BR",
   },
   protocolLabel: {
-    "pt-BR": "Numero do Protocolo",
+    "pt-BR": "Número do Protocolo",
     en: "Protocol Number",
-    es: "Numero de Protocolo",
+    es: "Número de Protocolo",
   },
   protocolInfo: {
-    "pt-BR": "Guarde este numero para acompanhar sua solicitacao",
+    "pt-BR": "Guarde este número para acompanhar sua solicitação",
     en: "Save this number to track your request",
-    es: "Guarde este numero para seguir su solicitud",
+    es: "Guarde este número para seguir su solicitud",
   },
   nextSteps: {
-    "pt-BR": "Proximos Passos",
+    "pt-BR": "Próximos Passos",
     en: "Next Steps",
-    es: "Proximos Pasos",
+    es: "Próximos Pasos",
   },
   step2: {
     "pt-BR":
-      "O prazo para resposta e de 30 dias, prorrogavel por igual periodo",
+      "O prazo para resposta é de 30 dias, prorrogável por igual período",
     en: "The response deadline is 30 days, extendable for an equal period",
-    es: "El plazo de respuesta es de 30 dias, prorrogable por igual periodo",
+    es: "El plazo de respuesta es de 30 días, prorrogable por igual período",
   },
   step3: {
-    "pt-BR": "Voce pode acompanhar o status atraves do numero do protocolo",
+    "pt-BR": "Você pode acompanhar o status através do número do protocolo",
     en: "You can track the status using the protocol number",
-    es: "Puede seguir el estado usando el numero de protocolo",
+    es: "Puede seguir el estado usando el número de protocolo",
   },
   download: {
     "pt-BR": "Baixar Comprovante",
@@ -64,7 +64,7 @@ const translations = {
     es: "Consultar en Fala.BR",
   },
   newRequest: {
-    "pt-BR": "Nova Solicitacao",
+    "pt-BR": "Nova Solicitação",
     en: "New Request",
     es: "Nueva Solicitud",
   },
@@ -80,18 +80,18 @@ const translations = {
   },
   anonymousNotice: {
     "pt-BR":
-      "Por se tratar de uma manifestacao anonima, nao sera possivel acompanhar o andamento pelo sistema.",
+      "Por se tratar de uma manifestação anônima, não será possível acompanhar o andamento pelo sistema.",
     en: "Because this is an anonymous report, it will not be possible to follow the progress through the system.",
-    es: "Por tratarse de una denuncia anonima, no sera posible seguir el progreso en el sistema.",
+    es: "Por tratarse de una denuncia anónima, no será posible seguir el progreso en el sistema.",
   },
   redirectTitle: {
     "pt-BR": "Atendimento encerrado",
     en: "Service closed",
-    es: "Atencion finalizada",
+    es: "Atención finalizada",
   },
   redirectSubtitle: {
     "pt-BR":
-      "Para manifestacoes originadas no Brasil, utilize o servico oficial Fala.BR.",
+      "Para manifestações originadas no Brasil, utilize o serviço oficial Fala.BR.",
     en: "For manifestations originating in Brazil, please use the official Fala.BR service.",
     es: "Para manifestaciones originadas en Brasil, utilice el servicio oficial Fala.BR.",
   },
@@ -99,7 +99,7 @@ const translations = {
     "pt-BR":
       "Para prosseguir com seu registro, acesse https://falabr.cgu.gov.br. Este atendimento foi encerrado aqui.",
     en: "To continue your submission, visit https://falabr.cgu.gov.br. This session is now closed here.",
-    es: "Para continuar con su registro, acceda a https://falabr.cgu.gov.br. Esta atencion se cerro aqui.",
+    es: "Para continuar con su registro, acceda a https://falabr.cgu.gov.br. Esta atención se cerró aquí.",
   },
   redirectButton: {
     "pt-BR": "Ir para o Fala.BR",
@@ -108,8 +108,8 @@ const translations = {
   },
   details: {
     "pt-BR": {
-      protocol: "Numero do Protocolo",
-      access: "Codigo de Acesso",
+      protocol: "Número do Protocolo",
+      access: "Código de Acesso",
       createdAt: "Data de Cadastro",
       deadline: "Prazo de Resposta",
     },
@@ -120,8 +120,8 @@ const translations = {
       deadline: "Response Deadline",
     },
     es: {
-      protocol: "Numero de Protocolo",
-      access: "Codigo de Acceso",
+      protocol: "Número de Protocolo",
+      access: "Código de Acceso",
       createdAt: "Fecha de Registro",
       deadline: "Plazo de Respuesta",
     },
@@ -439,8 +439,3 @@ export function ConfirmationScreen({
     </div>
   );
 }
-
-
-
-
-
