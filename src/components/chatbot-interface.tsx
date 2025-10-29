@@ -45,14 +45,14 @@ interface Message {
 
 const translations = {
   header: {
-    "pt-BR": "Registro de ManifestaÃ§Ã£o",
+    "pt-BR": "Registro de Manifestação",
     en: "Manifestation Registration",
-    es: "Registro de ManifestaciÃ³n",
+    es: "Registro de Manifestación",
   },
   subtitle: {
-    "pt-BR": "Controladoria-Geral da UniÃ£o â¢ Governo Federal do Brasil",
-    en: "Office of the Comptroller General â¢ Federal Government of Brazil",
-    es: "ContralorÃ­a General de la UniÃ³n â¢ Gobierno Federal de Brasil",
+    "pt-BR": "Controladoria-Geral da União • Governo Federal do Brasil",
+    en: "Office of the Comptroller General • Federal Government of Brazil",
+    es: "Contraloría General de la Unión • Gobierno Federal de Brasil",
   },
   placeholder: {
     "pt-BR": "Digite sua resposta...",
@@ -94,31 +94,31 @@ const manifestationTypeDescriptions: Record<
 > = {
   report: {
     "pt-BR":
-      "DenÃºncia: para comunicar a ocorrÃªncia de um ato ilÃ­cito, irregularidade, violaÃ§Ã£o de direitos humanos ou prÃ¡tica de mÃ¡ conduta por agentes pÃºblicos.",
+      "Denúncia: para comunicar a ocorrência de um ato ilícito, irregularidade, violação de direitos humanos ou prática de má conduta por agentes públicos.",
     en: "Report: used to communicate suspected illicit acts, irregularities, human rights violations, or misconduct by public agents.",
-    es: "Denuncia: se usa para comunicar la ocurrencia de un acto ilÃ­cito, irregularidad, violaciÃ³n de derechos humanos o mala conducta de agentes pÃºblicos.",
+    es: "Denuncia: se usa para comunicar la ocurrencia de un acto ilícito, irregularidad, violación de derechos humanos o mala conducta de agentes públicos.",
   },
   compliment: {
     "pt-BR":
-      "Elogio: para expressar satisfaÃ§Ã£o com um atendimento ou serviÃ§o pÃºblico.",
+      "Elogio: para expressar satisfação com um atendimento ou serviço público.",
     en: "Compliment: used to express satisfaction with a public service or assistance received.",
-    es: "Elogio: se utiliza para expresar satisfacciÃ³n con un servicio o atenciÃ³n pÃºblica.",
+    es: "Elogio: se utiliza para expresar satisfacción con un servicio o atención pública.",
   },
   complaint: {
     "pt-BR":
-      "ReclamaÃ§Ã£o: para manifestar insatisfaÃ§Ã£o com um serviÃ§o, obra ou atendimento pÃºblico e solicitar providÃªncias.",
+      "Reclamação: para manifestar insatisfação com um serviço, obra ou atendimento público e solicitar providências.",
     en: "Complaint: used to express dissatisfaction with a public service, work, or assistance and request corrective measures.",
-    es: "Queja: se utiliza para manifestar insatisfacciÃ³n con un servicio, obra o atenciÃ³n pÃºblica y solicitar medidas correctivas.",
+    es: "Queja: se utiliza para manifestar insatisfacción con un servicio, obra o atención pública y solicitar medidas correctivas.",
   },
   request: {
     "pt-BR":
-      "SolicitaÃ§Ã£o: para requerer o atendimento ou a prestaÃ§Ã£o de um serviÃ§o pÃºblico.",
+      "Solicitação: para requerer o atendimento ou a prestação de um serviço público.",
     en: "Request: used to ask for the delivery of a public service or specific assistance.",
-    es: "Solicitud: se utiliza para requerir la prestaciÃ³n de un servicio pÃºblico.",
+    es: "Solicitud: se utiliza para requerir la prestación de un servicio público.",
   },
   suggestion: {
     "pt-BR":
-      "SugestÃ£o: para apresentar ideias ou propostas de melhoria para serviÃ§os ou atendimentos.",
+      "Sugestão: para apresentar ideias ou propostas de melhoria para serviços ou atendimentos.",
     en: "Suggestion: used to present ideas or proposals to improve services or assistance.",
     es: "Sugerencia: se utiliza para presentar ideas o propuestas de mejora para servicios o atenciones.",
   },
@@ -129,29 +129,29 @@ const manifestationTypePlaceholders: Record<
   Record<Language, string>
 > = {
   report: {
-    "pt-BR": "Escreva aqui sua denÃºncia em detalhes...",
+    "pt-BR": "Escreva aqui sua denúncia em detalhes...",
     en: "Write here your report in detail...",
-    es: "Escriba aquÃ­ su denuncia en detalle...",
+    es: "Escriba aquí su denuncia en detalle...",
   },
   compliment: {
     "pt-BR": "Escreva aqui seu elogio em detalhes...",
     en: "Write here your compliment in detail...",
-    es: "Escriba aquÃ­ su elogio en detalle...",
+    es: "Escriba aquí su elogio en detalle...",
   },
   complaint: {
-    "pt-BR": "Escreva aqui sua reclamaÃ§Ã£o em detalhes...",
+    "pt-BR": "Escreva aqui sua reclamação em detalhes...",
     en: "Write here your complaint in detail...",
-    es: "Escriba aquÃ­ su queja en detalle...",
+    es: "Escriba aquí su queja en detalle...",
   },
   request: {
-    "pt-BR": "Escreva aqui sua solicitaÃ§Ã£o em detalhes...",
+    "pt-BR": "Escreva aqui sua solicitação em detalhes...",
     en: "Write here your request in detail...",
-    es: "Escriba aquÃ­ su solicitud en detalle...",
+    es: "Escriba aquí su solicitud en detalle...",
   },
   suggestion: {
-    "pt-BR": "Escreva aqui sua sugestÃ£o em detalhes...",
+    "pt-BR": "Escreva aqui sua sugestão em detalhes...",
     en: "Write here your suggestion in detail...",
-    es: "Escriba aquÃ­ su sugerencia en detalle...",
+    es: "Escriba aquí su sugerencia en detalle...",
   },
 };
 
@@ -183,9 +183,9 @@ const getManifestationPlaceholder = (
 const manifestationConfirmationTexts = {
   question: {
     "pt-BR":
-      "Deseja prosseguir com este tipo de manifestaÃ§Ã£o ou selecionar outro?",
+      "Deseja prosseguir com este tipo de manifestação ou selecionar outro?",
     en: "Do you want to proceed with this type of manifestation or select another one?",
-    es: "Â¿Desea continuar con este tipo de manifestaciÃ³n o seleccionar otro?",
+    es: "¿Desea continuar con este tipo de manifestación o seleccionar otro?",
   },
   proceed: {
     "pt-BR": "Prosseguir",
@@ -198,16 +198,16 @@ const manifestationConfirmationTexts = {
     es: "Elegir otro tipo",
   },
   changeAck: {
-    "pt-BR": "Tudo bem! Vamos escolher outro tipo de manifestaÃ§Ã£o.",
+    "pt-BR": "Tudo bem! Vamos escolher outro tipo de manifestação.",
     en: "No problem! Let's choose another type of manifestation.",
-    es: "Â¡Sin problema! Vamos elegir otro tipo de manifestaciÃ³n.",
+    es: "¡Sin problema! Vamos elegir otro tipo de manifestación.",
   },
 };
 
 const languages = [
-  { code: "pt-BR" as Language, flag: "ð§ð·", name: "PortuguÃªs" },
-  { code: "en" as Language, flag: "ðºð¸", name: "English" },
-  { code: "es" as Language, flag: "ðªð¸", name: "EspaÃ±ol" },
+  { code: "pt-BR" as Language, flag: "🇧🇷", name: "Português" },
+  { code: "en" as Language, flag: "🇺🇸", name: "English" },
+  { code: "es" as Language, flag: "🇪🇸", name: "Español" },
 ];
 
 type FlowStep =
@@ -327,10 +327,10 @@ export function ChatbotInterface({
     // Mensagem inicial
     addBotMessage(
       language === "pt-BR"
-        ? "OlÃ¡! Bem-vindo ao sistema de atendimento da COP30."
+        ? "Olá! Bem-vindo ao sistema de atendimento da COP30."
         : language === "en"
         ? "Hello! Welcome to the COP30 service system."
-        : "Â¡Hola! Bienvenido al sistema de atenciÃ³n de la COP30.",
+        : "¡Hola! Bienvenido al sistema de atención de la COP30.",
       0
     );
 
@@ -338,10 +338,10 @@ export function ChatbotInterface({
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "VocÃª jÃ¡ leu e aceitou os Termos de Uso."
+          ? "Você já leu e aceitou os Termos de Uso."
           : language === "en"
           ? "You have read and accepted the Terms of Use."
-          : "Usted ha leÃ­do y aceptado los TÃ©rminos de Uso.",
+          : "Usted ha leído y aceptado los Términos de Uso.",
         0
       );
     }, 1000);
@@ -350,10 +350,10 @@ export function ChatbotInterface({
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "VocÃª gostaria de Consultar ou Cadastrar uma manifestaÃ§Ã£o?"
+          ? "Você gostaria de Consultar ou Cadastrar uma manifestação?"
           : language === "en"
           ? "Would you like to Consult or Register a manifestation?"
-          : "Â¿Le gustarÃ­a Consultar o Registrar una manifestaciÃ³n?",
+          : "¿Le gustaría Consultar o Registrar una manifestación?",
         0,
         [
           {
@@ -439,16 +439,16 @@ export function ChatbotInterface({
   ) => {
     const question =
       language === "pt-BR"
-        ? "Que tipo de manifestaÃ§Ã£o vocÃª gostaria de fazer?"
+        ? "Que tipo de manifestação você gostaria de fazer?"
         : language === "en"
         ? "What type of manifestation would you like to make?"
-        : "Â¿QuÃ© tipo de manifestaciÃ³n le gustarÃ­a hacer?";
+        : "¿Qué tipo de manifestación le gustaría hacer?";
 
     const options = [
       {
         label:
           language === "pt-BR"
-            ? "DenÃºncia"
+            ? "Denúncia"
             : language === "en"
             ? "Report"
             : "Denuncia",
@@ -468,7 +468,7 @@ export function ChatbotInterface({
       {
         label:
           language === "pt-BR"
-            ? "ReclamaÃ§Ã£o"
+            ? "Reclamação"
             : language === "en"
             ? "Complaint"
             : "Queja",
@@ -478,7 +478,7 @@ export function ChatbotInterface({
       {
         label:
           language === "pt-BR"
-            ? "SolicitaÃ§Ã£o"
+            ? "Solicitação"
             : language === "en"
             ? "Request"
             : "Solicitud",
@@ -488,7 +488,7 @@ export function ChatbotInterface({
       {
         label:
           language === "pt-BR"
-            ? "SugestÃ£o"
+            ? "Sugestão"
             : language === "en"
             ? "Suggestion"
             : "Sugerencia",

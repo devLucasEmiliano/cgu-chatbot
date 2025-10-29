@@ -14,7 +14,12 @@ const DEFAULT_TIMEOUT_MS = (() => {
   return 60000;
 })();
 
-export async function postManifestacao(payload: ManifestacaoPayloadMinimo, opts?: { token?: string; timeoutMs?: number }): Promise<CGUResponse> {
+const AUTH_TOKEN = process.env.CGU_API_TOKEN?.trim() || undefined;
+
+export async function postManifestacao(
+  payload: ManifestacaoPayloadMinimo,
+  opts?: { timeoutMs?: number }
+): Promise<CGUResponse> {
   const controller = new AbortController();
   const effectiveTimeout =
     typeof opts?.timeoutMs === "number" && opts.timeoutMs > 0 ? opts.timeoutMs : DEFAULT_TIMEOUT_MS;
@@ -24,7 +29,7 @@ export async function postManifestacao(payload: ManifestacaoPayloadMinimo, opts?
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(opts?.token ? { Authorization: `Bearer ${opts.token}` } : {}),
+        ...(AUTH_TOKEN ? { Authorization: `Bearer ${AUTH_TOKEN}` } : {}),
       },
       body: JSON.stringify(payload),
       signal: controller.signal,
