@@ -75,6 +75,7 @@ O projeto disponibiliza alvos no `Makefile` para construir e subir containers Do
   - Acesse `http://localhost:3003`
 
 Para encerrar os containers, execute o alvo correspondente (`make stop-development`, `make stop-staging` ou `make stop-production`).
+
 ## Scripts ÃƒÅ¡teis
 
 - `npm run dev`: inicia o servidor Next em modo desenvolvimento.
@@ -144,6 +145,7 @@ O `web.config` incluÃƒÂ­do:
 - Erros de payload geralmente indicam IDs faltantes (`CGU_ID_*`) ou anexos fora do padrao permitido (30MB totais/arquivo e extensoes especificas).
 
 ---
+
 
 
 
