@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: [
     "192.168.1.11", // device IP observed in dev warning
   ],
+  output: "standalone",
 };
 
 export default nextConfig;
