@@ -1,148 +1,110 @@
-﻿# COP30 Chatbot - CGU
+﻿# COP30 Chatbot CGU
 
-Aplicacao Next.js que orienta participantes da COP30 no registro de manifestacoes na plataforma Fala.BR. O fluxo conversa em tres idiomas, valida dados, trata anexos e envia o payload final para a API oficial da CGU.
+Aplicacao web desenvolvida em Next.js 16 para orientar participantes da COP30 no registro de manifestacoes na plataforma Fala.BR. O fluxo cobre todo o processo: escolha de idioma, aceite de termos, coleta guiada das informacoes, upload de anexos e envio seguro para a API oficial da CGU.
 
-## Visao Geral do Codigo
+## Principais funcionalidades
 
-- `src/app/page.tsx`: conduz o fluxo por etapas (idioma, termos, chat, confirmacao) e integra o hook de preferencias do usuario.
-- `src/components/language-selection.tsx`: tela inicial para escolha de idioma com persistencia da selecao.
-- `src/components/terms-acceptance.tsx`: exibe os termos de uso multilingues e bloqueia o avanco ate o aceite.
-- `src/components/chatbot-interface.tsx`: nucleo do assistente; coleta dados, gerencia anexos, normaliza respostas e chama `/api/manifestacoes`.
-- `src/components/confirmation-screen.tsx`: mostra protocolos retornados pela CGU e permite baixar recibo em PDF.
-- `src/components/language-switcher.tsx` e demais componentes em `src/components/ui`: componentes visuais reutilizaveis baseados em shadcn/ui.
-- `src/lib/user-preferences.ts`: hook client-side que guarda idioma e aceite dos termos no `localStorage`.
-- `src/lib/cgu/*`: tipagens, normalizacao de texto e regras para anexos; `client.ts` abstrai a chamada da API da CGU.
-- `src/app/api/manifestacoes/route.ts`: endpoint Next.js (runtime Node) com rate limiting que monta o payload via `toCguPayload` e chama `postManifestacao`.
-- `server.js`: servidor Node customizado para producao (incluindo hospedagem em IIS) usando o handler do Next.
-- `web.config`: configuracao para IIS + iisnode que redireciona as requisicoes para `server.js`.
+- Atendimento trilingue (portugues, ingles e espanhol) com mensagens contextualizadas ao longo do fluxo.
+- Suporte a anexos com verificacao de tamanho e extensao aceitas pela API da CGU.
+- Persistencia de preferencias do usuario (idioma e aceite dos termos) no `localStorage` para reentrada rapida.
+- Geracao de recibo com protocolo e dados de retorno, incluindo opcao de baixar um PDF.
+- Endpoint interno `/api/manifestacoes` com CORS configuravel, limitador de taxa, correlacao de logs e sanitizacao de erros antes de encaminhar ao backend oficial.
 
-## Stack e Dependencias
+## Arquitetura em alto nivel
 
-- Next.js 15 (App Router) + React 19
-- TypeScript e ESLint
-- Tailwind CSS 4 + shadcn/ui (Radix UI, class-variance-authority, lucide-react)
-- Zod e React Hook Form
-- iisnode + URL Rewrite (IIS) para hospedagem em Windows Server
+- **Frontend (App Router)**: Pagina unica em `src/app/page.tsx` que controla as etapas `language`, `terms`, `chat` e `confirmation`. Componentes React ficam em `src/components`, com UI baseada em shadcn/ui e Tailwind CSS 4.
+- **Backend Next.js**: Endpoint serverless em `src/app/api/manifestacoes/route.ts` (runtime Node.js) que recebe as respostas do chatbot, valida o DTO, monta o payload esperado e chama a API da CGU via `src/lib/cgu/client.ts`.
+- **Biblioteca CGU**: Tipos, esquemas de validacao e utilitarios estao organizados em `src/lib/cgu`, incluindo lista de paises, normalizacao de texto e montagem do corpo da requisicao.
+- **Infra de desenvolvimento**: Dockerfiles separados por ambiente (`docker/development|staging|production`) e Makefile com alvos para compilar, subir e derrubar os containers via Docker Compose.
 
-## Variaveis de Ambiente
+## Requisitos
 
-Copie `.env.example` para `.env.local` em desenvolvimento ou `.env` em producao.
+- Node.js 20 LTS (minimo 18.18) e npm 10.
+- Docker e Docker Compose (opcional para executar em container).
+- GNU Make (opcional; necessario apenas para usar os atalhos do Makefile).
 
-| Variavel                   | Uso                                                                                      |
-| -------------------------- | ---------------------------------------------------------------------------------------- |
-| `CGU_API_BASE_URL`         | URL base da API Fala.BR (deixe vazio para `https://treinafalabr.cgu.gov.br`).            |
-| `CGU_API_TOKEN`            | Token Bearer opcional, quando exigido pela instancia da API.                             |
-| `ALLOWED_ORIGINS`          | Lista de origens permitidas para CORS (ex: `http://localhost:3000,https://seu.dominio`). |
-| `CGU_ID_OUVIDORIA_DESTINO` | ID obrigatorio da ouvidoria de destino.                                                  |
-| `CGU_ID_MODO_RESPOSTA`     | ID obrigatorio do modo de resposta.                                                      |
+## Configuracao de ambiente
 
-> Outros IDs podem ser enviados via DTO do frontend. Em producao, configure as variaveis diretamente no ambiente do servidor/IIS.
+1. Copie `.env.example` para `.env.local` e defina os valores minimos para desenvolvimento.
+2. Os arquivos `.env.development.sample`, `.env.staging.sample` e `.env.production.sample` trazem modelos completos por ambiente.
+3. Variaveis principais:
+   - `CGU_API_BASE_URL`: URL base da API Fala.BR (padrao `https://treinafalabr.cgu.gov.br/`).
+   - `CGU_API_TOKEN`: Token Bearer quando o endpoint exigir autenticacao.
+   - `CGU_ID_OUVIDORIA_DESTINO`: ID da ouvidoria destino da manifestacao.
+   - `CGU_ID_MODO_RESPOSTA`: ID do modo de resposta escolhido.
+   - `ALLOWED_ORIGINS`: Lista separada por virgula de origens autorizadas para CORS (`http://localhost:3000` etc).
 
-## Preparando arquivos de ambiente por ambiente
+Mantenha os arquivos `.env.*` fora de controle de versao e configure-os nos ambientes de deploy (CI/CD ou servidor) conforme a politica de credenciais da CGU.
 
-Alem do `.env.example`, o repositorio traz tres modelos especificos por ambiente: `.env.development.sample`, `.env.staging.sample` e `.env.production.sample`. Preencha cada um deles com os valores que devem ser usados em cada contexto e salve-os como:
+## Executando localmente com Node
 
-- Desenvolvimento: copie para `.env.development`.
-- Staging (UAT): copie para `.env.staging`.
-- Producao: copie para `.env.production`.
+```bash
+npm install
+npm run dev
+```
 
-Esses arquivos podem ser referenciados por pipelines ou ferramentas de deploy automatizado, garantindo que cada ambiente utilize credenciais e IDs corretos.
+A aplicacao ficara disponivel em `http://localhost:3000`.
 
-## Docker e Makefile
+Para inspecionar erros de tipagem e lint antes de enviar alteracoes:
 
-O projeto disponibiliza alvos no `Makefile` para construir e subir containers Docker por ambiente. O `make` atua como um orquestrador simples: cada alvo executa internamente o comando `docker compose` correspondente, evitando que voce memorize caminhos e flags.
+```bash
+npm run lint
+npm run typecheck
+```
 
-### Pre-requisitos
-
-- Docker + Docker Compose instalados.
-- GNU Make. No Windows, instale via `winget install GnuWin32.Make`, `choco install make`, utilize Git Bash/MSYS2 (que ja incluem o `make`) ou execute os comandos em um shell WSL.
-
-> Sem `make`, e possivel chamar os mesmos comandos diretamente com `docker compose` (por exemplo, `docker compose -f docker/development/compose.yaml build`).
-
-### Fluxos por ambiente
-
-- **Desenvolvimento (testes locais)**
-  - `make build-development`
-  - `make start-development`
-  - Acesse `http://localhost:3001`
-- **Staging / UAT**
-  - `make build-staging`
-  - `make start-staging`
-  - Acesse `http://localhost:3002`
-- **Producao (simulacao do ambiente final)**
-  - `make build-production`
-  - `make start-production`
-  - Acesse `http://localhost:3003`
-
-Para encerrar os containers, execute o alvo correspondente (`make stop-development`, `make stop-staging` ou `make stop-production`).
-
-## Scripts Uteis
-
-- `npm run dev`: inicia o servidor Next em modo desenvolvimento.
-- `npm run build`: gera o build otimizado (lint, type-check e output em `.next`).
-- `npm run start`: sobe o build usando o servidor do Next.
-- `npm run lint`: executa ESLint.
-- `npm run typecheck`: valida os tipos TypeScript.
-
-## Executando Localmente
-
-1. **Requisitos**: Node.js >= 18.18 (recomendado 20 LTS) e npm.
-2. `npm install`
-3. Configure `.env.local` com os IDs e tokens necessarios.
-4. `npm run dev` e acesse `http://localhost:3000`.
-
-Para validar o build antes de publicar:
+Para gerar o build otimizado e testar a versao de producao:
 
 ```bash
 npm run build
 npm run start
 ```
 
-## Deploy Padrao (qualquer servidor Node)
+## Executando via Docker e Makefile
 
-1. Garanta que as variaveis de ambiente estejam definidas (`NODE_ENV=production`).
-2. Execute `npm run build`.
-3. Publique os artefatos necessarios (`.next/`, `public/`, `server.js`, `package.json`, `package-lock.json`, `.env`).
-4. Instale dependencias (`npm ci --only=production`) e inicie com `node server.js` ou `npm run start`.
+1. Certifique-se de que Docker, Docker Compose e GNU Make estao instalados (no Windows, instale Make via `winget install GnuWin32.Make`, `choco install make`, Git Bash ou WSL).
+2. Rode o fluxo desejado:
+   - Desenvolvimento: `make build-development` e `make start-development` (acesso em `http://localhost:3001`).
+   - Staging/UAT: `make build-staging` e `make start-staging` (acesso em `http://localhost:3002`).
+   - Producao: `make build-production` e `make start-production` (acesso em `http://localhost:3003`).
+3. Para encerrar containers, utilize `make stop-<ambiente>` (por exemplo, `make stop-development`).
 
-O `server.js` ja prepara o app Next e respeita a variavel `PORT` (padrao 3000). O build foi validado via `npm run build`.
+Sem `make`, execute diretamente `docker compose -f docker/<ambiente>/compose.yaml up -d` e o respectivo `down` para finalizar.
 
-## Deploy no IIS (Windows Server)
+## Estrutura de pastas
 
-Pre-requisitos:
+```text
+.
+|-- docker/
+|   |-- development/
+|   |-- staging/
+|   |-- production/
+|-- src/
+|   |-- app/
+|   |   |-- api/manifestacoes/route.ts
+|   |   |-- globals.css
+|   |   |-- page.tsx
+|   |-- components/
+|   |-- lib/
+|-- Makefile
+|-- package.json
+|-- README.md
+```
 
-- IIS 10+ com **URL Rewrite Module** instalado.
-- **iisnode** configurado (handler disponivel para `server.js`).
-- Node.js instalado no servidor (o `web.config` aponta por padrao para `C:\Program Files\nodejs\node.exe`).
+## Fluxo de submissao
 
-Passo a passo sugerido:
+1. O usuario escolhe idioma e aceita os termos.
+2. O chatbot coleta dados de forma guiada, valida entradas e permite anexar arquivos.
+3. Ao finalizar, os dados sao enviados para `/api/manifestacoes` junto com o `x-correlation-id`.
+4. O endpoint aplica CORS, limita 60 requisicoes por minuto por IP, valida o DTO e chama a API da CGU.
+5. A resposta (protocolo, codigo de acesso, prazos) e exibida na tela de confirmacao e pode ser baixada como PDF.
 
-1. Gere o build (`npm run build`).
-2. Publique para a pasta do site no IIS copiando `.next/`, `public/`, `server.js`, `web.config`, `package.json`, `package-lock.json`, `.env` (ou configure variaveis diretamente no IIS).
-3. Defina `NODE_ENV=production`, `CGU_API_*` e IDs em _Application Settings_ do IIS ou via `<appSettings>` no `web.config`.
-4. Garanta permissoes de leitura para a pasta e, se necessario, escrita nos diretorios onde o iisnode gera logs.
-5. Recicle o _Application Pool_ apos cada publicacao para carregar o novo build.
+## Boas praticas e suporte
 
-O `web.config` incluso:
+- Execute `npm run lint` e `npm run typecheck` antes de abrir PRs.
+- Revise os limites de anexos definidos em `src/lib/cgu/utils.ts` (30 MB totais e extensoes controladas) se precisar alterar regras.
+- Configure `ALLOWED_ORIGINS` adequadamente em producao para liberar apenas dominios confiaveis.
+- Use o `x-correlation-id` para rastrear chamadas entre frontend e logs do endpoint.
 
-- Reescreve todas as requisicoes para `server.js`.
-- Registra o handler `iisnode` que executa o servidor.
-- Opera junto com `server.js`, que escuta a porta fornecida pelo IIS. Caso o modulo iisnode nao esteja ativo, readicione o handler via IIS Manager.
-
-## Fluxo da Aplicacao
-
-1. **LanguageSelection**: salva idioma preferido no `localStorage` e permite alterar a qualquer momento.
-2. **TermsAcceptance**: apresenta termos de uso e exige consentimento antes de prosseguir.
-3. **ChatbotInterface**: conduz perguntas, valida anexos (tamanho, extensao e conteudo), normaliza respostas e envia ao backend.
-4. **/api/manifestacoes**: aplica rate limiting (60 req/min por IP), monta o payload exigido pela CGU e chama a API oficial.
-5. **ConfirmationScreen**: mostra protocolos recebidos, gera comprovante em PDF e permite iniciar nova solicitacao.
-
-## Qualidade e Troubleshooting
-
-- Execute `npm run lint` e `npm run typecheck` antes de enviar alteracoes.
-- O endpoint `/api/manifestacoes` registra logs estruturados com niveis (info/warn/error) e correlacao via `x-correlation-id`.
-- Para diagnosticar problemas no IIS, consulte os logs do iisnode (pasta `\logs` da aplicacao) e o Event Viewer.
-- Erros de payload costumam indicar IDs faltantes (`CGU_ID_*`) ou anexos fora do padrao aceito (30 MB totais e extensoes autorizadas).
+Em caso de duvidas, consulte os componentes no diretorio `src/components` e a camada de integracao em `src/lib/cgu` para entender como novos campos ou validacoes devem ser adicionados.
 
 ---
-
