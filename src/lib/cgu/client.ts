@@ -1,6 +1,28 @@
 ﻿import type { CGUResponse, ManifestacaoPayloadMinimo } from "./types";
 
-const BASE_URL = process.env.CGU_API_BASE_URL || "https://treinafalabr.cgu.gov.br";
+const ALLOWED_HOSTS = new Set([
+  "treinafalabr.cgu.gov.br",
+  "falabr.cgu.gov.br"
+]);
+
+const validateFalaBrURL = (url: string): string => {
+  try {
+    const parsed = new URL(url);
+    if (!ALLOWED_HOSTS.has(parsed.hostname)) {
+      throw new Error(`URL não permitida: ${parsed.hostname}`);
+    }
+    if (parsed.protocol !== "https:") {
+      throw new Error("Necessário HTTPS");
+    }
+    return url;
+  } catch (error) {
+    throw new Error(`URL do FalaBR inválida: ${error instanceof Error ? error.message : 'Erro desconhecido!'}`);
+  }
+};
+
+const BASE_URL = validateFalaBrURL(
+  process.env.CGU_API_BASE_URL || "https://treinafalabr.cgu.gov.br"
+);
 const API_PATH = "/api/manifestacoes";
 const DEFAULT_TIMEOUT_MS = (() => {
   const raw = process.env.CGU_API_TIMEOUT_MS?.trim();
