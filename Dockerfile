@@ -37,9 +37,8 @@ ENV NODE_ENV=production
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-# Instala AWS CLI via pip (compatível com Alpine)
-RUN apk add --no-cache aws-cli && \
-    aws --version
+# Instala AWS CLI
+RUN apk add --no-cache aws-cli
 
 # Gera certificado SSL para comunicação encriptada com Load Balancer
 RUN apk add --no-cache openssl && \
@@ -59,10 +58,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/server-https.js ./
 COPY --from=builder /app/scripts ./scripts
-COPY --from=builder /app/.env.production.secrets ./
+COPY --from=builder --chown=nextjs:nodejs /app/.env.production.secrets ./
 
-# Torna os scripts executáveis
-RUN chmod +x scripts/*.sh
+# Torna os scripts executáveis e ajusta permissões
+RUN chmod +x scripts/*.sh && \
+    chown nextjs:nodejs .env.production.secrets
 
 USER nextjs
 
