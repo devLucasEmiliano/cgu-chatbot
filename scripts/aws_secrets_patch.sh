@@ -45,7 +45,7 @@ DATA_JSON=$(aws secretsmanager get-secret-value --secret-id "$SECRET_ID" --query
 # Primeiro retira as chaves do início e final. Pattern: ^\{ *| *\}
 # Depois localiza um padrão do tipo "chave":"valor". Pattern: (^|[, ]+)"(([^"\\]|\\.)+)" *: *"(([^"\\]|\\.)+)" *
 # Depois elimina os escaping da contrabarra e das aspas duplas dentro das strings JSON. Pattern: \\([\\"])
-DATA=$(echo "$DATA_JSON" | sed 's/^{ *\| *}$//g; s/\(^\|[, ]\+\)"\([^"]*\)" *: *"\([^"]*\)"/\2=\3\n/g')
+DATA=$(echo "$DATA_JSON" | sed -E 's/^\{ *| *\}$//g; s/(^|[, ]+)"(([^"\\]|\\.)+)" *: *"(([^"\\]|\\.)*)" */\2=\4\n/g; s/\\([\\"])/\1/g')
 
 # Salva os secrets em arquivo, se foi solicitado
 if [ $SAVE -eq 1 ]; then
@@ -56,7 +56,7 @@ fi
 # Se passada a opção, normaliza o nome dos secrets para iniciar com SECRET_
 # e ficar tudo em maiúsculas
 if [ $NORMALIZE -eq 1 ]; then
-  DATA=$(echo "$DATA" | sed '/^SECRET_/b; s/^\([^=]*\)=/SECRET_\1=/' | tr '[:lower:]' '[:upper:]')
+  DATA=$(echo "$DATA" | sed -E '/^SECRET_/b; s/^([^=]+)=/SECRET_\U\1=/')
 fi
 
 # Faz a substituição de valores nos arquivos indicados

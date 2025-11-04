@@ -40,14 +40,11 @@ process_data() {
   if [ "$FORMAT" = "env" ]; then
     local DELIM='='
   elif [ "$FORMAT" = "tab" ]; then
-    local DELIM='	'
+    local DELIM=$'\t'
   fi
   while IFS=$DELIM read -r name value; do
-    if [ $PREFIX -eq 1 ]; then
-      case "$name" in
-        SECRET_*) ;;
-        *) continue ;;
-      esac
+    if [ $PREFIX -eq 1 ] && [[ "$name" != SECRET_* ]]; then
+      continue
     fi
 
     replace_value "$name" "$value" "$1"

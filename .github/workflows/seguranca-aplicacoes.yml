@@ -1,0 +1,14 @@
+name: Segurança de Aplicações 
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+jobs:
+  appsec-services:
+    uses: cgugovbr/cgu-actions/.github/workflows/seguranca-aplicacoes.yml@main
+    with:
+      working-directory: "src"
+      file-patterns: "**/*.{ts,tsx,js,jsx}"
+      semgrep-config: "p/typescript,p/javascript,p/react,p/security-audit"
