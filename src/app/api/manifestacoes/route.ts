@@ -7,15 +7,6 @@ import type { ManifestacaoRequestDTO } from "@/src/lib/cgu/types";
 
 export const runtime = "nodejs";
 
-// Configuracao para aceitar payloads maiores (ate 50 MB)
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "50mb",
-    },
-  },
-};
-
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 60;
 const RATE_LIMIT_MESSAGE = "Muitas solicitacoes. Tente novamente em breve.";
@@ -212,6 +203,22 @@ export async function POST(req: NextRequest) {
     origin: cors.origin ?? "same-origin",
     clientId,
   });
+
+  const contentLengthHeader = req.headers.get("content-length");
+  const contentLength = Number(contentLengthHeader ?? 0);
+  const MAX_CONTENT_LENGTH = 35 * 1024 * 1024;
+  if (Number.isFinite(contentLength) && contentLength > MAX_CONTENT_LENGTH) {
+    logStructured("warn", "Payload too large", {
+      correlationId,
+      contentLength,
+    });
+    return respondWithError(
+      "Payload too large",
+      413,
+      baseHeaders,
+      correlationId
+    );
+  }
 
   const rateStatus = enforceRateLimit(clientId);
   if (!rateStatus.allowed) {
