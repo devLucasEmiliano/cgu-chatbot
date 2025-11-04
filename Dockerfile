@@ -37,8 +37,8 @@ ENV NODE_ENV=production
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-# Instala pacotes adicionais
-RUN apk add --no-cache curl unzip && \
+# Instala AWS CLI
+RUN apk add --no-cache curl unzip glibc libc6-compat && \
     curl -L -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
@@ -63,7 +63,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/server-https.js ./
 COPY --from=builder /app/scripts ./scripts
-COPY --from=builder /app/.env.production ./
+COPY --from=builder /app/.env.production.secrets ./
 
 # Torna os scripts executáveis
 RUN chmod +x scripts/*.sh
