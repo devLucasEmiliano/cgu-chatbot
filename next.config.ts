@@ -8,14 +8,6 @@ const nextConfig: NextConfig = {
     "192.168.1.11", // device IP observed in dev warning
   ],
   output: "standalone",
-
-  // Configuração para aceitar payloads maiores nas API routes
-  experimental: {
-    // Aumenta o limite de body size para 35MB
-    serverActions: {
-      bodySizeLimit: "35mb",
-    },
-  },
 };
 
 export default nextConfig;

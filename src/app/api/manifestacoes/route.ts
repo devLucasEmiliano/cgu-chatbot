@@ -7,11 +7,11 @@ import type { ManifestacaoRequestDTO } from "@/src/lib/cgu/types";
 
 export const runtime = "nodejs";
 
-// Configuração para aceitar payloads maiores (até 35 MB)
+// Configuracao para aceitar payloads maiores (ate 50 MB)
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: "35mb",
+      sizeLimit: "50mb",
     },
   },
 };
@@ -212,22 +212,6 @@ export async function POST(req: NextRequest) {
     origin: cors.origin ?? "same-origin",
     clientId,
   });
-
-  const contentLengthHeader = req.headers.get("content-length");
-  const contentLength = Number(contentLengthHeader ?? 0);
-  const MAX_CONTENT_LENGTH = 35 * 1024 * 1024;
-  if (Number.isFinite(contentLength) && contentLength > MAX_CONTENT_LENGTH) {
-    logStructured("warn", "Payload too large", {
-      correlationId,
-      contentLength,
-    });
-    return respondWithError(
-      "Payload too large",
-      413,
-      baseHeaders,
-      correlationId
-    );
-  }
 
   const rateStatus = enforceRateLimit(clientId);
   if (!rateStatus.allowed) {
