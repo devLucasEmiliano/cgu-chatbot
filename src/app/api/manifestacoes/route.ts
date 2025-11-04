@@ -7,6 +7,15 @@ import type { ManifestacaoRequestDTO } from "@/src/lib/cgu/types";
 
 export const runtime = "nodejs";
 
+// Configuração para aceitar payloads maiores (até 35 MB)
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "35mb",
+    },
+  },
+};
+
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 60;
 const RATE_LIMIT_MESSAGE = "Muitas solicitacoes. Tente novamente em breve.";
@@ -100,7 +109,9 @@ const evaluateCors = (
       headers: Record<string, string>;
     } => {
   const originHeader = req.headers.get("origin");
-  const headers: Record<string, string> = originHeader ? { Vary: "Origin" } : {};
+  const headers: Record<string, string> = originHeader
+    ? { Vary: "Origin" }
+    : {};
   if (!originHeader) {
     return { allowed: true, origin: null, headers };
   }
@@ -108,8 +119,12 @@ const evaluateCors = (
   if (!normalizedOrigin) {
     return { allowed: false, reason: "invalid_origin", headers };
   }
-  const requestOrigin = normalizeOrigin(req.nextUrl.origin) ?? req.nextUrl.origin;
-  if (normalizedOrigin === requestOrigin || ALLOWED_ORIGINS.has(normalizedOrigin)) {
+  const requestOrigin =
+    normalizeOrigin(req.nextUrl.origin) ?? req.nextUrl.origin;
+  if (
+    normalizedOrigin === requestOrigin ||
+    ALLOWED_ORIGINS.has(normalizedOrigin)
+  ) {
     headers["Access-Control-Allow-Origin"] = normalizedOrigin;
     headers["Access-Control-Allow-Methods"] = "POST, OPTIONS";
     headers["Access-Control-Allow-Headers"] = "Content-Type,x-correlation-id";
@@ -169,8 +184,8 @@ const respondWithError = (
 };
 
 export async function POST(req: NextRequest) {
-  console.log('[API] POST /api/manifestacoes -', new Date().toISOString())
-  
+  console.log("[API] POST /api/manifestacoes -", new Date().toISOString());
+
   const startedAt = Date.now();
   const correlationId = getCorrelationId(req);
   const cors = evaluateCors(req);
@@ -184,7 +199,12 @@ export async function POST(req: NextRequest) {
       reason: cors.reason,
       clientId,
     });
-    return respondWithError("Origin not allowed", 403, baseHeaders, correlationId);
+    return respondWithError(
+      "Origin not allowed",
+      403,
+      baseHeaders,
+      correlationId
+    );
   }
 
   logStructured("info", "Manifestacao request received", {
@@ -201,7 +221,12 @@ export async function POST(req: NextRequest) {
       correlationId,
       contentLength,
     });
-    return respondWithError("Payload too large", 413, baseHeaders, correlationId);
+    return respondWithError(
+      "Payload too large",
+      413,
+      baseHeaders,
+      correlationId
+    );
   }
 
   const rateStatus = enforceRateLimit(clientId);
@@ -231,7 +256,12 @@ export async function POST(req: NextRequest) {
         correlationId,
         issues: parsed.error.issues,
       });
-      return respondWithError("Requisicao invalida", 400, baseHeaders, correlationId);
+      return respondWithError(
+        "Requisicao invalida",
+        400,
+        baseHeaders,
+        correlationId
+      );
     }
 
     const dto = parsed.data as ManifestacaoRequestDTO;

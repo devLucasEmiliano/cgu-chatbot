@@ -1735,7 +1735,7 @@ export function ChatbotInterface({
                   : language === "en"
                   ? "Attachments"
                   : "Adjuntos"}
-                {`: ${attachments.length}/10 â¢ `}
+                {`: ${attachments.length}/10 `}
                 {language === "pt-BR"
                   ? "Total"
                   : language === "en"
