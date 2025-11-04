@@ -7,7 +7,7 @@ on:
 
 jobs:
   appsec-services:
-    uses: cgu-se-dti/cgu-actions/.github/workflows/seguranca-aplicacoes.yml@main
+    uses: cgugovbr/cgu-actions/.github/workflows/seguranca-aplicacoes.yml@main
     with:
       working-directory: "src"
       file-patterns: "**/*.{ts,tsx,js,jsx}"
