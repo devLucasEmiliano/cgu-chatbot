@@ -205,7 +205,7 @@ const manifestationConfirmationTexts = {
 };
 
 const languages = [
-  { code: "pt-BR" as Language, flag: "🇧🇷", name: "Português" },
+  { code: "pt-BR" as Language, flag: "🇧🇷", name: "Português (Brasil)" },
   { code: "en" as Language, flag: "🇺🇸", name: "English" },
   { code: "es" as Language, flag: "🇪🇸", name: "Español" },
 ];
@@ -289,7 +289,7 @@ export function ChatbotInterface({
   };
 
   // Limite de caracteres: replicar cabecalho do backend para calcular espaco restante
-  const MAX_CHARS = 7500;
+  const MAX_CHARS = 8000;
   const computeHeaderLen = () => {
     const linha1 = "Manifestacao recebida no ambito da COP30.";
     const pais = formData.countryName || "Nao Informado";
@@ -1264,11 +1264,7 @@ export function ChatbotInterface({
           [
             {
               label:
-                language === "pt-BR"
-                  ? "Sim"
-                  : language === "en"
-                  ? "Yes"
-                  : "Sí",
+                language === "pt-BR" ? "Sim" : language === "en" ? "Yes" : "Sí",
               value: "yes",
               variant: "outline" as const,
             },
