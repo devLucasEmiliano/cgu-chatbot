@@ -45,7 +45,7 @@ DATA_JSON=$(aws secretsmanager get-secret-value --secret-id "$SECRET_ID" --query
 # Primeiro retira as chaves do início e final. Pattern: ^\{ *| *\}
 # Depois localiza um padrão do tipo "chave":"valor". Pattern: (^|[, ]+)"(([^"\\]|\\.)+)" *: *"(([^"\\]|\\.)+)" *
 # Depois elimina os escaping da contrabarra e das aspas duplas dentro das strings JSON. Pattern: \\([\\"])
-DATA=$(echo "$DATA_JSON" | sed 's/^{ *\| *}$//g; s/\(^\|[, ]\+\)"\([^"]*\)" *: *"\([^"]*\)"/\2=\3\n/g; s/\\\([\\"]\ )/\1/g')
+DATA=$(echo "$DATA_JSON" | sed 's/^{ *\| *}$//g; s/\(^\|[, ]\+\)"\([^"]*\)" *: *"\([^"]*\)"/\2=\3\n/g')
 
 # Salva os secrets em arquivo, se foi solicitado
 if [ $SAVE -eq 1 ]; then
