@@ -64,7 +64,7 @@ RUN chmod +x scripts/*.sh && \
 
 COPY scripts/replace_secrets.sh scripts/aws_secrets_patch.sh /usr/local/bin/
 
-USER nextjs
+# USER nextjs
 
 EXPOSE 8083
 
