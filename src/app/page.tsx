@@ -21,6 +21,8 @@ type ErrorResult = { success: false; error: string }
 export type SubmitResult = SuccessResult | ErrorResult
 
 export default function Home() {
+  console.log('[ACESSO] Página principal acessada -', new Date().toISOString())
+  
   const { preferences, isLoaded, setLanguage, acceptTerms } = useUserPreferences()
   const [currentStep, setCurrentStep] = useState<Step>("language")
   const [selectedLanguage, setSelectedLanguage] = useState<Language>("pt-BR")

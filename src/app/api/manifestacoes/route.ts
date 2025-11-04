@@ -169,6 +169,8 @@ const respondWithError = (
 };
 
 export async function POST(req: NextRequest) {
+  console.log('[API] POST /api/manifestacoes -', new Date().toISOString())
+  
   const startedAt = Date.now();
   const correlationId = getCorrelationId(req);
   const cors = evaluateCors(req);
