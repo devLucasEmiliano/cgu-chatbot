@@ -57,6 +57,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/server-https.js ./
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder --chown=nextjs:nodejs /app/.env.production.secrets ./.env
+COPY --from=builder /app/pscripts/replace_secrets.sh /ap/pscripts/aws_secrets_patch.sh /usr/local/bin/
 
 # Torna os scripts executáveis e ajusta permissões
 RUN chmod +x scripts/*.sh && \
