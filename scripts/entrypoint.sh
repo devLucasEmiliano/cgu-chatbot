@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # Copia .env.production para .env
-if [ -f ".env.production" ]; then
-    cp .env.production .env
-    echo "Copiado .env.production para .env"
+if [ -f ".env.production.secrets" ]; then
+    cp .env.production.secrets .env
+    echo "Copiado .env.production.secrets para .env"
 fi
 
 # Executa aws_secrets_patch.sh se existir
