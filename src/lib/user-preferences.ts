@@ -3,7 +3,44 @@
 import { useEffect, useState } from "react";
 import type { Language } from "@/src/app/page";
 
-const PREFERENCES_KEY = "cgu-chatbot-preferences";
+const PREFERENCES_COOKIE = "cgu_chatbot_preferences";
+const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365; // 1 year
+
+const isBrowser = () =>
+  typeof window !== "undefined" && typeof document !== "undefined";
+
+const cookieAttributes = (maxAge: number) => {
+  if (!isBrowser()) return "";
+
+  const secure =
+    typeof window !== "undefined" && window.location.protocol === "https:"
+      ? "; Secure"
+      : "";
+
+  return `Max-Age=${maxAge}; Path=/; SameSite=Strict${secure}`;
+};
+
+const readCookie = (name: string) => {
+  if (!isBrowser()) return null;
+
+  const prefix = `${name}=`;
+  const cookies = document.cookie ? document.cookie.split("; ") : [];
+  const match = cookies.find((cookie) => cookie.startsWith(prefix));
+
+  if (!match) return null;
+
+  return match.slice(prefix.length);
+};
+
+const writeCookie = (name: string, value: string, maxAge: number) => {
+  if (!isBrowser()) return;
+
+  document.cookie = `${name}=${value}; ${cookieAttributes(maxAge)}`;
+};
+
+const deleteCookie = (name: string) => {
+  writeCookie(name, "", 0);
+};
 
 export interface UserPreferences {
   language: Language | null;
@@ -16,38 +53,29 @@ const defaultPreferences: UserPreferences = {
   termsAccepted: false,
 };
 
-// Funcao para salvar preferencias no localStorage
+// Funcao para salvar preferencias em cookie seguro
 export function savePreferences(preferences: UserPreferences): void {
-  if (typeof window === "undefined") return;
-
   try {
-    localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
-  } catch (error) {
-    // Silenciar erro em producao - falha ao salvar preferencias nao e critica
-    if (process.env.NODE_ENV === "development") {
-      console.error("Erro ao salvar preferencias:", error);
-    }
+    const encoded = encodeURIComponent(JSON.stringify(preferences));
+    writeCookie(PREFERENCES_COOKIE, encoded, COOKIE_MAX_AGE_SECONDS);
+  } catch {
+    // Silenciar erro - falhas ao persistir preferencias nao sao criticas
   }
 }
 
-// Funcao para carregar preferencias do localStorage
+// Funcao para carregar preferencias do cookie
 export function loadPreferences(): UserPreferences {
-  if (typeof window === "undefined") return defaultPreferences;
-
   try {
-    const stored = localStorage.getItem(PREFERENCES_KEY);
+    const stored = readCookie(PREFERENCES_COOKIE);
     if (!stored) return defaultPreferences;
 
-    const parsed = JSON.parse(stored) as UserPreferences;
+    const parsed = JSON.parse(decodeURIComponent(stored)) as UserPreferences;
     return {
       ...defaultPreferences,
       ...parsed,
     };
-  } catch (error) {
-    // Silenciar erro em producao - falha ao carregar preferencias usa valores padrao
-    if (process.env.NODE_ENV === "development") {
-      console.error("Erro ao carregar preferencias:", error);
-    }
+  } catch {
+    // Silenciar erro - falhas ao carregar preferencias usa valores padrao
     return defaultPreferences;
   }
 }
@@ -82,9 +110,9 @@ export function useUserPreferences() {
   };
 
   const clearPreferences = () => {
-    const cleared = defaultPreferences;
+    const cleared = { ...defaultPreferences };
     setPreferencesState(cleared);
-    savePreferences(cleared);
+    deleteCookie(PREFERENCES_COOKIE);
   };
 
   return {
