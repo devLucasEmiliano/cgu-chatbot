@@ -37,13 +37,9 @@ ENV NODE_ENV=production
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-# Instala AWS CLI
-RUN apk add --no-cache curl unzip glibc libc6-compat && \
-    curl -L -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install && \
-    rm -f awscliv2.zip && \
-    rm -rf ./aws/
+# Instala AWS CLI via pip (compatível com Alpine)
+RUN apk add --no-cache aws-cli && \
+    aws --version
 
 # Gera certificado SSL para comunicação encriptada com Load Balancer
 RUN apk add --no-cache openssl && \
