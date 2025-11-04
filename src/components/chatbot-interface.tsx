@@ -94,33 +94,31 @@ const manifestationTypeDescriptions: Record<
 > = {
   report: {
     "pt-BR":
-      "Denúncia: para comunicar a ocorrência de um ato ilícito, irregularidade, violação de direitos humanos ou prática de má conduta por agentes públicos.",
-    en: "Report: used to communicate suspected illicit acts, irregularities, human rights violations, or misconduct by public agents.",
-    es: "Denuncia: se usa para comunicar la ocurrencia de un acto ilícito, irregularidad, violación de derechos humanos o mala conducta de agentes públicos.",
+      "Denúncia: Para comunicar uma irregularidade, um ato ilícito ou uma violação de direitos na administração pública.",
+    en: "Report: Used to report an irregularity, an unlawful act, or a violation of rights in public administration.",
+    es: "Denuncia: Para comunicar una irregularidad, un acto ilícito o una violación de derechos en la administración pública.",
   },
   compliment: {
-    "pt-BR":
-      "Elogio: para expressar satisfação com um atendimento ou serviço público.",
-    en: "Compliment: used to express satisfaction with a public service or assistance received.",
-    es: "Elogio: se utiliza para expresar satisfacción con un servicio o atención pública.",
+    "pt-BR": "Elogio: Para expressão satisfação com um atendimento público.",
+    en: "Compliment: Used to express satisfaction with a public service.",
+    es: "Felicitación: Para expresar satisfacción con un servicio público.",
   },
   complaint: {
-    "pt-BR":
-      "Reclamação: para manifestar insatisfação com um serviço, obra ou atendimento público e solicitar providências.",
-    en: "Complaint: used to express dissatisfaction with a public service, work, or assistance and request corrective measures.",
-    es: "Queja: se utiliza para manifestar insatisfacción con un servicio, obra o atención pública y solicitar medidas correctivas.",
+    "pt-BR": "Reclamação: Para manifestar insatisfação com um serviço público.",
+    en: "Complaint: Used to express dissatisfaction with a public service.",
+    es: "Reclamo: Para manifestar insatisfacción con un servicio público.",
   },
   request: {
     "pt-BR":
-      "Solicitação: para requerer o atendimento ou a prestação de um serviço público.",
-    en: "Request: used to ask for the delivery of a public service or specific assistance.",
-    es: "Solicitud: se utiliza para requerir la prestación de un servicio público.",
+      "Solicitação: Para pedir adoção de providências por parte dos órgãos e das entidades da administração pública.",
+    en: "Request: Used to ask for actions to be taken by public administration.",
+    es: "Petición: Para solicitar la adopción de medidas por parte de la administración pública.",
   },
   suggestion: {
     "pt-BR":
-      "Sugestão: para apresentar ideias ou propostas de melhoria para serviços ou atendimentos.",
-    en: "Suggestion: used to present ideas or proposals to improve services or assistance.",
-    es: "Sugerencia: se utiliza para presentar ideas o propuestas de mejora para servicios o atenciones.",
+      "Sugestão: Para comunicar ideia ou proposta de melhoria dos serviços públicos.",
+    en: "Suggestion: Used to submit a suggestion for improving public service.",
+    es: "Sugerencia: Para comunicar una idea o propuesta de mejora de los servicios públicos.",
   },
 };
 
@@ -136,17 +134,17 @@ const manifestationTypePlaceholders: Record<
   compliment: {
     "pt-BR": "Escreva aqui seu elogio em detalhes...",
     en: "Write here your compliment in detail...",
-    es: "Escriba aquí su elogio en detalle...",
+    es: "Escriba aquí su felicitación en detalle...",
   },
   complaint: {
     "pt-BR": "Escreva aqui sua reclamação em detalhes...",
     en: "Write here your complaint in detail...",
-    es: "Escriba aquí su queja en detalle...",
+    es: "Escriba aquí su reclamo en detalle...",
   },
   request: {
     "pt-BR": "Escreva aqui sua solicitação em detalhes...",
     en: "Write here your request in detail...",
-    es: "Escriba aquí su solicitud en detalle...",
+    es: "Escriba aquí su petición en detalle...",
   },
   suggestion: {
     "pt-BR": "Escreva aqui sua sugestão em detalhes...",
@@ -359,22 +357,22 @@ export function ChatbotInterface({
           {
             label:
               language === "pt-BR"
-                ? "Consultar"
-                : language === "en"
-                ? "Consult"
-                : "Consultar",
-            value: "consult",
-            variant: "outline" as const,
-          },
-          {
-            label:
-              language === "pt-BR"
                 ? "Cadastrar"
                 : language === "en"
                 ? "Register"
                 : "Registrar",
             value: "register",
             variant: "default" as const,
+          },
+          {
+            label:
+              language === "pt-BR"
+                ? "Consultar"
+                : language === "en"
+                ? "Consult"
+                : "Consultar",
+            value: "consult",
+            variant: "outline" as const,
           },
         ]
       );
@@ -461,7 +459,7 @@ export function ChatbotInterface({
             ? "Elogio"
             : language === "en"
             ? "Compliment"
-            : "Elogio",
+            : "Felicitación",
         value: "compliment",
         variant: "outline" as const,
       },
@@ -471,7 +469,7 @@ export function ChatbotInterface({
             ? "Reclamação"
             : language === "en"
             ? "Complaint"
-            : "Queja",
+            : "Reclamo",
         value: "complaint",
         variant: "outline" as const,
       },
@@ -481,7 +479,7 @@ export function ChatbotInterface({
             ? "Solicitação"
             : language === "en"
             ? "Request"
-            : "Solicitud",
+            : "Petición",
         value: "request",
         variant: "outline" as const,
       },
@@ -664,10 +662,10 @@ export function ChatbotInterface({
         // Aviso informativo para denuncias (identificada vs anonima)
         addBotMessage(
           language === "pt-BR"
-            ? "Identificada: você poderá receber informações sobre as providências adotadas. Denúncia anônima: não será possível acompanhar ou receber respostas."
+            ? "Identificada: você poderá receber informações sobre as providências adotadas.\nDenúncia anônima: não será possível acompanhar ou receber respostas."
             : language === "en"
-            ? "Identified: you will be able to receive information about the measures taken. Anonymous report: it will not be possible to track or receive responses."
-            : "Identificada: podrá recibir información sobre las medidas adoptadas. Denuncia anónima: no será posible hacer seguimiento ni recibir respuestas.",
+            ? "Identified: you will be able to receive information about the measures taken.\nAnonymous report: it will not be possible to track or receive responses."
+            : "Identificada: podrá recibir información sobre las medidas adoptadas.\nDenuncia anónima: no será posible hacer seguimiento ni recibir respuestas.",
           0,
           undefined,
           undefined,
@@ -702,7 +700,7 @@ export function ChatbotInterface({
                   ? "Anonymous"
                   : "Anónima",
               value: "anonymous",
-              variant: "secondary" as const,
+              variant: "outline" as const,
             },
           ],
           undefined,
@@ -866,31 +864,17 @@ export function ChatbotInterface({
           setTimeout(() => {
             addBotMessage(
               language === "pt-BR"
-                ? "Os e-mails não coincidem. Vamos tentar novamente."
+                ? "Os e-mails não coincidem. Por favor, informe seu e-mail novamente:"
                 : language === "en"
-                ? "Emails do not match. Let's try again."
-                : "Los correos electrónicos no coinciden. Volvamos a intentarlo.",
-              300,
-              undefined,
-              undefined,
-              "default",
-              true
-            );
-          }, 300);
-          setTimeout(() => {
-            addBotMessage(
-              language === "pt-BR"
-                ? "Qual é seu e-mail?"
-                : language === "en"
-                ? "What is your email?"
-                : "¿Cuál es su correo electrónico?",
+                ? "The emails do not match. Please enter your email again:"
+                : "Los correos electrónicos no coinciden. Por favor, ingrese su correo nuevamente:",
               300,
               undefined,
               "email",
               "default",
               true
             );
-          }, 1100);
+          }, 300);
           return;
         }
         setFormData((prev) => ({ ...prev, emailConfirmed: value }));
@@ -898,10 +882,10 @@ export function ChatbotInterface({
         setTimeout(() => {
           addBotMessage(
             language === "pt-BR"
-              ? "Você possui afiliação UNFCCC?"
+              ? "Você possui credencial UNFCCC?"
               : language === "en"
-              ? "Do you have UNFCCC affiliation?"
-              : "¿Tiene afiliación UNFCCC?",
+              ? "Do you have UNFCCC credentials?"
+              : "¿Tiene credencial UNFCCC?",
             300,
             [
               {
@@ -1060,7 +1044,7 @@ export function ChatbotInterface({
                   ? "Skip"
                   : "Omitir",
               value: "skip",
-              variant: "secondary" as const,
+              variant: "outline" as const,
             },
           ],
           "text"

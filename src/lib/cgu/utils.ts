@@ -31,10 +31,14 @@ const gzipAsync = promisify(gzip);
 const allowedMimeByExtension: Record<string, readonly string[]> = {
   ".pdf": ["application/pdf"],
   ".doc": ["application/msword"],
-  ".docx": ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+  ".docx": [
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ],
   ".txt": ["text/plain"],
   ".xls": ["application/vnd.ms-excel"],
-  ".xlsx": ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+  ".xlsx": [
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ],
   ".png": ["image/png"],
   ".jpg": ["image/jpeg"],
   ".jpeg": ["image/jpeg"],
@@ -99,10 +103,14 @@ export function buildManifestationText(params: {
     textoUsuario: userText,
   } = params;
 
-  const line1 = "Manifestation received within the scope of COP30.";
-  const line2 = `Selected country/nationality: ${countryOrNationality || "Not provided"}`;
-  const line3 = `Selected language: ${language || "Not provided"}`;
-  const line4 = `UNFCCC registration number: ${unfcccNumber?.trim() || "Not provided"}`;
+  const line1 = "Manifestação recebida no âmbito da COP30.";
+  const line2 = `País/Naturalidade selecionado: ${
+    countryOrNationality || "Não informado"
+  }`;
+  const line3 = `Linguagem selecionada: ${language || "Não informado"}`;
+  const line4 = `Número de inscrição UNFCCC: ${
+    unfcccNumber?.trim() || "Não informado"
+  }`;
   const header = [line1, line2, line3, line4].join("\n") + "\n";
 
   const normalize = (value: string) =>
@@ -116,14 +124,18 @@ export function buildManifestationText(params: {
   }
   if (body.length > remainingCharacters) {
     const ellipsis = "...";
-    body = body.slice(0, Math.max(0, remainingCharacters - ellipsis.length)) + ellipsis;
+    body =
+      body.slice(0, Math.max(0, remainingCharacters - ellipsis.length)) +
+      ellipsis;
   }
   return normalizedHeader + body;
 }
 
 export function validateAttachments(attachments: AnexoInput[] = []): void {
   if (attachments.length > maxFiles) {
-    throw new Error(`Maximum of ${maxFiles} attachments. Received: ${attachments.length}.`);
+    throw new Error(
+      `Maximum of ${maxFiles} attachments. Received: ${attachments.length}.`
+    );
   }
   let totalBytes = 0;
   for (const attachment of attachments) {
@@ -131,17 +143,23 @@ export function validateAttachments(attachments: AnexoInput[] = []): void {
     totalBytes += fileSize;
     if (fileSize > maxFileBytes) {
       throw new Error(
-        `File ${attachment.NomeArquivo} exceeds ${maxFileBytes / (1024 * 1024)}MB (${fileSize} bytes).`
+        `File ${attachment.NomeArquivo} exceeds ${
+          maxFileBytes / (1024 * 1024)
+        }MB (${fileSize} bytes).`
       );
     }
     const extension = getFileExtension(attachment.NomeArquivo || "");
     if (!allowedExtensions.includes(extension)) {
-      throw new Error(`File type not allowed: ${attachment.NomeArquivo || "(no name)"}.`);
+      throw new Error(
+        `File type not allowed: ${attachment.NomeArquivo || "(no name)"}.`
+      );
     }
   }
   if (totalBytes > maxTotalBytes) {
     throw new Error(
-      `Total attachment size exceeds ${maxTotalBytes / (1024 * 1024)}MB (${totalBytes} bytes).`
+      `Total attachment size exceeds ${
+        maxTotalBytes / (1024 * 1024)
+      }MB (${totalBytes} bytes).`
     );
   }
 }
@@ -150,11 +168,15 @@ export function base64ToBuffer(base64: string): Buffer {
   // Supports standard Base64; strip data URI prefix when present
   const clean = base64.replace(/^data:.*;base64,/, "");
   if (clean.length > maxBase64Length) {
-    throw new Error(`Base64 file exceeds the limit of ${maxFileBytes / (1024 * 1024)}MB.`);
+    throw new Error(
+      `Base64 file exceeds the limit of ${maxFileBytes / (1024 * 1024)}MB.`
+    );
   }
   const buffer = Buffer.from(clean, "base64");
   if (buffer.length > maxFileBytes) {
-    throw new Error(`Decoded file exceeds the limit of ${maxFileBytes / (1024 * 1024)}MB.`);
+    throw new Error(
+      `Decoded file exceeds the limit of ${maxFileBytes / (1024 * 1024)}MB.`
+    );
   }
   return buffer;
 }
@@ -170,7 +192,9 @@ export async function attachmentsToPayload(
     totalBytes += buffer.length;
     if (totalBytes > maxTotalBytes) {
       throw new Error(
-        `Total attachment size exceeds ${maxTotalBytes / (1024 * 1024)}MB (${totalBytes} bytes).`
+        `Total attachment size exceeds ${
+          maxTotalBytes / (1024 * 1024)
+        }MB (${totalBytes} bytes).`
       );
     }
     const extension = getFileExtension(attachment.NomeArquivo || "");
@@ -183,7 +207,9 @@ export async function attachmentsToPayload(
         );
       }
     } else if (!extensionsAllowingUnknownMagic.has(extension)) {
-      throw new Error(`Unable to verify the type of file ${attachment.NomeArquivo}.`);
+      throw new Error(
+        `Unable to verify the type of file ${attachment.NomeArquivo}.`
+      );
     }
     const gzipped = await gzipAsync(buffer);
     const gzippedBase64 = gzipped.toString("base64");
@@ -201,13 +227,14 @@ export async function attachmentsToPayload(
 
 export async function toCguPayload(dto: ManifestacaoRequestDTO) {
   // Leverage the stable key mapping first; environment variables act as fallbacks
-  const manifestationTypeByKey: Record<string, { type: number; form: number }> = {
-    report: { type: 1, form: 4 },
-    complaint: { type: 2, form: 1 },
-    compliment: { type: 3, form: 1 },
-    suggestion: { type: 4, form: 1 },
-    request: { type: 5, form: 1 },
-  };
+  const manifestationTypeByKey: Record<string, { type: number; form: number }> =
+    {
+      report: { type: 1, form: 4 },
+      complaint: { type: 2, form: 1 },
+      compliment: { type: 3, form: 1 },
+      suggestion: { type: 4, form: 1 },
+      request: { type: 5, form: 1 },
+    };
 
   const readEnvNumber = (name: string): number | undefined => {
     const value = process.env[name];
@@ -225,13 +252,16 @@ export async function toCguPayload(dto: ManifestacaoRequestDTO) {
     formTypeId = manifestationTypeByKey[dto.tipoChave].form;
   } else {
     // Without an explicit key, allow environment overrides
-    manifestationTypeId = readEnvNumber("CGU_ID_TIPO_MANIFESTACAO") ?? manifestationTypeId;
+    manifestationTypeId =
+      readEnvNumber("CGU_ID_TIPO_MANIFESTACAO") ?? manifestationTypeId;
     formTypeId = readEnvNumber("CGU_ID_TIPO_FORMULARIO") ?? formTypeId;
   }
 
   const validation = validateFormTypePair(manifestationTypeId, formTypeId);
   if (!validation.valid) {
-    throw new Error(validation.reason || "Invalid manifestation/form combination.");
+    throw new Error(
+      validation.reason || "Invalid manifestation/form combination."
+    );
   }
 
   validateAttachments(dto.anexos);

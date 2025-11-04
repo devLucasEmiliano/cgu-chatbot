@@ -18,9 +18,9 @@ const languages = [
 
 const translations = {
   title: {
-    "pt-BR": "Escolha seu idioma preferido",
+    "pt-BR": "Selecione o idioma de preferência",
     en: "Select your preferred language",
-    es: "Seleccione su idioma preferido",
+    es: "Seleccione su idioma de preferencia",
   },
   subtitle: {
     "pt-BR": "Escolha o idioma para iniciar",
