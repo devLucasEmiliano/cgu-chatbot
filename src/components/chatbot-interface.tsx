@@ -153,6 +153,25 @@ const manifestationTypePlaceholders: Record<
   },
 };
 
+let messageIdCounter = 0;
+
+const generateMessageId = () => {
+  if (typeof crypto !== "undefined") {
+    if (typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+    if (typeof crypto.getRandomValues === "function") {
+      const randomValues = new Uint32Array(4);
+      crypto.getRandomValues(randomValues);
+      return Array.from(randomValues, (value) =>
+        value.toString(16).padStart(8, "0")
+      ).join("");
+    }
+  }
+  messageIdCounter += 1;
+  return `msg-${Date.now().toString(36)}-${messageIdCounter.toString(36)}`;
+};
+
 const getManifestationDescription = (
   type: string,
   lang: Language
@@ -407,7 +426,7 @@ export function ChatbotInterface({
     // Mostra a mensagem apos a animacao de digitacao (minimo 800ms)
     setTimeout(() => {
       const newMessage: Message = {
-        id: Date.now().toString() + Math.random(),
+        id: generateMessageId(),
         type: "bot",
         content,
         timestamp: new Date(),
@@ -423,7 +442,7 @@ export function ChatbotInterface({
 
   const addUserMessage = (content: string) => {
     const userMessage: Message = {
-      id: Date.now().toString() + Math.random(),
+      id: generateMessageId(),
       type: "user",
       content,
       timestamp: new Date(),
@@ -1183,7 +1202,16 @@ export function ChatbotInterface({
     }
 
     if (accepted.length === 0) {
-      if (rejectedMessages.length > 0) alert(rejectedMessages.join("\n"));
+      if (rejectedMessages.length > 0) {
+        addBotMessage(
+          rejectedMessages.join("\n"),
+          200,
+          undefined,
+          undefined,
+          "info",
+          true
+        );
+      }
       return;
     }
 
@@ -1260,7 +1288,16 @@ export function ChatbotInterface({
         }`
       );
 
-      if (rejectedMessages.length > 0) alert(rejectedMessages.join("\n"));
+      if (rejectedMessages.length > 0) {
+        addBotMessage(
+          rejectedMessages.join("\n"),
+          200,
+          undefined,
+          undefined,
+          "info",
+          true
+        );
+      }
 
       setCurrentStep("moreAttachments");
       setTimeout(() => {
@@ -1293,12 +1330,17 @@ export function ChatbotInterface({
       }, 300);
     } catch {
       hasError = true;
-      alert(
+      addBotMessage(
         language === "pt-BR"
           ? "Falha ao processar anexos."
           : language === "en"
           ? "Failed to process attachments."
-          : "Error al procesar los archivos adjuntos."
+          : "Error al procesar los archivos adjuntos.",
+        200,
+        undefined,
+        undefined,
+        "info",
+        true
       );
     } finally {
       if (hasError) {
