@@ -830,7 +830,9 @@ export function ChatbotInterface({
                 : "Por favor, ingrese un correo electrónico válido.",
               300,
               undefined,
-              "email"
+              "email",
+              "default",
+              true
             );
           }, 300);
           return;
@@ -846,25 +848,49 @@ export function ChatbotInterface({
               : "Confirme su correo electrónico:",
             300,
             undefined,
-            "email"
+            "email",
+            "default",
+            true
           );
         }, 300);
         break;
 
       case "confirmEmail":
         if (value !== formData.email) {
+          setFormData((prev) => ({
+            ...prev,
+            email: "",
+            emailConfirmed: "",
+          }));
+          setCurrentStep("email");
           setTimeout(() => {
             addBotMessage(
               language === "pt-BR"
-                ? "Os e-mails não coincidem. Por favor, tente novamente."
+                ? "Os e-mails não coincidem. Vamos tentar novamente."
                 : language === "en"
-                ? "Emails do not match. Please try again."
-                : "Los correos electrónicos no coinciden. Por favor, inténtelo de nuevo.",
+                ? "Emails do not match. Let's try again."
+                : "Los correos electrónicos no coinciden. Volvamos a intentarlo.",
               300,
               undefined,
-              "email"
+              undefined,
+              "default",
+              true
             );
           }, 300);
+          setTimeout(() => {
+            addBotMessage(
+              language === "pt-BR"
+                ? "Qual é seu e-mail?"
+                : language === "en"
+                ? "What is your email?"
+                : "¿Cuál es su correo electrónico?",
+              300,
+              undefined,
+              "email",
+              "default",
+              true
+            );
+          }, 1100);
           return;
         }
         setFormData((prev) => ({ ...prev, emailConfirmed: value }));
