@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 usage() {
   echo -e "Uso: aws_secrets_pacth.sh [-h] [-n] [-s <nome do arquivo>] <secret ID> <arquivo 1> [<arquivo 2> ... ]\n\n\
