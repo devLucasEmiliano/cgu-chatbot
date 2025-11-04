@@ -204,22 +204,6 @@ export async function POST(req: NextRequest) {
     clientId,
   });
 
-  const contentLengthHeader = req.headers.get("content-length");
-  const contentLength = Number(contentLengthHeader ?? 0);
-  const MAX_CONTENT_LENGTH = 35 * 1024 * 1024;
-  if (Number.isFinite(contentLength) && contentLength > MAX_CONTENT_LENGTH) {
-    logStructured("warn", "Payload too large", {
-      correlationId,
-      contentLength,
-    });
-    return respondWithError(
-      "Payload too large",
-      413,
-      baseHeaders,
-      correlationId
-    );
-  }
-
   const rateStatus = enforceRateLimit(clientId);
   if (!rateStatus.allowed) {
     const retryAfterSeconds = Math.max(
