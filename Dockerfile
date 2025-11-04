@@ -24,8 +24,6 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# This will do the trick, use the corresponding env file for each environment.
-COPY .env.production.sample .env.production
 RUN npm run build
 
 # 3. Production image, copy all the files and run next
@@ -58,11 +56,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/server-https.js ./
 COPY --from=builder /app/scripts ./scripts
-COPY --from=builder --chown=nextjs:nodejs /app/.env.production.secrets ./
+COPY --from=builder --chown=nextjs:nodejs /app/.env.production.secrets ./.env
 
 # Torna os scripts executáveis e ajusta permissões
 RUN chmod +x scripts/*.sh && \
-    chown nextjs:nodejs .env.production.secrets
+    chown nextjs:nodejs .env
 
 USER nextjs
 
