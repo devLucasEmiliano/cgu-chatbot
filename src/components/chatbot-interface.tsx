@@ -1950,6 +1950,7 @@ export function ChatbotInterface({
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={translations.placeholder[language]}
                   className="flex-1 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                  maxLength={currentStep === "unfcccNumber" ? 100 : undefined}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       handleInputSubmit();
