@@ -21,7 +21,12 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import Image from "next/image";
 import { ScrollArea } from "@/src/components/ui/scroll-area";
-import { COUNTRIES, findCountryCodeByName } from "@/src/lib/cgu/countries";
+import {
+  COUNTRIES,
+  type Country,
+  findCountryCodeByName,
+  getCountryLabel,
+} from "@/src/lib/cgu/countries";
 
 interface ChatbotInterfaceProps {
   language: Language;
@@ -260,10 +265,17 @@ export function ChatbotInterface({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isCountryOpen, setIsCountryOpen] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<{
-    codigo: number;
-    descricao: string;
-  } | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const countryOptions = useMemo(
+    () =>
+      COUNTRIES.map((country) => ({
+        country,
+        label:
+          getCountryLabel(country.codigo, language) ??
+          country.names["pt-BR"],
+      })),
+    [language]
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const descriptionPlaceholder = useMemo(
@@ -1937,7 +1949,8 @@ export function ChatbotInterface({
                         }
                       >
                         {selectedCountry
-                          ? selectedCountry.descricao
+                          ? getCountryLabel(selectedCountry.codigo, language) ??
+                            selectedCountry.names["pt-BR"]
                           : language === "pt-BR"
                           ? "Selecione seu pais/naturalidade..."
                           : language === "en"
@@ -1952,7 +1965,7 @@ export function ChatbotInterface({
                     className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[300px]"
                   >
                     <ScrollArea className="h-[280px]">
-                      {COUNTRIES.map((country) => (
+                      {countryOptions.map(({ country, label }) => (
                         <DropdownMenuItem
                           key={country.codigo}
                           onClick={() => {
@@ -1961,7 +1974,7 @@ export function ChatbotInterface({
                           }}
                           className="cursor-pointer"
                         >
-                          {country.descricao}
+                          {label}
                         </DropdownMenuItem>
                       ))}
                     </ScrollArea>
@@ -1970,7 +1983,10 @@ export function ChatbotInterface({
                 <Button
                   onClick={() => {
                     if (selectedCountry) {
-                      handleTextInput(selectedCountry.descricao);
+                      const label =
+                        getCountryLabel(selectedCountry.codigo, language) ??
+                        selectedCountry.names["pt-BR"];
+                      handleTextInput(label);
                       setSelectedCountry(null);
                     }
                   }}
