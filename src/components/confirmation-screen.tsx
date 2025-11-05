@@ -91,9 +91,9 @@ const translations = {
   },
   redirectSubtitle: {
     "pt-BR":
-      "Para manifestações originadas no Brasil, utilize o serviço oficial Fala.BR.",
-    en: "For manifestations originating in Brazil, please use the official Fala.BR service.",
-    es: "Para manifestaciones originadas en Brasil, utilice el servicio oficial Fala.BR.",
+      "Para manifestações de cidadãos brasileiros, utilize o serviço oficial Fala.BR.",
+    en: "For manifestations from Brazilian citizens, please use the official Fala.BR service.",
+    es: "Para manifestaciones de ciudadanos brasileños, utilice el servicio oficial Fala.BR.",
   },
   redirectNotice: {
     "pt-BR":
