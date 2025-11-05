@@ -355,10 +355,10 @@ export function ChatbotInterface({
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "Você já leu e aceitou os Termos de Uso."
+          ? "Você já leu e aceitou os Termo de Uso e Política de Privacidade."
           : language === "en"
-          ? "You have read and accepted the Terms of Use."
-          : "Usted ha leído y aceptado los Términos de Uso.",
+          ? "You have read and accepted the Terms of Use and Privacy Policy."
+          : "Usted ha leído y aceptado los Términos de Uso y Política de Privacidad.",
         0
       );
     }, 1000);
