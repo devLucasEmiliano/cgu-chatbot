@@ -29,8 +29,7 @@ const translations = {
     es: "Términos de Uso y Política de Privacidad",
   },
   content: {
-    "pt-BR": `**Termo de Uso e Política de Privacidade**
-O Canal FalaCOP30 foi pensado especialmente para que sejam encaminhadas ao governo brasileiro manifestações como sugestões, elogios, denúncias, reclamações ou solicitações relacionadas à COP30, sempre com respeito à sua voz e ao compromisso com a transparência e integridade.
+    "pt-BR": `  O Canal FalaCOP30 foi pensado especialmente para que sejam encaminhadas ao governo brasileiro manifestações como sugestões, elogios, denúncias, reclamações ou solicitações relacionadas à COP30, sempre com respeito à sua voz e ao compromisso com a transparência e integridade.
 
 O prazo para atendimento das manifestações registradas neste formulário é de 30 dias, prorrogável por igual período.
 
@@ -129,8 +128,7 @@ A Controladoria-Geral da União pode descontinuar ou modificar o FalaCOP30 a qua
 
 2.10. Contato
 Para dúvidas, sugestões ou solicitações relacionadas à Política de Privacidade do FalaCOP30, entre em contato com a Ouvidoria da Controladoria-Geral da União, por meio da Plataforma Fala.BR: [https://falabr.cgu.gov.br](https://falabr.cgu.gov.br).`,
-    en: `**Terms of Use and Privacy Policy**
-The FalaCOP30 Channel was created to collect suggestions, compliments, reports, complaints, or requests related to COP30 that are sent to the Brazilian government, always respecting your voice and honoring the commitment to transparency and integrity.
+    en: `  The FalaCOP30 Channel was created to collect suggestions, compliments, reports, complaints, or requests related to COP30 that are sent to the Brazilian government, always respecting your voice and honoring the commitment to transparency and integrity.
 
 The response time for submissions registered in this form is 30 days, which may be extended once for the same period.
 
@@ -229,8 +227,7 @@ The CGU may discontinue or modify FalaCOP30 at any time, ensuring that users are
 
 2.10. Contact
 For questions, suggestions, or requests related to the FalaCOP30 Privacy Policy, contact the CGU Ombuds Office via the Fala.BR Platform: [https://falabr.cgu.gov.br](https://falabr.cgu.gov.br).`,
-    es: `**Términos de Uso y Política de Privacidad**
-El Canal FalaCOP30 fue concebido para recibir sugerencias, elogios, denuncias, quejas o solicitudes relacionadas con la COP30 dirigidas al gobierno brasileño, siempre respetando su voz y el compromiso con la transparencia y la integridad.
+    es: `  El Canal FalaCOP30 fue concebido para recibir sugerencias, elogios, denuncias, quejas o solicitudes relacionadas con la COP30 dirigidas al gobierno brasileño, siempre respetando su voz y el compromiso con la transparencia y la integridad.
 
 El plazo para atender las manifestaciones registradas en este formulario es de 30 días, prorrogable por igual período.
 
