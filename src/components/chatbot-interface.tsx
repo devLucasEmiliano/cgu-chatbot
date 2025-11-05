@@ -367,10 +367,10 @@ export function ChatbotInterface({
     setTimeout(() => {
       addBotMessage(
         language === "pt-BR"
-          ? "Você gostaria de Consultar ou Cadastrar uma manifestação?"
+          ? "Você gostaria de Cadastrar ou Consultar uma manifestação?"
           : language === "en"
-          ? "Would you like to Consult or Register a manifestation?"
-          : "¿Le gustaría Consultar o Registrar una manifestación?",
+          ? "Would you like to Register or Consulta manifestation?"
+          : "¿Le gustaría Registrar o Consultar una manifestación?",
         0,
         [
           {
