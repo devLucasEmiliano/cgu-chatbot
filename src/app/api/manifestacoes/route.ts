@@ -7,8 +7,8 @@ import type { ManifestacaoRequestDTO } from "@/src/lib/cgu/types";
 
 export const runtime = "nodejs";
 
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX_REQUESTS = 60;
+const RATE_LIMIT_WINDOW_MS = 120_000;
+const RATE_LIMIT_MAX_REQUESTS = 5;
 const RATE_LIMIT_MESSAGE = "Muitas solicitacoes. Tente novamente em breve.";
 const rateLimitBucket = new Map<string, { count: number; expiresAt: number }>();
 

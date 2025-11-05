@@ -2,7 +2,14 @@
 
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
-import { CheckCircle2, Download, Home } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Download,
+  Home,
+  XCircle,
+} from "lucide-react";
+import type { CSSProperties } from "react";
 import type { Language, SubmitResult } from "@/src/app/page";
 import Image from "next/image";
 import { jsPDF } from "jspdf";
@@ -139,6 +146,39 @@ export function ConfirmationScreen({
   const meta = result.success ? result.meta : undefined;
   const isBrazilRedirect = Boolean(meta?.redirectToFalaBr);
   const anonymousView = isAnonymous || Boolean(meta?.isAnonymousReport);
+  const isWarningState = isSuccess && isBrazilRedirect;
+  const isErrorState = !isSuccess;
+  const IconComponent = isErrorState
+    ? XCircle
+    : isWarningState
+      ? AlertTriangle
+      : CheckCircle2;
+  const iconBackgroundClass = isErrorState
+    ? "from-red-100 to-red-50"
+    : isWarningState
+      ? "from-amber-100 to-amber-50"
+      : "from-primary/20 to-primary/10";
+  const iconForegroundClass = isErrorState
+    ? "text-red-500"
+    : isWarningState
+      ? "text-amber-500"
+      : "text-primary";
+  type GlowStyle = CSSProperties & {
+    "--pulse-glow-color"?: string;
+    "--pulse-glow-color-fade"?: string;
+  };
+
+  const iconStyle: GlowStyle = {
+    animationDelay: "200ms",
+  };
+
+  if (isWarningState) {
+    iconStyle["--pulse-glow-color"] = "oklch(0.92 0.09 95 / 0.45)";
+    iconStyle["--pulse-glow-color-fade"] = "oklch(0.92 0.09 95 / 0)";
+  } else if (isErrorState) {
+    iconStyle["--pulse-glow-color"] = "oklch(0.78 0.14 25 / 0.45)";
+    iconStyle["--pulse-glow-color-fade"] = "oklch(0.78 0.14 25 / 0)";
+  }
   const titleText = isSuccess
     ? isBrazilRedirect
       ? translations.redirectTitle[language]
@@ -263,10 +303,12 @@ export function ConfirmationScreen({
         <div className="flex flex-col items-center text-center space-y-5 md:space-y-6">
           {/* Success icon with pulse */}
           <div
-            className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center animate-pulse-glow animate-in zoom-in duration-500"
-            style={{ animationDelay: "200ms" }}
+            className={`w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br ${iconBackgroundClass} flex items-center justify-center animate-pulse-glow animate-in zoom-in duration-500`}
+            style={iconStyle}
           >
-            <CheckCircle2 className="w-12 h-12 md:w-14 md:h-14 text-primary" />
+            <IconComponent
+              className={`w-12 h-12 md:w-14 md:h-14 ${iconForegroundClass}`}
+            />
           </div>
 
           {/* Title and subtitle */}
