@@ -24,8 +24,6 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# This will do the trick, use the corresponding env file for each environment.
-COPY .env.production.sample .env.production
 RUN npm run build
 
 # 3. Production image, copy all the files and run next
@@ -37,18 +35,42 @@ ENV NODE_ENV=production
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
+# Instala AWS CLI
+RUN apk add --no-cache aws-cli
+
+# Gera certificado SSL para comunicação encriptada com Load Balancer
+RUN apk add --no-cache openssl && \
+    openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 \
+    -subj "/C=BR/ST=DF/L=Brasilia/O=CGU/CN=*.cgu.gov.br" \
+    -keyout /etc/ssl/private/server.key \
+    -out /etc/ssl/certs/server.crt && \
+    chown nextjs:nodejs /etc/ssl/private/server.key /etc/ssl/certs/server.crt && \
+    chmod 600 /etc/ssl/private/server.key && \
+    chmod 644 /etc/ssl/certs/server.crt
+
 COPY --from=builder /app/public ./public
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/server-https.js ./
+COPY --from=builder /app/scripts ./scripts
+COPY --from=builder --chown=nextjs:nodejs /app/.env.production.secrets ./.env
 
+# Torna os scripts executáveis e ajusta permissões
+RUN chmod +x scripts/*.sh && \
+    chown nextjs:nodejs .env
 
-USER nextjs
+COPY scripts/replace_secrets.sh scripts/aws_secrets_patch.sh /usr/local/bin/
 
-EXPOSE 3000
+# USER nextjs
 
-ENV PORT=3000
+EXPOSE 8083
 
-CMD HOSTNAME="0.0.0.0" node server.js
+ENV PORT=8083
+
+ENTRYPOINT ["./scripts/entrypoint.sh"]
+
+# CMD ["sh", "-c", "HOSTNAME=0.0.0.0 node server-https.js"]
+CMD ["sh", "-c", "HOSTNAME=0.0.0.0 node server.js"]

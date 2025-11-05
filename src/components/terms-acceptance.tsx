@@ -28,14 +28,8 @@ const translations = {
     en: "Terms of Use",
     es: "Términos de Uso",
   },
-  subtitle: {
-    "pt-BR":
-      "Ao aceitar, você concorda com os termos e pode prosseguir com o registro de sua solicitação.",
-    en: "By accepting, you agree to the terms and can proceed with registering your request.",
-    es: "Al aceptar, usted acepta los términos y puede proceder con el registro de su solicitud.",
-  },
   content: {
-    "pt-BR": `Este canal foi projetado especialmente para manifestações como sugestões, elogios, denúncias, reclamações ou solicitações relacionadas à COP30 a serem encaminhadas ao governo brasileiro, sempre com respeito à sua voz e compromisso com a transparência e integridade.
+    "pt-BR": `Este canal foi pensado especialmente para que sejam encaminhadas ao governo brasileiro manifestações como sugestões, elogios, denúncias, reclamações ou solicitações relacionadas à COP30, sempre com respeito à sua voz e ao compromisso com a transparência e integridade.
 
 **Prazo de Atendimento**
 
@@ -43,55 +37,37 @@ O prazo para atendimento das manifestações registradas neste formulário é de
 
 **Informações Importantes**
 
-Antes de iniciar o formulário, aconselhamos verificar se já existe um canal apropriado para encaminhar sua solicitação. Para casos específicos, utilizar os canais abaixo pode fornecer soluções mais rápidas:
-
-a) Denúncias Trabalhistas: Acesse [https://mpt.mp.br/pgt/servicos/servico-denuncia](https://mpt.mp.br/pgt/servicos/servico-denuncia) (sistema em português)
-
-b) Reclamações sobre serviços de acomodação e transporte: Denuncie em [https://falabr.cgu.gov.br](https://falabr.cgu.gov.br)
-
-c) Incidentes na Zona Azul: Denuncie em [https://falabr.cgu.gov.br](https://falabr.cgu.gov.br)
+Antes de iniciar o formulário, orientamos que verifique se já existe canal adequado para encaminhamento da sua demanda em [https://cop30.br/pt-br/servicos-da-cop30/fale-conosco](https://cop30.br/pt-br/servicos-da-cop30/fale-conosco). A utilização adequada dos canais indicados na página mencionada pode trazer maior tempestividade para soluções de casos específicos, como denúncias trabalhistas e problemas com serviços de hospedagem e transporte.
 
 **Plataforma Fala.BR**
 
-As manifestações registradas neste formulário serão processadas na Plataforma Fala.BR. A Plataforma Fala.BR é o canal oficial de comunicação entre o cidadão e o governo federal, gerenciado pela Controladoria-Geral da União (CGU).`,
-    en: `This channel was designed especially for manifestations such as suggestions, compliments, reports, complaints, or requests related to COP30 to be forwarded to the Brazilian government, always with respect for your voice and commitment to transparency and integrity.
+As manifestações registradas nesse formulário serão tratadas na Plataforma Fala.BR. A Plataforma Fala.BR é um canal integrado para encaminhamento de manifestações a órgãos e entidades do poder público brasileiro.`,
+    en: `This channel was designed specifically to forward expressions such as suggestions, compliments, complaints, or requests related to COP30 to the Brazilian government, always respecting your voice and the commitment to transparency and integrity.
 
-**Service Timeline**
+**Deadline for service**
 
 The deadline for addressing the manifestations registered in this form is 30 days, extendable for an equal period.
 
 **Important Information**
 
-Before starting the form, we advise you to check if there is already an appropriate channel for forwarding your request. For specific cases, using the channels below may provide quicker solutions:
-
-a) Labor Complaints: Access [https://mpt.mp.br/pgt/servicos/servico-denuncia](https://mpt.mp.br/pgt/servicos/servico-denuncia) (system in Portuguese language)
-
-b) Complaints regarding accommodation and transportation services: Report at [https://falabr.cgu.gov.br](https://falabr.cgu.gov.br)
-
-c) Incidents in the Blue Zone: Report at [https://falabr.cgu.gov.br](https://falabr.cgu.gov.br)
+Before starting the form, we advise you to check if there is already an appropriate channel for forwarding your request at [https://cop30.br/pt-br/servicos-da-cop30/fale-conosco](https://cop30.br/pt-br/servicos-da-cop30/fale-conosco). The proper use of the channels indicated on the mentioned page may provide quicker solutions to specific cases, such as labor complaints and complaints regarding accommodation and transportation services.
 
 **Fala.BR Platform**
 
-The manifestations registered in this form will be processed on the Fala.BR Platform. The Fala.BR Platform is the official communication channel between citizens and the federal government, managed by the Office of the Comptroller General (CGU).`,
-    es: `Este canal fue diseñado especialmente para manifestaciones como sugerencias, elogios, denuncias, quejas o solicitudes relacionadas con la COP30 para ser enviadas al gobierno brasileño, siempre con respeto a su voz y compromiso con la transparencia e integridad.
+The manifestations registered in this form will be processed on the Fala.BR Platform. The Fala.BR Platform is an integrated channel for forwarding manifestations to agencies and entities of the Brazilian public authorities.`,
+    es: `Este canal fue creado especialmente para que se envíen al gobierno brasileño solicitudes como sugerencias, felicitaciones, denuncias, reclamos o peticiones relacionadas con la COP30, siempre con respeto a su voz y al compromiso con la transparencia y la integridad.
 
-**Plazo de Atención**
+**Plazo para atender las solicitudes**
 
-El plazo para atender las manifestaciones registradas en este formulario es de 30 días, prorrogable por igual período.
+El plazo para atender las solicitudes registradas en este formulario es de 30 días, prorrogable por igual período.
 
 **Información Importante**
 
-Antes de iniciar el formulario, le aconsejamos verificar si ya existe un canal apropiado para enviar su solicitud. Para casos específicos, usar los canales a continuación puede proporcionar soluciones más rápidas:
-
-a) Denuncias Laborales: Acceda a [https://mpt.mp.br/pgt/servicos/servico-denuncia](https://mpt.mp.br/pgt/servicos/servico-denuncia) (sistema en portugués)
-
-b) Quejas sobre servicios de alojamiento y transporte: Denuncie en [https://falabr.cgu.gov.br](https://falabr.cgu.gov.br)
-
-c) Incidentes en la Zona Azul: Denuncie en [https://falabr.cgu.gov.br](https://falabr.cgu.gov.br)
+Antes de iniciar el formulario, le aconsejamos verificar si ya existe un canal apropiado para enviar su solicitud en [https://cop30.br/pt-br/servicos-da-cop30/fale-conosco](https://cop30.br/pt-br/servicos-da-cop30/fale-conosco). El uso de los canales indicados en la página mencionada puede proporcionar una solución más rápida de casos específicos, como denuncias laborales y quejas sobre servicios de hospedaje y transporte.
 
 **Plataforma Fala.BR**
 
-Las manifestaciones registradas en este formulario serán procesadas en la Plataforma Fala.BR. La Plataforma Fala.BR es el canal oficial de comunicación entre el ciudadano y el gobierno federal, gestionado por la Contraloría General de la Unión (CGU).`,
+Las manifestaciones registradas en este formulario serán tratadas en la Plataforma Fala.BR. La Plataforma Fala.BR es un canal integrado para el envío de manifestaciones a órganos y entidades del poder público brasileño.`,
   },
   checkboxLabel: {
     "pt-BR": "Li e aceito os termos de uso",
@@ -190,9 +166,6 @@ export function TermsAcceptance({
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2 text-balance">
                 {translations.title[language]}
               </h1>
-              <p className="text-xs md:text-sm text-muted-foreground text-balance">
-                {translations.subtitle[language]}
-              </p>
             </div>
 
             {onLanguageChange && (

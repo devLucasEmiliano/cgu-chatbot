@@ -97,9 +97,9 @@ const translations = {
   },
   redirectNotice: {
     "pt-BR":
-      "Para prosseguir com seu registro, acesse https://falabr.cgu.gov.br. Este atendimento foi encerrado aqui.",
-    en: "To continue your submission, visit https://falabr.cgu.gov.br. This session is now closed here.",
-    es: "Para continuar con su registro, acceda a https://falabr.cgu.gov.br. Esta atención se cerró aquí.",
+      "Para prosseguir com seu registro, acesse falabr.cgu.gov.br. Este atendimento foi encerrado aqui.",
+    en: "To continue your submission, visit falabr.cgu.gov.br. This session is now closed here.",
+    es: "Para continuar con su registro, acceda a falabr.cgu.gov.br. Esta atención se cerró aquí.",
   },
   redirectButton: {
     "pt-BR": "Ir para o Fala.BR",
