@@ -369,7 +369,7 @@ export function ChatbotInterface({
         language === "pt-BR"
           ? "Você gostaria de Cadastrar ou Consultar uma manifestação?"
           : language === "en"
-          ? "Would you like to Register or Consulta manifestation?"
+          ? "Would you like to Register or Consult a manifestation?"
           : "¿Le gustaría Registrar o Consultar una manifestación?",
         0,
         [
@@ -1708,7 +1708,7 @@ export function ChatbotInterface({
                       className="object-cover"
                     />
                     <AvatarFallback className="text-teal-700 text-lg">
-                      ð¤
+                      🤖
                     </AvatarFallback>
                   </Avatar>
                   <div className="bg-gray-100 rounded-2xl px-5 py-4 shadow-sm">
