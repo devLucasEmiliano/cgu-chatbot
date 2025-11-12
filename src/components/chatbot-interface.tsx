@@ -26,6 +26,7 @@ import {
   type Country,
   findCountryCodeByName,
   getCountryLabel,
+  getCountryOptions,
 } from "@/src/lib/cgu/countries";
 
 interface ChatbotInterfaceProps {
@@ -266,16 +267,14 @@ export function ChatbotInterface({
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
-  const countryOptions = useMemo(
-    () =>
-      COUNTRIES.map((country) => ({
-        country,
-        label:
-          getCountryLabel(country.codigo, language) ??
-          country.names["pt-BR"],
-      })),
-    [language]
-  );
+  // Opções de país ordenadas alfabeticamente conforme idioma selecionado
+  const countryOptions = useMemo(() => {
+    const opts = getCountryOptions(language);
+    return opts.map((o) => ({
+      country: COUNTRIES.find((c) => c.codigo === o.codigo)!,
+      label: o.label,
+    }));
+  }, [language]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const descriptionPlaceholder = useMemo(
@@ -1545,7 +1544,7 @@ export function ChatbotInterface({
         />
       </div>
 
-      <header className="bg-gradient-to-r from-teal-700 via-emerald-600 to-teal-600 text-white shadow-lg relative z-10 border-b-4 border-emerald-700/50">
+      <header className="bg-linear-to-r from-teal-700 via-emerald-600 to-teal-600 text-white shadow-lg relative z-10 border-b-4 border-emerald-700/50">
         <div className="container max-w-6xl mx-auto px-4 py-5 md:py-6">
           <div className="flex items-center justify-between gap-4 md:gap-6">
             <div className="flex items-center gap-3 md:gap-5 min-w-0">
@@ -1656,7 +1655,7 @@ export function ChatbotInterface({
                     }`}
                   >
                     <div
-                      className={`rounded-2xl px-4 py-3 transition-all duration-200 break-words overflow-wrap-anywhere ${
+                      className={`rounded-2xl px-4 py-3 transition-all duration-200 wrap-break-word overflow-wrap-anywhere ${
                         message.type === "user"
                           ? "bg-teal-500 text-white shadow-md"
                           : message.variant === "info"
@@ -1664,7 +1663,7 @@ export function ChatbotInterface({
                           : "bg-gray-100 text-gray-900 shadow-sm"
                       }`}
                     >
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap wrap-break-word">
                         {message.content}
                       </p>
                     </div>
@@ -1962,7 +1961,7 @@ export function ChatbotInterface({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="start"
-                    className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[300px]"
+                    className="w-(--radix-dropdown-menu-trigger-width) max-h-[300px]"
                   >
                     <ScrollArea className="h-[280px]">
                       {countryOptions.map(({ country, label }) => (
